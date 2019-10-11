@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	storage.Initialize("sqlite3", "./controller.db")
+	storage := storage.New("sqlite3", "./controller.db")
 	defer storage.Close()
 
 	server.Initialize(":8080")
