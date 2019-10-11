@@ -1,6 +1,6 @@
 create table cluster (
     ID      integer primary key asc,
-    cluster text not null
+    name    text not null
 );
 
 create table configuration_profile (
