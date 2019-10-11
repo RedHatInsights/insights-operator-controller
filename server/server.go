@@ -1,10 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"log"
 	"net/http"
@@ -42,31 +44,71 @@ func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	countEndpoint(request, start)
 }
 
-func getClusters(writer http.ResponseWriter, request *http.Request) {
+func getClusters(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	start := time.Now()
-	io.WriteString(writer, "Clusters\n")
+	clusters := storage.ListOfClusters()
+	json.NewEncoder(writer).Encode(clusters)
 	countEndpoint(request, start)
 }
 
-func getConfiguration(writer http.ResponseWriter, request *http.Request) {
+func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	start := time.Now()
-	io.WriteString(writer, "getConfiguration\n")
+	profiles := storage.ListConfigurationProfiles()
+	json.NewEncoder(writer).Encode(profiles)
 	countEndpoint(request, start)
 }
 
-func setConfiguration(writer http.ResponseWriter, request *http.Request) {
+func getConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
-	io.WriteString(writer, "setConfiguration\n")
+	io.WriteString(writer, "getConfigurationProfile\n")
 	countEndpoint(request, start)
 }
 
-func readConfiguration(writer http.ResponseWriter, request *http.Request) {
+func setConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
-	io.WriteString(writer, "operatorConfiguration\n")
+	io.WriteString(writer, "setConfigurationProfile\n")
 	countEndpoint(request, start)
 }
 
-func Initialize(address string) {
+func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "changeConfigurationProfile\n")
+	countEndpoint(request, start)
+}
+
+func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	cluster := mux.Vars(request)["cluster"]
+	start := time.Now()
+	configuration := storage.ListClusterConfiguration(cluster)
+	json.NewEncoder(writer).Encode(configuration)
+	countEndpoint(request, start)
+}
+
+func setClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "setClusterConfiguration")
+	countEndpoint(request, start)
+}
+
+func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "enableClusterConfiguration")
+	countEndpoint(request, start)
+}
+
+func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "disableClusterConfiguration")
+	countEndpoint(request, start)
+}
+
+func readConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "readConfigurationForOperator")
+	countEndpoint(request, start)
+}
+
+func Initialize(address string, storage storage.Storage) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -74,12 +116,21 @@ func Initialize(address string) {
 	router.HandleFunc(API_PREFIX, mainEndpoint)
 
 	// REST API endpoints used by client
-	router.HandleFunc(API_PREFIX+"client/clusters", getClusters).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/configuration/{id}", getConfiguration).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/configuration/{id}", setConfiguration).Methods("POST")
+	// configuration profiles
+	router.HandleFunc(API_PREFIX+"client/configuration_profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
+	router.HandleFunc(API_PREFIX+"client/configuration_profile/{id}", getConfigurationProfile).Methods("GET")
+	router.HandleFunc(API_PREFIX+"client/configuration_profile/{id}", changeConfigurationProfile).Methods("PUT")
+	router.HandleFunc(API_PREFIX+"client/configuration_profile", setConfigurationProfile).Methods("POST")
+
+	// clusters and its configurations
+	router.HandleFunc(API_PREFIX+"client/clusters", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
+	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
+	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}", setClusterConfiguration).Methods("POST", "PUT")
+	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}/enable", enableClusterConfiguration).Methods("POST", "PUT")
+	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}/disable", enableClusterConfiguration).Methods("POST", "PUT")
 
 	// REST API endpoints used by operator
-	router.HandleFunc(API_PREFIX+"operator/configuration", readConfiguration).Methods("GET")
+	router.HandleFunc(API_PREFIX+"operator/configuration", readConfigurationForOperator).Methods("GET")
 
 	// Prometheus metrics
 	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
