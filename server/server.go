@@ -82,6 +82,7 @@ func Initialize(address string, storage storage.Storage) {
 	// clusters-related operations
 	// (handlers are implemented in the file cluster.go)
 	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{id:[0-9]+}/{name}", func(w http.ResponseWriter, r *http.Request) { newCluster(w, r, storage) }).Methods("POST")
 	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/search", func(w http.ResponseWriter, r *http.Request) { searchCluster(w, r, storage) }).Methods("GET")
 
