@@ -49,37 +49,6 @@ func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	countEndpoint(request, start)
 }
 
-func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	start := time.Now()
-	profiles := storage.ListConfigurationProfiles()
-	json.NewEncoder(writer).Encode(profiles)
-	countEndpoint(request, start)
-}
-
-func getConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "getConfigurationProfile\n")
-	countEndpoint(request, start)
-}
-
-func setConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "setConfigurationProfile\n")
-	countEndpoint(request, start)
-}
-
-func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "deleteConfigurationProfile\n")
-	countEndpoint(request, start)
-}
-
-func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "changeConfigurationProfile\n")
-	countEndpoint(request, start)
-}
-
 func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster := mux.Vars(request)["cluster"]
 	start := time.Now()
@@ -145,10 +114,10 @@ func Initialize(address string, storage storage.Storage) {
 
 	// configuration profiles
 	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/profile/{id}", getConfigurationProfile).Methods("GET")
-	clientRouter.HandleFunc("/profile/{id}", changeConfigurationProfile).Methods("PUT")
-	clientRouter.HandleFunc("/profile", setConfigurationProfile).Methods("POST")
-	clientRouter.HandleFunc("/profile/{id}", deleteConfigurationProfile).Methods("DELETE")
+	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { getConfigurationProfile(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { changeConfigurationProfile(w, r, storage) }).Methods("PUT")
+	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { newConfigurationProfile(w, r, storage) }).Methods("POST")
+	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfigurationProfile(w, r, storage) }).Methods("DELETE")
 
 	// clusters and its configurations
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")

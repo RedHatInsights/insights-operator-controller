@@ -74,8 +74,6 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 			log.Println("error", err)
 		}
 	}
-	rows.Close()
-
 	return clusters, nil
 }
 
@@ -102,7 +100,6 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 	} else {
 		return cluster, errors.New("Unknown cluster ID provided")
 	}
-	rows.Close()
 	return cluster, err
 }
 
@@ -129,14 +126,16 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	} else {
 		return cluster, errors.New("Unknown cluster ID provided")
 	}
-	rows.Close()
 	return cluster, err
 }
 
-func (storage Storage) ListConfigurationProfiles() []ConfigurationProfile {
+func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, error) {
 	profiles := []ConfigurationProfile{}
 
 	rows, err := storage.connections.Query("SELECT id, configuration, changed_at, changed_by, description FROM configuration_profile")
+	if err != nil {
+		return profiles, err
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -154,7 +153,90 @@ func (storage Storage) ListConfigurationProfiles() []ConfigurationProfile {
 		}
 	}
 
-	return profiles
+	return profiles, nil
+}
+
+func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, error) {
+	var profile ConfigurationProfile
+
+	rows, err := storage.connections.Query("SELECT id, configuration, changed_at, changed_by, description FROM configuration_profile WHERE id = ?", id)
+	if err != nil {
+		return profile, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var id int
+		var configuration string
+		var changed_at string
+		var changed_by string
+		var description string
+
+		err = rows.Scan(&id, &configuration, &changed_at, &changed_by, &description)
+		if err == nil {
+			profile.Id = id
+			profile.Configuration = configuration
+			profile.ChangedAt = changed_at
+			profile.ChangedBy = changed_by
+			profile.Description = description
+		} else {
+			log.Println("error", err)
+		}
+	} else {
+		return profile, errors.New("Unknown configuration profile ID provided")
+	}
+	return profile, err
+}
+
+func (storage Storage) StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error) {
+	var profiles []ConfigurationProfile
+
+	statement, err := storage.connections.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		return profiles, err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(configuration, "?", username, description)
+	if err != nil {
+		return profiles, err
+	}
+
+	return storage.ListConfigurationProfiles()
+}
+
+func (storage Storage) ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error) {
+	var profiles []ConfigurationProfile
+
+	statement, err := storage.connections.Prepare("UPDATE configuration_profile SET configuration=?, changed_at=?, changed_by=?, description=? WHERE id=?")
+	if err != nil {
+		return profiles, err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(configuration, "?", username, description, id)
+	if err != nil {
+		return profiles, err
+	}
+
+	return storage.ListConfigurationProfiles()
+}
+
+func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfile, error) {
+	var profiles []ConfigurationProfile
+
+	statement, err := storage.connections.Prepare("DELETE FROM configuration_profile WHERE id=?")
+	if err != nil {
+		return profiles, err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(id)
+	if err != nil {
+		return profiles, err
+	}
+
+	return storage.ListConfigurationProfiles()
 }
 
 func (storage Storage) ListClusterConfiguration(cluster string) []ClusterConfiguration {

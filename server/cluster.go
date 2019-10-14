@@ -67,5 +67,4 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Either cluster ID or name needs to be specified")
 	}
-
 }
