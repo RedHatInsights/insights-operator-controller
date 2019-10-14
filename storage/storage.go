@@ -301,38 +301,26 @@ SELECT operator_configuration.id
 	}
 }
 
-func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
-	clusterId, err := storage.GetConfigurationIdForCluster(cluster)
-
-	if err != nil {
-		return []ClusterConfiguration{}, err
-	}
-
-	tx, err := storage.connections.Begin()
-	if err != nil {
-		log.Println("Transaction failed")
-		return []ClusterConfiguration{}, err
-	}
-
+func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool {
 	t := time.Now()
 
 	statement, err := tx.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
 	if err != nil {
-		_ = tx.Rollback()
-		return []ClusterConfiguration{}, err
+		return false
 	}
 	defer statement.Close()
 
 	_, err = statement.Exec(configuration, t, username, description)
 	if err != nil {
-		_ = tx.Rollback()
-		return []ClusterConfiguration{}, err
+		return false
 	}
+	return true
+}
 
+func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 	rows, err := tx.Query(`SELECT rowid FROM configuration_profile ORDER BY rowid DESC limit 1`)
 	if err != nil {
-		_ = tx.Rollback()
-		return []ClusterConfiguration{}, err
+		return -1, err
 	}
 	defer rows.Close()
 
@@ -340,32 +328,77 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 		var configurationId int
 		err = rows.Scan(&configurationId)
 		log.Printf("Configuration stored under ID=%d\n", configurationId)
+		return configurationId, nil
+	} else {
+		return -1, errors.New("can not retrieve last configuration ID")
+	}
+}
 
-		stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster=?")
-		defer stmt.Close()
-		if err != nil {
-			_ = tx.Rollback()
-			return []ClusterConfiguration{}, err
-		}
-		_, err = stmt.Exec(clusterId)
-		if err != nil {
-			_ = tx.Rollback()
-			return []ClusterConfiguration{}, err
-		}
+func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterId int) error {
+	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster=?")
+	defer stmt.Close()
 
-		statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES (?, ?, ?, ?, ?, ?)")
-		defer statement.Close()
-		if err != nil {
-			_ = tx.Rollback()
-			return []ClusterConfiguration{}, err
-		}
-		_, err = statement.Exec(clusterId, configurationId, t, username, "1", reason)
-		if err != nil {
-			_ = tx.Rollback()
-			return []ClusterConfiguration{}, err
-		}
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(clusterId)
+	return err
+}
+
+func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int, configurationId int, username string, reason string) error {
+	t := time.Now()
+	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES (?, ?, ?, ?, ?, ?)")
+	defer statement.Close()
+	if err != nil {
+		return err
 	}
 
+	_, err = statement.Exec(clusterId, configurationId, t, username, "1", reason)
+	return err
+}
+
+func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
+	// retrieve cluster ID
+	clusterId, err := storage.GetConfigurationIdForCluster(cluster)
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+
+	// begin transaction
+	tx, err := storage.connections.Begin()
+	if err != nil {
+		log.Println("Transaction failed")
+		return []ClusterConfiguration{}, err
+	}
+
+	// insert new configuration profile
+	if !storage.InsertNewConfigurationProfile(tx, configuration, username, description) {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+
+	// retrieve configuration ID for newly created configuration
+	configurationId, err := storage.SelectConfigurationProfileId(tx)
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+
+	// deactivate all previous configurations
+	err = storage.DeactivatePreviousConfigurations(tx, clusterId)
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+
+	// and insert new one that will be activated
+	err = storage.InsertNewOperatorConfiguration(tx, clusterId, configurationId, username, reason)
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+
+	// end the transaction
 	if err := tx.Commit(); err != nil {
 		return []ClusterConfiguration{}, err
 	}
