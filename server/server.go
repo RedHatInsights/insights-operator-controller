@@ -29,7 +29,6 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 
 func countEndpoint(request *http.Request, start time.Time) {
 	url := request.URL.String()
-	log.Printf("Request URL: %s\n", url)
 	duration := time.Since(start)
 	log.Printf("Time to serve the page: %s\n", duration)
 
@@ -117,9 +116,23 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 	countEndpoint(request, start)
 }
 
+func logRequestHandler(writer http.ResponseWriter, request *http.Request, nextHandler http.Handler) {
+	log.Println("Request URI: " + request.RequestURI)
+	log.Println("Request method: " + request.Method)
+	nextHandler.ServeHTTP(writer, request)
+}
+
+func logRequest(nextHandler http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(writer http.ResponseWriter, request *http.Request) {
+			logRequestHandler(writer, request, nextHandler)
+		})
+}
+
 func Initialize(address string, storage storage.Storage) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
+	router.Use(logRequest)
 
 	// common REST API endpoints
 	router.HandleFunc(API_PREFIX, mainEndpoint)
