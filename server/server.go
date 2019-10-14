@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -46,32 +45,6 @@ func retrieveIdRequestParameter(request *http.Request) (int64, error) {
 func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	io.WriteString(writer, "Hello world!\n")
-	countEndpoint(request, start)
-}
-
-func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	cluster := mux.Vars(request)["cluster"]
-	start := time.Now()
-	configuration := storage.ListClusterConfiguration(cluster)
-	json.NewEncoder(writer).Encode(configuration)
-	countEndpoint(request, start)
-}
-
-func setClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "setClusterConfiguration")
-	countEndpoint(request, start)
-}
-
-func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "enableClusterConfiguration")
-	countEndpoint(request, start)
-}
-
-func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "disableClusterConfiguration")
 	countEndpoint(request, start)
 }
 
@@ -121,9 +94,9 @@ func Initialize(address string, storage storage.Storage) {
 
 	// clusters and its configurations
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}", setClusterConfiguration).Methods("POST", "PUT")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}/enable", enableClusterConfiguration).Methods("POST", "PUT")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}/disable", enableClusterConfiguration).Methods("POST", "PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage) }).Methods("POST")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage) }).Methods("PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage) }).Methods("PUT")
 
 	// REST API endpoints used by operator
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()

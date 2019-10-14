@@ -5,6 +5,7 @@ import (
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"time"
 )
 
 type Storage struct {
@@ -191,13 +192,15 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 func (storage Storage) StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
+	t := time.Now()
+
 	statement, err := storage.connections.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return profiles, err
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(configuration, "?", username, description)
+	_, err = statement.Exec(configuration, t, username, description)
 	if err != nil {
 		return profiles, err
 	}
@@ -208,13 +211,15 @@ func (storage Storage) StoreConfigurationProfile(username string, description st
 func (storage Storage) ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
+	t := time.Now()
+
 	statement, err := storage.connections.Prepare("UPDATE configuration_profile SET configuration=?, changed_at=?, changed_by=?, description=? WHERE id=?")
 	if err != nil {
 		return profiles, err
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(configuration, "?", username, description, id)
+	_, err = statement.Exec(configuration, t, username, description, id)
 	if err != nil {
 		return profiles, err
 	}
@@ -239,7 +244,7 @@ func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfil
 	return storage.ListConfigurationProfiles()
 }
 
-func (storage Storage) ListClusterConfiguration(cluster string) []ClusterConfiguration {
+func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
 	configurations := []ClusterConfiguration{}
 
 	rows, err := storage.connections.Query(`
@@ -248,6 +253,9 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
     ON cluster.id = operator_configuration.cluster
  WHERE cluster.name=?`, cluster)
 
+	if err != nil {
+		return configurations, err
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -268,5 +276,138 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 	}
 	rows.Close()
 
-	return configurations
+	return configurations, nil
+}
+
+func (storage Storage) GetConfigurationIdForCluster(cluster string) (int, error) {
+	rows, err := storage.connections.Query(`
+SELECT operator_configuration.id
+  FROM operator_configuration, cluster
+    ON cluster.id = operator_configuration.cluster
+ WHERE cluster.name=?`, cluster)
+
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var id int
+
+		err = rows.Scan(&id)
+		return id, err
+	} else {
+		return 0, errors.New("Unknown operator name provided")
+	}
+}
+
+func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
+	clusterId, err := storage.GetConfigurationIdForCluster(cluster)
+
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+
+	tx, err := storage.connections.Begin()
+	if err != nil {
+		log.Println("Transaction failed")
+		return []ClusterConfiguration{}, err
+	}
+
+	t := time.Now()
+
+	statement, err := tx.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(configuration, t, username, description)
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+
+	rows, err := tx.Query(`SELECT rowid FROM configuration_profile ORDER BY rowid DESC limit 1`)
+	if err != nil {
+		_ = tx.Rollback()
+		return []ClusterConfiguration{}, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var configurationId int
+		err = rows.Scan(&configurationId)
+		log.Printf("Configuration stored under ID=%d\n", configurationId)
+
+		stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster=?")
+		defer stmt.Close()
+		if err != nil {
+			_ = tx.Rollback()
+			return []ClusterConfiguration{}, err
+		}
+		_, err = stmt.Exec(clusterId)
+		if err != nil {
+			_ = tx.Rollback()
+			return []ClusterConfiguration{}, err
+		}
+
+		statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES (?, ?, ?, ?, ?, ?)")
+		defer statement.Close()
+		if err != nil {
+			_ = tx.Rollback()
+			return []ClusterConfiguration{}, err
+		}
+		_, err = statement.Exec(clusterId, configurationId, t, username, "1", reason)
+		if err != nil {
+			_ = tx.Rollback()
+			return []ClusterConfiguration{}, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return []ClusterConfiguration{}, err
+	}
+
+	return storage.ListClusterConfiguration(cluster)
+}
+
+func (storage Storage) EnableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
+	id, err := storage.GetConfigurationIdForCluster(cluster)
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=1, changed_at=?, changed_by=?, reason=? WHERE id=?")
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	defer statement.Close()
+
+	t := time.Now()
+
+	_, err = statement.Exec(t, username, reason, id)
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	return storage.ListClusterConfiguration(cluster)
+}
+
+// TODO: copy & paste, needs to be refactored later
+func (storage Storage) DisableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
+	id, err := storage.GetConfigurationIdForCluster(cluster)
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=0, changed_at=?, changed_by=?, reason=? WHERE id=?")
+	defer statement.Close()
+
+	t := time.Now()
+
+	_, err = statement.Exec(t, username, reason, id)
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	return storage.ListClusterConfiguration(cluster)
 }
