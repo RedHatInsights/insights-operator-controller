@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -37,6 +38,11 @@ func countEndpoint(request *http.Request, start time.Time) {
 	apiResponses.With(prometheus.Labels{"url": url}).Observe(float64(duration.Microseconds()))
 }
 
+func retrieveIdRequestParameter(request *http.Request) (int64, error) {
+	id_var := mux.Vars(request)["id"]
+	return strconv.ParseInt(id_var, 10, 0)
+}
+
 func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	io.WriteString(writer, "Hello world!\n")
@@ -51,6 +57,17 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 }
 
 func getClusterById(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, err := retrieveIdRequestParameter(request)
+	if err == nil {
+		cluster, err := storage.GetCluster(int(id))
+		if err == nil {
+			json.NewEncoder(writer).Encode(cluster)
+		} else {
+			io.WriteString(writer, err.Error())
+		}
+	} else {
+		io.WriteString(writer, "Error reading cluster ID\n")
+	}
 }
 
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -142,7 +159,7 @@ func Initialize(address string, storage storage.Storage) {
 	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
 	// clusters-related operations
 	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{id}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
 
 	// configuration profiles
 	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")

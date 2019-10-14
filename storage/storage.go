@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 )
@@ -73,6 +74,33 @@ func (storage Storage) ListOfClusters() []Cluster {
 	rows.Close()
 
 	return clusters
+}
+
+func (storage Storage) GetCluster(id int) (Cluster, error) {
+	var cluster Cluster
+
+	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE id = ?", id)
+	if err != nil {
+		return cluster, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var id int
+		var name string
+
+		err = rows.Scan(&id, &name)
+		if err == nil {
+			cluster.Id = id
+			cluster.Name = name
+		} else {
+			log.Println("error", err)
+		}
+	} else {
+		return cluster, errors.New("Unknown cluster ID provided")
+	}
+	rows.Close()
+	return cluster, err
 }
 
 func (storage Storage) ListConfigurationProfiles() []ConfigurationProfile {
