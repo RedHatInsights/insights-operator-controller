@@ -51,6 +51,9 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 	countEndpoint(request, start)
 }
 
+func getClusterById(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+}
+
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	start := time.Now()
 	profiles := storage.ListConfigurationProfiles()
@@ -67,6 +70,12 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request) 
 func setConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	io.WriteString(writer, "setConfigurationProfile\n")
+	countEndpoint(request, start)
+}
+
+func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	start := time.Now()
+	io.WriteString(writer, "deleteConfigurationProfile\n")
 	countEndpoint(request, start)
 }
 
@@ -116,26 +125,35 @@ func Initialize(address string, storage storage.Storage) {
 	router.HandleFunc(API_PREFIX, mainEndpoint)
 
 	// REST API endpoints used by client
+
+	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
+	// clusters-related operations
+	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{id}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
+
 	// configuration profiles
-	router.HandleFunc(API_PREFIX+"client/configuration_profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/configuration_profile/{id}", getConfigurationProfile).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/configuration_profile/{id}", changeConfigurationProfile).Methods("PUT")
-	router.HandleFunc(API_PREFIX+"client/configuration_profile", setConfigurationProfile).Methods("POST")
+	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/profile/{id}", getConfigurationProfile).Methods("GET")
+	clientRouter.HandleFunc("/profile/{id}", changeConfigurationProfile).Methods("PUT")
+	clientRouter.HandleFunc("/profile", setConfigurationProfile).Methods("POST")
+	clientRouter.HandleFunc("/profile/{id}", deleteConfigurationProfile).Methods("DELETE")
 
 	// clusters and its configurations
-	router.HandleFunc(API_PREFIX+"client/clusters", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
-	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}", setClusterConfiguration).Methods("POST", "PUT")
-	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}/enable", enableClusterConfiguration).Methods("POST", "PUT")
-	router.HandleFunc(API_PREFIX+"client/cluster/{cluster}/configuration/{id}/disable", enableClusterConfiguration).Methods("POST", "PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}", setClusterConfiguration).Methods("POST", "PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}/enable", enableClusterConfiguration).Methods("POST", "PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/{id}/disable", enableClusterConfiguration).Methods("POST", "PUT")
 
 	// REST API endpoints used by operator
-	router.HandleFunc(API_PREFIX+"operator/configuration", readConfigurationForOperator).Methods("GET")
+	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
+	operatorRouter.HandleFunc("/configuration", readConfigurationForOperator).Methods("GET")
 
 	// Prometheus metrics
 	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
 
-	err := http.ListenAndServe(":8080", router)
+	log.Println("Starting HTTP server at", address)
+
+	err := http.ListenAndServe(address, router)
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
 		os.Exit(2)
