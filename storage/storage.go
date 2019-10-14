@@ -54,10 +54,13 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
-func (storage Storage) ListOfClusters() []Cluster {
+func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	clusters := []Cluster{}
 
 	rows, err := storage.connections.Query("SELECT id, name FROM cluster")
+	if err != nil {
+		return clusters, err
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -73,13 +76,40 @@ func (storage Storage) ListOfClusters() []Cluster {
 	}
 	rows.Close()
 
-	return clusters
+	return clusters, nil
 }
 
 func (storage Storage) GetCluster(id int) (Cluster, error) {
 	var cluster Cluster
 
 	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE id = ?", id)
+	if err != nil {
+		return cluster, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var id int
+		var name string
+
+		err = rows.Scan(&id, &name)
+		if err == nil {
+			cluster.Id = id
+			cluster.Name = name
+		} else {
+			log.Println("error", err)
+		}
+	} else {
+		return cluster, errors.New("Unknown cluster ID provided")
+	}
+	rows.Close()
+	return cluster, err
+}
+
+func (storage Storage) GetClusterByName(name string) (Cluster, error) {
+	var cluster Cluster
+
+	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE name = ?", name)
 	if err != nil {
 		return cluster, err
 	}

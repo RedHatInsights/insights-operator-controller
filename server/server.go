@@ -49,27 +49,6 @@ func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	countEndpoint(request, start)
 }
 
-func getClusters(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	start := time.Now()
-	clusters := storage.ListOfClusters()
-	json.NewEncoder(writer).Encode(clusters)
-	countEndpoint(request, start)
-}
-
-func getClusterById(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	id, err := retrieveIdRequestParameter(request)
-	if err == nil {
-		cluster, err := storage.GetCluster(int(id))
-		if err == nil {
-			json.NewEncoder(writer).Encode(cluster)
-		} else {
-			io.WriteString(writer, err.Error())
-		}
-	} else {
-		io.WriteString(writer, "Error reading cluster ID\n")
-	}
-}
-
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	start := time.Now()
 	profiles := storage.ListConfigurationProfiles()
@@ -157,9 +136,12 @@ func Initialize(address string, storage storage.Storage) {
 	// REST API endpoints used by client
 
 	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
+
 	// clusters-related operations
+	// (handlers are implemented in the file cluster.go)
 	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/search", func(w http.ResponseWriter, r *http.Request) { searchCluster(w, r, storage) }).Methods("GET")
 
 	// configuration profiles
 	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
