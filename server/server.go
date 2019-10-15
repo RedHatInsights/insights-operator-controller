@@ -48,12 +48,6 @@ func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	countEndpoint(request, start)
 }
 
-func readConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
-	start := time.Now()
-	io.WriteString(writer, "readConfigurationForOperator")
-	countEndpoint(request, start)
-}
-
 func logRequestHandler(writer http.ResponseWriter, request *http.Request, nextHandler http.Handler) {
 	log.Println("Request URI: " + request.RequestURI)
 	log.Println("Request method: " + request.Method)
@@ -101,7 +95,7 @@ func Initialize(address string, storage storage.Storage) {
 
 	// REST API endpoints used by operator
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
-	operatorRouter.HandleFunc("/configuration", readConfigurationForOperator).Methods("GET")
+	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
 	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
