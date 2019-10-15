@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
@@ -23,5 +22,5 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 		io.WriteString(writer, err.Error())
 		return
 	}
-	json.NewEncoder(writer).Encode(configuration)
+	io.WriteString(writer, configuration)
 }
