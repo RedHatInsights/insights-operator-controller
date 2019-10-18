@@ -115,6 +115,17 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 	return err
 }
 
+func (storage Storage) DeleteCluster(id string) error {
+	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(id)
+	return err
+}
+
 func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	var cluster Cluster
 

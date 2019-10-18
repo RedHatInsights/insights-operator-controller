@@ -82,6 +82,36 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 	}
 }
 
+// Delete a cluster
+func deleteCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	clusterId, foundId := mux.Vars(request)["id"]
+
+	// check parameter provided by client
+	if !foundId {
+		log.Println("Cluster ID is not provided")
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Cluster ID needs to be specified")
+		return
+	}
+
+	err := storage.DeleteCluster(clusterId)
+	if err != nil {
+		log.Println("Cannot delete cluster", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(writer, err.Error())
+	}
+
+	clusters, err := storage.ListOfClusters()
+	if err != nil {
+		log.Println("Unable to get list of clusters", err)
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+	} else {
+		writer.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(writer).Encode(clusters)
+	}
+}
+
 // Search for a cluster specified by its ID or name.
 func searchCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	idParam, foundId := request.URL.Query()["id"]
