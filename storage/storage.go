@@ -13,7 +13,7 @@ type Storage struct {
 }
 
 func New(driverName string, dataSourceName string) Storage {
-	log.Println("Making connection to data storage")
+	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
 
 	if err != nil {
