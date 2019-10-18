@@ -57,6 +57,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
+		writer.WriteHeader(http.StatusCreated)
 		json.NewEncoder(writer).Encode(clusters)
 	}
 }
