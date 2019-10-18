@@ -2,6 +2,6 @@
 
 DATABASE=controller.db
 
-cat schema.sql | sqlite3 ../${DATABASE}
-cat test_data.sql | sqlite3 ../${DATABASE}
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
+cat "${SCRIPT_DIR}/schema.sql" | sqlite3 "${SCRIPT_DIR}/../${DATABASE}"
