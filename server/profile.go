@@ -77,14 +77,16 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Error reading profile ID from request\n")
+		return
 	}
 
 	profiles, err := storage.DeleteConfigurationProfile(int(id))
-	if err == nil {
-		json.NewEncoder(writer).Encode(profiles)
-	} else {
+	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
+	} else {
+		writer.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(writer).Encode(profiles)
 	}
 }
 
