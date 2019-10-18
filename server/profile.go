@@ -63,11 +63,12 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 	}
 
 	profiles, err := storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
-	if err == nil {
-		json.NewEncoder(writer).Encode(profiles)
-	} else {
+	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
+	} else {
+		writer.WriteHeader(http.StatusCreated)
+		json.NewEncoder(writer).Encode(profiles)
 	}
 }
 
@@ -77,14 +78,16 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Error reading profile ID from request\n")
+		return
 	}
 
 	profiles, err := storage.DeleteConfigurationProfile(int(id))
-	if err == nil {
-		json.NewEncoder(writer).Encode(profiles)
-	} else {
+	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
+	} else {
+		writer.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(writer).Encode(profiles)
 	}
 }
 
@@ -120,10 +123,11 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 	}
 
 	profiles, err := storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
-	if err == nil {
-		json.NewEncoder(writer).Encode(profiles)
-	} else {
+	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
+	} else {
+		writer.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(writer).Encode(profiles)
 	}
 }

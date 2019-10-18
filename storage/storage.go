@@ -13,7 +13,7 @@ type Storage struct {
 }
 
 func New(driverName string, dataSourceName string) Storage {
-	log.Println("Making connection to data storage")
+	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
 
 	if err != nil {
@@ -112,6 +112,17 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 	defer statement.Close()
 
 	_, err = statement.Exec(id, name)
+	return err
+}
+
+func (storage Storage) DeleteCluster(id string) error {
+	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(id)
 	return err
 }
 

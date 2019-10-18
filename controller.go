@@ -16,6 +16,7 @@ limitations under the License.
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/redhatinsighs/insights-operator-controller/server"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
@@ -28,6 +29,7 @@ import (
 // - start the HTTP server with all required endpints
 // - TODO: initialize connection to the logging service
 func main() {
+	// parse the configuration
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
@@ -35,7 +37,12 @@ func main() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
-	storage := storage.New("sqlite3", "./controller.db")
+	// parse all command-line arguments
+	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
+	storageSpecification := flag.String("storage", "./controller.db", "storage specification")
+	flag.Parse()
+
+	storage := storage.New(*dbDriver, *storageSpecification)
 	defer storage.Close()
 
 	server.Initialize(":8080", storage)
