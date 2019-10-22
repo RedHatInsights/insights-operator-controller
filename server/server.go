@@ -70,7 +70,6 @@ func Initialize(address string, storage storage.Storage) {
 	router.HandleFunc(API_PREFIX, mainEndpoint)
 
 	// REST API endpoints used by client
-
 	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
 
 	// clusters-related operations
@@ -95,8 +94,9 @@ func Initialize(address string, storage storage.Storage) {
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage) }).Methods("PUT")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage) }).Methods("PUT")
 
-	// REST API endpoints used by operator
+	// REST API endpoints used by insights operator
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
+	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage) }).Methods("GET")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
