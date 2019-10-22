@@ -302,6 +302,18 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 	return configurations, nil
 }
 
+func (storage Storage) ListAllClusterConfigurations() ([]ClusterConfiguration, error) {
+	rows, err := storage.connections.Query(`
+SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
+  FROM operator_configuration, cluster
+    ON cluster.id = operator_configuration.cluster`)
+
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	return storage.readClusterConfigurations(rows)
+}
+
 func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
