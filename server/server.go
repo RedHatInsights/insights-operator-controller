@@ -89,12 +89,15 @@ func Initialize(address string, storage storage.Storage) {
 	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfigurationProfile(w, r, storage) }).Methods("DELETE")
 
 	// clusters and its configurations
+	// (handlers are implemented in the file configuration.go)
+	clientRouter.HandleFunc("/configuration", func(w http.ResponseWriter, r *http.Request) { getAllConfigurations(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage) }).Methods("POST")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage) }).Methods("PUT")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage) }).Methods("PUT")
 
 	// REST API endpoints used by insights operator
+	// (handlers are implemented in the file operator.go)
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
 	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage) }).Methods("GET")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")

@@ -277,18 +277,9 @@ func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfil
 	return storage.ListConfigurationProfiles()
 }
 
-func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
+func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfiguration, error) {
 	configurations := []ClusterConfiguration{}
 
-	rows, err := storage.connections.Query(`
-SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
-  FROM operator_configuration, cluster
-    ON cluster.id = operator_configuration.cluster
- WHERE cluster.name=?`, cluster)
-
-	if err != nil {
-		return configurations, err
-	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -300,16 +291,41 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 		var active string
 		var reason string
 
-		err = rows.Scan(&id, &cluster, &configuration, &changed_at, &changed_by, &active, &reason)
+		err := rows.Scan(&id, &cluster, &configuration, &changed_at, &changed_by, &active, &reason)
 		if err == nil {
 			configurations = append(configurations, ClusterConfiguration{id, cluster, configuration, changed_at, changed_by, active, reason})
 		} else {
 			log.Println("error", err)
 		}
 	}
-	rows.Close()
 
 	return configurations, nil
+}
+
+func (storage Storage) ListAllClusterConfigurations() ([]ClusterConfiguration, error) {
+	rows, err := storage.connections.Query(`
+SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
+  FROM operator_configuration, cluster
+    ON cluster.id = operator_configuration.cluster`)
+
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+	return storage.readClusterConfigurations(rows)
+}
+
+func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
+	rows, err := storage.connections.Query(`
+SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
+  FROM operator_configuration, cluster
+    ON cluster.id = operator_configuration.cluster
+ WHERE cluster.name=?`, cluster)
+
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
+
+	return storage.readClusterConfigurations(rows)
 }
 
 func (storage Storage) GetClusterActiveConfiguration(cluster string) (string, error) {

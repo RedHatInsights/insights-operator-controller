@@ -13,7 +13,7 @@ then
     if [ $? -eq 0 ]
     then
         echo "Service started, PID=$PID"
-        go test -count=1 github.com/redhatinsighs/insights-operator-controller/server
+        go test ./... -count=1 github.com/redhatinsighs/insights-operator-controller/server
         kill $PID
         if [ $? -eq 0 ]
         then

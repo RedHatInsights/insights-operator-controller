@@ -9,6 +9,16 @@ import (
 	"net/http"
 )
 
+func getAllConfigurations(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	configuration, err := storage.ListAllClusterConfigurations()
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	json.NewEncoder(writer).Encode(configuration)
+}
+
 func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
