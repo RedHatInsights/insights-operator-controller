@@ -104,6 +104,17 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 	return cluster, err
 }
 
+func (storage Storage) RegisterNewCluster(name string) error {
+	statement, err := storage.connections.Prepare("INSERT INTO cluster(name) VALUES (?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(name)
+	return err
+}
+
 func (storage Storage) CreateNewCluster(id string, name string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES (?, ?)")
 	if err != nil {
