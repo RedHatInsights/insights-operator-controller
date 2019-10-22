@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -11,6 +12,7 @@ import (
 func readConfigurationForOperator(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
+		log.Println("Cluster name is not provided")
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Cluster ID needs to be specified")
 		return
@@ -18,9 +20,11 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 
 	configuration, err := storage.GetClusterActiveConfiguration(cluster)
 	if err != nil {
+		log.Println("Cannot read cluster configuration", err)
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 		return
 	}
+	writer.WriteHeader(http.StatusOK)
 	io.WriteString(writer, configuration)
 }
