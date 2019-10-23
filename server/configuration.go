@@ -9,6 +9,23 @@ import (
 	"net/http"
 )
 
+func getConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Configuration ID needs to be specified")
+		return
+	}
+
+	configuration, err := storage.GetClusterConfigurationById(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	io.WriteString(writer, configuration)
+}
+
 func getAllConfigurations(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	configuration, err := storage.ListAllClusterConfigurations()
 	if err != nil {
