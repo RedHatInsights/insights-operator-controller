@@ -154,6 +154,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 		if err == nil {
 			cluster.Id = id
 			cluster.Name = name
+			log.Printf("Cluster name %s has id %d\n", name, id)
 		} else {
 			log.Println("error", err)
 		}
@@ -441,6 +442,9 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterId in
 		return err
 	}
 	_, err = stmt.Exec(clusterId)
+	if err == nil {
+		log.Printf("All previous configuration has been deactivated for clusterID %d\n", clusterId)
+	}
 	return err
 }
 
@@ -453,12 +457,17 @@ func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int,
 	}
 
 	_, err = statement.Exec(clusterId, configurationId, t, username, "1", reason)
+	if err == nil {
+		log.Printf("New operator configuration %d has been assigned to cluster %d\n", configurationId, clusterId)
+	}
 	return err
 }
 
 func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
 	// retrieve cluster ID
-	clusterId, err := storage.GetConfigurationIdForCluster(cluster)
+	clusterInfo, err := storage.GetClusterByName(cluster)
+	clusterId := clusterInfo.Id
+
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
