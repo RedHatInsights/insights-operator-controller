@@ -543,3 +543,19 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 	}
 	return storage.ListClusterConfiguration(cluster)
 }
+
+func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active string) error {
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=?, changed_at=? WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	t := time.Now()
+
+	_, err = statement.Exec(active, t, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

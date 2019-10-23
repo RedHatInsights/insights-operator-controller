@@ -53,6 +53,35 @@ func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 	json.NewEncoder(writer).Encode(configuration)
 }
 
+func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, active string) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Configuration ID needs to be specified")
+		return
+	}
+
+	err := storage.EnableOrDisableClusterConfigurationById(id, active)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	if active == "0" {
+		io.WriteString(writer, "disabled")
+	} else {
+		io.WriteString(writer, "enabled")
+	}
+}
+
+func enableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	enableOrDisableConfiguration(writer, request, storage, "1")
+}
+
+func disableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	enableOrDisableConfiguration(writer, request, storage, "0")
+}
+
 func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
