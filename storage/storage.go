@@ -328,6 +328,30 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 	return storage.readClusterConfigurations(rows)
 }
 
+func (storage Storage) GetClusterConfigurationById(id string) (string, error) {
+	var configuration string
+
+	row, err := storage.connections.Query(`
+SELECT configuration_profile.configuration
+  FROM operator_configuration, configuration_profile
+    ON configuration_profile.id = operator_configuration.configuration
+ WHERE operator_configuration.id=?`, id)
+
+	if err != nil {
+		return configuration, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		err = row.Scan(&configuration)
+		if err != nil {
+			log.Println("error", err)
+		}
+		return configuration, err
+	}
+	return configuration, errors.New("unable to read any active configuration")
+}
+
 func (storage Storage) GetClusterActiveConfiguration(cluster string) (string, error) {
 	var configuration string
 
