@@ -88,10 +88,15 @@ func Initialize(address string, storage storage.Storage) {
 	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { newConfigurationProfile(w, r, storage) }).Methods("POST")
 	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfigurationProfile(w, r, storage) }).Methods("DELETE")
 
-	// clusters and its configurations
+	// configurations
 	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/configuration", func(w http.ResponseWriter, r *http.Request) { getAllConfigurations(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { getConfiguration(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/configuration/{id}/enable", func(w http.ResponseWriter, r *http.Request) { enableConfiguration(w, r, storage) }).Methods("PUT")
+	clientRouter.HandleFunc("/configuration/{id}/disable", func(w http.ResponseWriter, r *http.Request) { disableConfiguration(w, r, storage) }).Methods("PUT")
+
+	// clusters and its configurations
+	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage) }).Methods("POST")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage) }).Methods("PUT")
