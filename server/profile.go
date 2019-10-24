@@ -86,7 +86,7 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		writer.WriteHeader(http.StatusAccepted)
+		writer.WriteHeader(http.StatusOK)
 		json.NewEncoder(writer).Encode(profiles)
 	}
 }
