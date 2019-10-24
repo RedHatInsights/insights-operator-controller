@@ -19,6 +19,14 @@ func New(driverName string, dataSourceName string) Storage {
 	if err != nil {
 		log.Fatal("Can not connect to data storage", err)
 	}
+
+	statement, err := connections.Prepare("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal("Can not set PRAGMA for sqlite", err)
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec()
 	return Storage{connections}
 }
 
