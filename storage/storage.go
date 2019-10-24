@@ -568,3 +568,18 @@ func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active
 	}
 	return nil
 }
+
+// TODO: copy & paste, needs to be refactored later
+func (storage Storage) DeleteClusterConfigurationById(id string) error {
+	statement, err := storage.connections.Prepare("DELETE FROM operator_configuration WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

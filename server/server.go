@@ -92,6 +92,7 @@ func Initialize(address string, storage storage.Storage) {
 	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/configuration", func(w http.ResponseWriter, r *http.Request) { getAllConfigurations(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { getConfiguration(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfiguration(w, r, storage) }).Methods("DELETE")
 	clientRouter.HandleFunc("/configuration/{id}/enable", func(w http.ResponseWriter, r *http.Request) { enableConfiguration(w, r, storage) }).Methods("PUT")
 	clientRouter.HandleFunc("/configuration/{id}/disable", func(w http.ResponseWriter, r *http.Request) { disableConfiguration(w, r, storage) }).Methods("PUT")
 
