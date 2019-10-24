@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 create table cluster (
     ID      integer primary key asc,
     name    text not null
@@ -19,7 +21,13 @@ create table operator_configuration (
     changed_by    varchar,
     active        integer,
     reason        varchar,
-    foreign key(cluster) references cluster(ID)
-    foreign key(configuration) references configuration_profile(ID)
+    CONSTRAINT fk_cluster
+        foreign key(cluster)
+        references cluster(ID)
+        on delete cascade
+    CONSTRAINT fk_configuration
+        foreign key (configuration)
+        references configuration_profile(ID)
+        on delete cascade
 );
 
