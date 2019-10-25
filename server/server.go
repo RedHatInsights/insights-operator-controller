@@ -106,7 +106,7 @@ func Initialize(address string, storage storage.Storage) {
 	// REST API endpoints used by insights operator
 	// (handlers are implemented in the file operator.go)
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
-	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage) }).Methods("GET")
+	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage) }).Methods("GET", "PUT")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
