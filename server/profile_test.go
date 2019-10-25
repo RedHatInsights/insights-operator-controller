@@ -33,6 +33,24 @@ func readListOfConfigurationProfiles(t *testing.T) []storage.ConfigurationProfil
 	return profiles
 }
 
+func deleteProfileTestTest(t *testing.T, profileId string) {
+	var client http.Client
+
+	url := API_URL + "client/profile/" + profileId
+	request, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		t.Errorf("Error creating request %v", err)
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		t.Errorf("Communication error with the server %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Expected HTTP status 200 OK, got %d", response.StatusCode)
+	}
+}
+
 func compareConfigurationProfiles(t *testing.T, profiles []storage.ConfigurationProfile, expected []storage.ConfigurationProfile) {
 	if len(profiles) != len(expected) {
 		t.Errorf("%d configuration profiles are expected, but got %d", len(expected), len(profiles))
@@ -117,20 +135,20 @@ func TestChangeConfigurationProfile(t *testing.T) {
 }
 
 func TestDeleteConfigurationProfile(t *testing.T) {
-	var client http.Client
+	deleteProfileTestTest(t, "3")
 
-	request, err := http.NewRequest("DELETE", API_URL+"client/profile/3", nil)
-	if err != nil {
-		t.Errorf("Error creating request %v", err)
-	}
+	profiles := readListOfConfigurationProfiles(t)
 
-	response, err := client.Do(request)
-	if err != nil {
-		t.Errorf("Communication error with the server %v", err)
+	expected := []storage.ConfigurationProfile{
+		{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"},
+		{1, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg2"},
+		{2, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-10-11T00:00:00Z", "tester", "cfg3"},
 	}
-	if response.StatusCode != http.StatusOK {
-		t.Errorf("Expected HTTP status 200 OK, got %d", response.StatusCode)
-	}
+	compareConfigurationProfiles(t, profiles, expected)
+}
+
+func TestDeleteNonexistingConfigurationProfile(t *testing.T) {
+	deleteProfileTestTest(t, "35")
 
 	profiles := readListOfConfigurationProfiles(t)
 
