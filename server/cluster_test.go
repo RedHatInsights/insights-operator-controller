@@ -34,6 +34,24 @@ func readListOfClusters(t *testing.T) []storage.Cluster {
 	return clusters
 }
 
+func createClusterTestStep(t *testing.T, clusterId string, clusterName string) {
+	var client http.Client
+
+	url := API_URL + "client/cluster/" + clusterId + "/" + clusterName
+	request, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		t.Errorf("Error creating request %v", err)
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		t.Errorf("Communication error with the server %v", err)
+	}
+	if response.StatusCode != http.StatusCreated {
+		t.Errorf("Expected HTTP status 201 Created, got %d", response.StatusCode)
+	}
+}
+
 // Test step that try to delete the cluster via REST API.
 func deleteClusterTestStep(t *testing.T, clusterId string) {
 	var client http.Client
@@ -160,5 +178,30 @@ func TestDeleteAllClusters(t *testing.T) {
 	clusters := readListOfClusters(t)
 
 	expected := []storage.Cluster{}
+	compareClusters(t, clusters, expected)
+}
+
+// Check if new cluster can be created
+func TestCreateCluster(t *testing.T) {
+	createClusterTestStep(t, "5", "cluster_5")
+
+	clusters := readListOfClusters(t)
+
+	expected := []storage.Cluster{
+		{5, "cluster_5"},
+	}
+	compareClusters(t, clusters, expected)
+}
+
+// Check if new cluster can be created
+func TestCreateCluster0(t *testing.T) {
+	createClusterTestStep(t, "0", "cluster_0")
+
+	clusters := readListOfClusters(t)
+
+	expected := []storage.Cluster{
+		{0, "cluster_0"},
+		{5, "cluster_5"},
+	}
 	compareClusters(t, clusters, expected)
 }
