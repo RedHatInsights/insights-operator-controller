@@ -134,3 +134,31 @@ func TestDeleteAnotherCluster(t *testing.T) {
 	}
 	compareClusters(t, clusters, expected)
 }
+
+// Check how is nonexisting cluster handled.
+func TestDeleteNonexistentCluster(t *testing.T) {
+	deleteClusterTestStep(t, "40")
+
+	clusters := readListOfClusters(t)
+
+	expected := []storage.Cluster{
+		{0, "cluster0"},
+		{1, "cluster1"},
+		{2, "cluster2"},
+		{3, "cluster3"},
+	}
+	compareClusters(t, clusters, expected)
+}
+
+// Check the database after all clusters are deleted.
+func TestDeleteAllClusters(t *testing.T) {
+	deleteClusterTestStep(t, "0")
+	deleteClusterTestStep(t, "1")
+	deleteClusterTestStep(t, "2")
+	deleteClusterTestStep(t, "3")
+
+	clusters := readListOfClusters(t)
+
+	expected := []storage.Cluster{}
+	compareClusters(t, clusters, expected)
+}
