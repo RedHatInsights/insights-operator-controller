@@ -128,8 +128,8 @@ func TestDeleteConfigurationProfile(t *testing.T) {
 	if err != nil {
 		t.Errorf("Communication error with the server %v", err)
 	}
-	if response.StatusCode != http.StatusAccepted {
-		t.Errorf("Expected HTTP status 202 Accepted, got %d", response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Expected HTTP status 200 OK, got %d", response.StatusCode)
 	}
 
 	profiles := readListOfConfigurationProfiles(t)
