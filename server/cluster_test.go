@@ -169,7 +169,7 @@ func TestDeleteNonexistentCluster(t *testing.T) {
 }
 
 // Check the database after all clusters are deleted.
-func TestDeleteAllClusters(t *testing.T) {
+func _TestDeleteAllClusters(t *testing.T) {
 	deleteClusterTestStep(t, "0")
 	deleteClusterTestStep(t, "1")
 	deleteClusterTestStep(t, "2")
@@ -183,25 +183,33 @@ func TestDeleteAllClusters(t *testing.T) {
 
 // Check if new cluster can be created
 func TestCreateCluster(t *testing.T) {
-	createClusterTestStep(t, "5", "cluster_5")
+	createClusterTestStep(t, "5", "cluster5")
 
 	clusters := readListOfClusters(t)
 
 	expected := []storage.Cluster{
-		{5, "cluster_5"},
+		{0, "cluster0"},
+		{1, "cluster1"},
+		{2, "cluster2"},
+		{3, "cluster3"},
+		{5, "cluster5"},
 	}
 	compareClusters(t, clusters, expected)
 }
 
 // Check if new cluster can be created
-func TestCreateCluster0(t *testing.T) {
-	createClusterTestStep(t, "0", "cluster_0")
+func TestCreateCluster9(t *testing.T) {
+	createClusterTestStep(t, "9", "cluster9")
 
 	clusters := readListOfClusters(t)
 
 	expected := []storage.Cluster{
-		{0, "cluster_0"},
-		{5, "cluster_5"},
+		{0, "cluster0"},
+		{1, "cluster1"},
+		{2, "cluster2"},
+		{3, "cluster3"},
+		{5, "cluster5"},
+		{9, "cluster9"},
 	}
 	compareClusters(t, clusters, expected)
 }
