@@ -34,6 +34,25 @@ func readListOfClusters(t *testing.T) []storage.Cluster {
 	return clusters
 }
 
+// Test step that try to delete the cluster via REST API.
+func deleteClusterTestStep(t *testing.T, clusterId string) {
+	var client http.Client
+
+	url := API_URL + "client/cluster/" + clusterId
+	request, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		t.Errorf("Error creating request %v", err)
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		t.Errorf("Communication error with the server %v", err)
+	}
+	if response.StatusCode != http.StatusAccepted {
+		t.Errorf("Expected HTTP status 202 Accepted, got %d", response.StatusCode)
+	}
+}
+
 func compareClusters(t *testing.T, clusters []storage.Cluster, expected []storage.Cluster) {
 	if len(clusters) != len(expected) {
 		t.Errorf("%d clusters are expected, but got %d", len(expected), len(clusters))
@@ -85,21 +104,9 @@ func TestAddCluster(t *testing.T) {
 	compareClusters(t, clusters, expected)
 }
 
+// Check that cluster can be deleted via REST API.
 func TestDeleteCluster(t *testing.T) {
-	var client http.Client
-
-	request, err := http.NewRequest("DELETE", API_URL+"client/cluster/5", nil)
-	if err != nil {
-		t.Errorf("Error creating request %v", err)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		t.Errorf("Communication error with the server %v", err)
-	}
-	if response.StatusCode != http.StatusAccepted {
-		t.Errorf("Expected HTTP status 202 Accepted, got %d", response.StatusCode)
-	}
+	deleteClusterTestStep(t, "5")
 
 	clusters := readListOfClusters(t)
 
@@ -113,21 +120,9 @@ func TestDeleteCluster(t *testing.T) {
 	compareClusters(t, clusters, expected)
 }
 
+// Check that another cluster can be deleted via REST API.
 func TestDeleteAnotherCluster(t *testing.T) {
-	var client http.Client
-
-	request, err := http.NewRequest("DELETE", API_URL+"client/cluster/4", nil)
-	if err != nil {
-		t.Errorf("Error creating request %v", err)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		t.Errorf("Communication error with the server %v", err)
-	}
-	if response.StatusCode != http.StatusAccepted {
-		t.Errorf("Expected HTTP status 202 Accepted, got %d", response.StatusCode)
-	}
+	deleteClusterTestStep(t, "4")
 
 	clusters := readListOfClusters(t)
 
