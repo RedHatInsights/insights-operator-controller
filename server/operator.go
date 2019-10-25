@@ -46,6 +46,6 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	}
-	writer.WriteHeader(http.StatusOK)
+	writer.WriteHeader(http.StatusCreated)
 	io.WriteString(writer, "Registered")
 }
