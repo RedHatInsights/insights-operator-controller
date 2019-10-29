@@ -45,6 +45,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		return
 	}
 
+	splunk.LogAction("CreateNewCluster", "tester", clusterName)
 	err := storage.CreateNewCluster(clusterId, clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
@@ -95,6 +96,7 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		return
 	}
 
+	splunk.LogAction("DeleteCluster", "tester", clusterId)
 	err := storage.DeleteCluster(clusterId)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)

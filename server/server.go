@@ -115,9 +115,11 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 
 	log.Println("Starting HTTP server at", address)
 
+	splunk.Log("Action", "starting service at address "+address)
 	err := http.ListenAndServe(address, router)
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
+		splunk.Log("Error", "service can not be started at address "+address)
 		os.Exit(2)
 	}
 }
