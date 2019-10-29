@@ -5,6 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"log"
@@ -61,7 +62,7 @@ func logRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
-func Initialize(address string, storage storage.Storage) {
+func Initialize(address string, storage storage.Storage, splunk logging.Client) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
@@ -75,38 +76,38 @@ func Initialize(address string, storage storage.Storage) {
 	// clusters-related operations
 	// (handlers are implemented in the file cluster.go)
 	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{id:[0-9]+}/{name}", func(w http.ResponseWriter, r *http.Request) { newCluster(w, r, storage) }).Methods("POST")
+	clientRouter.HandleFunc("/cluster/{id:[0-9]+}/{name}", func(w http.ResponseWriter, r *http.Request) { newCluster(w, r, storage, splunk) }).Methods("POST")
 	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { deleteCluster(w, r, storage) }).Methods("DELETE")
+	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { deleteCluster(w, r, storage, splunk) }).Methods("DELETE")
 	clientRouter.HandleFunc("/cluster/search", func(w http.ResponseWriter, r *http.Request) { searchCluster(w, r, storage) }).Methods("GET")
 
 	// configuration profiles
 	// (handlers are implemented in the file profile.go)
 	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { listConfigurationProfiles(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { getConfigurationProfile(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { changeConfigurationProfile(w, r, storage) }).Methods("PUT")
-	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { newConfigurationProfile(w, r, storage) }).Methods("POST")
-	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfigurationProfile(w, r, storage) }).Methods("DELETE")
+	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { changeConfigurationProfile(w, r, storage, splunk) }).Methods("PUT")
+	clientRouter.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { newConfigurationProfile(w, r, storage, splunk) }).Methods("POST")
+	clientRouter.HandleFunc("/profile/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfigurationProfile(w, r, storage, splunk) }).Methods("DELETE")
 
 	// configurations
 	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/configuration", func(w http.ResponseWriter, r *http.Request) { getAllConfigurations(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { getConfiguration(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfiguration(w, r, storage) }).Methods("DELETE")
-	clientRouter.HandleFunc("/configuration/{id}/enable", func(w http.ResponseWriter, r *http.Request) { enableConfiguration(w, r, storage) }).Methods("PUT")
-	clientRouter.HandleFunc("/configuration/{id}/disable", func(w http.ResponseWriter, r *http.Request) { disableConfiguration(w, r, storage) }).Methods("PUT")
+	clientRouter.HandleFunc("/configuration/{id}", func(w http.ResponseWriter, r *http.Request) { deleteConfiguration(w, r, storage, splunk) }).Methods("DELETE")
+	clientRouter.HandleFunc("/configuration/{id}/enable", func(w http.ResponseWriter, r *http.Request) { enableConfiguration(w, r, storage, splunk) }).Methods("PUT")
+	clientRouter.HandleFunc("/configuration/{id}/disable", func(w http.ResponseWriter, r *http.Request) { disableConfiguration(w, r, storage, splunk) }).Methods("PUT")
 
 	// clusters and its configurations
 	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage) }).Methods("POST")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage) }).Methods("PUT")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage) }).Methods("PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage, splunk) }).Methods("POST")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 
 	// REST API endpoints used by insights operator
 	// (handlers are implemented in the file operator.go)
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
-	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage) }).Methods("GET", "PUT")
+	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage, splunk) }).Methods("GET", "PUT")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
@@ -114,9 +115,11 @@ func Initialize(address string, storage storage.Storage) {
 
 	log.Println("Starting HTTP server at", address)
 
+	splunk.Log("Action", "starting service at address "+address)
 	err := http.ListenAndServe(address, router)
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
+		splunk.Log("Error", "service can not be started at address "+address)
 		os.Exit(2)
 	}
 }

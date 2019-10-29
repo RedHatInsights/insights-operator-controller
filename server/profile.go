@@ -2,11 +2,12 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"io/ioutil"
 	"net/http"
-	//"strconv"
+	"strconv"
 )
 
 // Read list of configuration profiles.
@@ -39,7 +40,7 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 }
 
 // Create new configuration profile
-func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
 
@@ -62,6 +63,7 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 
+	splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -73,7 +75,7 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 }
 
 // Delete configuration profile
-func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, err := retrieveIdRequestParameter(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -81,6 +83,7 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
+	splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
 	profiles, err := storage.DeleteConfigurationProfile(int(id))
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -92,7 +95,7 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 }
 
 // Change configuration profile
-func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, err := retrieveIdRequestParameter(request)
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
@@ -122,6 +125,7 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
+	splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)

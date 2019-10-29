@@ -1,0 +1,6 @@
+[splunk]
+address=""
+token=""
+source="test"
+source_type="generic_single_line"
+index="main"

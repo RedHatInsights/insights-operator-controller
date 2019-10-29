@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"log"
@@ -29,7 +30,7 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 	io.WriteString(writer, configuration)
 }
 
-func registerCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func registerCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	clusterName, foundName := mux.Vars(request)["cluster"]
 
 	// check parameters provided by client
@@ -40,6 +41,7 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 		return
 	}
 
+	splunk.LogAction("RegisterCluster", "tester", clusterName)
 	err := storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)

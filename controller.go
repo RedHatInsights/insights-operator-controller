@@ -18,10 +18,21 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/server"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"github.com/spf13/viper"
 )
+
+func initializeSplunk() logging.Client {
+	splunkCfg := viper.Sub("splunk")
+	address := splunkCfg.GetString("address")
+	token := splunkCfg.GetString("token")
+	source := splunkCfg.GetString("source")
+	source_type := splunkCfg.GetString("source_type")
+	index := splunkCfg.GetString("index")
+	return logging.NewClient(address, token, source, source_type, index)
+}
 
 // Entry point to the Insights operator controller.
 // It performs several tasks:
@@ -30,7 +41,7 @@ import (
 // - TODO: initialize connection to the logging service
 func main() {
 	// parse the configuration
-	viper.SetConfigName("config")
+	viper.SetConfigName("config_my")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -45,5 +56,7 @@ func main() {
 	storage := storage.New(*dbDriver, *storageSpecification)
 	defer storage.Close()
 
-	server.Initialize(":8080", storage)
+	splunk := initializeSplunk()
+
+	server.Initialize(":8080", storage, splunk)
 }
