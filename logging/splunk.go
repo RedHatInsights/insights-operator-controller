@@ -20,6 +20,15 @@ func (client Client) Log(key string, value string) error {
 	return err
 }
 
+func (client Client) LogAction(action string, user string, description string) error {
+	err := client.ClientImpl.Log(
+		map[string]string{
+			"action":      action,
+			"user":        user,
+			"description": description})
+	return err
+}
+
 func (client Client) LogWithTime(time int64, key string, value string) error {
 	err := client.ClientImpl.LogWithTime(
 		time,
