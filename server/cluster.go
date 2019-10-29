@@ -5,6 +5,7 @@ package server
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"log"
@@ -25,7 +26,7 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 }
 
 // Create a record with new cluster in a database. The updated list of all clusters is returned to client.
-func newCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func newCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	clusterId, foundId := mux.Vars(request)["id"]
 	clusterName, foundName := mux.Vars(request)["name"]
 
@@ -83,7 +84,7 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 }
 
 // Delete a cluster
-func deleteCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deleteCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	clusterId, foundId := mux.Vars(request)["id"]
 
 	// check parameter provided by client

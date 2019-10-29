@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"io/ioutil"
@@ -39,7 +40,7 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 }
 
 // Create new configuration profile
-func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
 
@@ -73,7 +74,7 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 }
 
 // Delete configuration profile
-func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, err := retrieveIdRequestParameter(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -92,7 +93,7 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 }
 
 // Change configuration profile
-func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, err := retrieveIdRequestParameter(request)
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]

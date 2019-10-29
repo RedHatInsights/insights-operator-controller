@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"io/ioutil"
@@ -26,7 +27,7 @@ func getConfiguration(writer http.ResponseWriter, request *http.Request, storage
 	io.WriteString(writer, configuration)
 }
 
-func deleteConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deleteConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -92,15 +93,15 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 	}
 }
 
-func enableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func enableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	enableOrDisableConfiguration(writer, request, storage, "1")
 }
 
-func disableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func disableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	enableOrDisableConfiguration(writer, request, storage, "0")
 }
 
-func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -146,7 +147,7 @@ func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 	json.NewEncoder(writer).Encode(configurations)
 }
 
-func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -178,7 +179,7 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 	json.NewEncoder(writer).Encode(configurations)
 }
 
-func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
