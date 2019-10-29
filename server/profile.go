@@ -7,7 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	//"strconv"
+	"strconv"
 )
 
 // Read list of configuration profiles.
@@ -63,6 +63,7 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 
+	splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -82,6 +83,7 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
+	splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
 	profiles, err := storage.DeleteConfigurationProfile(int(id))
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -123,6 +125,7 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
+	splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
