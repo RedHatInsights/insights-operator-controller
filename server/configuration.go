@@ -35,6 +35,7 @@ func deleteConfiguration(writer http.ResponseWriter, request *http.Request, stor
 		return
 	}
 
+	splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
 	err := storage.DeleteClusterConfigurationById(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -72,7 +73,7 @@ func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 	json.NewEncoder(writer).Encode(configuration)
 }
 
-func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, active string) {
+func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client, active string) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -80,6 +81,11 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
+	if active == "0" {
+		splunk.LogAction("DisableClusterConfiguration", "tester", id)
+	} else {
+		splunk.LogAction("EnableClusterConfiguration", "tester", id)
+	}
 	err := storage.EnableOrDisableClusterConfigurationById(id, active)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -94,11 +100,11 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 }
 
 func enableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	enableOrDisableConfiguration(writer, request, storage, "1")
+	enableOrDisableConfiguration(writer, request, storage, splunk, "1")
 }
 
 func disableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	enableOrDisableConfiguration(writer, request, storage, "0")
+	enableOrDisableConfiguration(writer, request, storage, splunk, "0")
 }
 
 func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -144,6 +150,7 @@ func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 		io.WriteString(writer, err.Error())
 		return
 	}
+	splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
 	json.NewEncoder(writer).Encode(configurations)
 }
 
@@ -170,6 +177,7 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
+	splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
 	configurations, err := storage.EnableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -202,6 +210,7 @@ func disableClusterConfiguration(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
+	splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
 	configurations, err := storage.DisableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
