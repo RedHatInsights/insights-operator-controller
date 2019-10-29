@@ -18,6 +18,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/server"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"github.com/spf13/viper"
@@ -44,6 +45,14 @@ func main() {
 
 	storage := storage.New(*dbDriver, *storageSpecification)
 	defer storage.Close()
+
+	splunkCfg := viper.Sub("splunk")
+	address := splunkCfg.GetString("address")
+	token := splunkCfg.GetString("token")
+	source := splunkCfg.GetString("source")
+	source_type := splunkCfg.GetString("source_type")
+	index := splunkCfg.GetString("index")
+	splunk := logging.NewClient(address, token, source, source_type, index)
 
 	server.Initialize(":8080", storage)
 }
