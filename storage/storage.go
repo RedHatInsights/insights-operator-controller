@@ -78,6 +78,18 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
+type Trigger struct {
+	Id          int    `json:"id"`
+	Type        string `json:"type"`
+	Cluster     string `json:"cluster"`
+	Reason      string `json:"reason"`
+	Link        string `json:"link"`
+	TriggeredAt string `json:"triggered_at"`
+	TriggeredBy string `json:"triggered_by"`
+	Parameters  string `json:"parameters"`
+	Active      int    `json:"active"`
+}
+
 func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	clusters := []Cluster{}
 
@@ -601,6 +613,138 @@ func (storage Storage) DeleteClusterConfigurationById(id string) error {
 	defer statement.Close()
 
 	_, err = statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
+	triggers := []Trigger{}
+	defer rows.Close()
+
+	for rows.Next() {
+		var trigger Trigger
+
+		err := rows.Scan(&trigger.Id, &trigger.Type, &trigger.Cluster,
+			&trigger.Reason, &trigger.Link,
+			&trigger.TriggeredAt, &trigger.TriggeredBy,
+			&trigger.Parameters, &trigger.Active)
+		if err == nil {
+			triggers = append(triggers, trigger)
+		} else {
+			log.Println("error", err)
+		}
+	}
+
+	return triggers, nil
+}
+
+func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE cluster.name = ?`, clusterName)
+
+	if err != nil {
+		return triggers, err
+	}
+
+	return storage.getTriggers(rows)
+}
+
+func (storage Storage) ListActiveClusterTriggers(clusterName string) ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE trigger.active = 1
+   AND cluster.name = ?`, clusterName)
+
+	if err != nil {
+		return triggers, err
+	}
+
+	return storage.getTriggers(rows)
+}
+
+func (storage Storage) GetTriggerId(triggerType string) (int, error) {
+	var id int
+
+	rows, err := storage.connections.Query("SELECT id FROM trigger_type WHERE type = ?", triggerType)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&id)
+		if err == nil {
+			log.Printf("Trigger type %s has id %d\n", triggerType, id)
+		} else {
+			log.Println("error", err)
+		}
+	} else {
+		return 0, errors.New("Unknown trigger type provided")
+	}
+	return id, err
+}
+
+func (storage Storage) NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error {
+	// retrieve cluster ID
+	clusterInfo, err := storage.GetClusterByName(clusterName)
+	clusterId := clusterInfo.Id
+
+	if err != nil {
+		return err
+	}
+
+	triggerId, err := storage.GetTriggerId(triggerType)
+
+	if err != nil {
+		return err
+	}
+	t := time.Now()
+
+	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(triggerId, clusterId, reason, link, t, userName, "", 1)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
+	// retrieve cluster ID
+	clusterInfo, err := storage.GetClusterByName(clusterName)
+	clusterId := clusterInfo.Id
+
+	if err != nil {
+		return err
+	}
+
+	statement, err := storage.connections.Prepare("UPDATE trigger SET active=0 WHERE cluster = ? and id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(clusterId, triggerId)
 	if err != nil {
 		return err
 	}
