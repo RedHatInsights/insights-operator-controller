@@ -120,11 +120,16 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 
+	// triggers
+	clientRouter.HandleFunc("/cluster/{cluster}/trigger", func(w http.ResponseWriter, r *http.Request) { getClusterTriggers(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{cluster}/trigger/{trigger}", func(w http.ResponseWriter, r *http.Request) { registerClusterTrigger(w, r, storage) }).Methods("POST")
+
 	// REST API endpoints used by insights operator
 	// (handlers are implemented in the file operator.go)
 	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
 	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage, splunk) }).Methods("GET", "PUT")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
+	operatorRouter.HandleFunc("/triggers/{cluster}", func(w http.ResponseWriter, r *http.Request) { getActiveTriggersForCluster(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
 	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
