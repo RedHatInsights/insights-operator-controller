@@ -31,3 +31,26 @@ create table operator_configuration (
         on delete cascade
 );
 
+create table trigger_type (
+    ID            integer primary key asc,
+    type          varchar not null,
+    description   varchar
+);
+
+create table trigger (
+    ID            integer primary key asc,
+    type          integer not null,
+    cluster       integer not null,
+    reason        varchar,
+    link          varchar,
+    triggered_at  datetime,
+    triggered_by  varchar,
+    parameters    varchar,
+    active        integer,
+    CONSTRAINT fk_type
+        foreign key (type)
+        references trigger_type(ID)
+    CONSTRAINT fk_cluster
+        foreign key(cluster)
+        references cluster(ID)
+);
