@@ -18,3 +18,8 @@ insert into operator_configuration (id, cluster, configuration, changed_at, chan
 insert into operator_configuration (id, cluster, configuration, changed_at, changed_by, active, reason) values (6, 4, 1, '2019-10-11', 'tester', 0, 'disabled one');
 
 insert into trigger_type (type, description) values ('must-gather', 'Triggers must-gather operation on selected cluster');
+
+insert into trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) values (1, 0, 'reason', 'link', '2019-11-01', 'tester', '{}', 0);
+insert into trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) values (1, 0, 'reason', 'link', '2019-11-01', 'tester', '{}', 1);
+insert into trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) values (1, 1, 'reason', 'link', '2019-11-01', 'tester', '{}', 0);
+insert into trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) values (1, 1, 'reason', 'link', '2019-11-01', 'tester', '{}', 1);
