@@ -17,11 +17,29 @@ limitations under the License.
 package server
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
+	"io"
 	"net/http"
 )
 
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	cluster, found := mux.Vars(request)["cluster"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Cluster name needs to be specified")
+		return
+	}
+
+	triggers, err := storage.ListClusterTriggers(cluster)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(triggers)
 }
 
 func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {

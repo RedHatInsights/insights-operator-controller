@@ -78,6 +78,18 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
+type Trigger struct {
+	Id          int    `json:"id"`
+	Type        string `json:"type"`
+	Cluster     string `json:"cluster"`
+	Reason      string `json:"reason"`
+	Link        string `json:"link"`
+	TriggeredAt string `json:"triggered_at"`
+	TriggeredBy string `json:"triggered_by"`
+	Parameters  string `json:"parameters"`
+	Active      int    `json:"active"`
+}
+
 func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	clusters := []Cluster{}
 
@@ -605,4 +617,37 @@ func (storage Storage) DeleteClusterConfigurationById(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE cluster.name = ?`, clusterName)
+
+	if err != nil {
+		return triggers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var trigger Trigger
+
+		err := rows.Scan(&trigger.Id, &trigger.Type, &trigger.Cluster,
+			&trigger.Reason, &trigger.Link,
+			&trigger.TriggeredAt, &trigger.TriggeredBy,
+			&trigger.Parameters, &trigger.Active)
+		if err == nil {
+			triggers = append(triggers, trigger)
+		} else {
+			log.Println("error", err)
+		}
+	}
+
+	return triggers, nil
 }
