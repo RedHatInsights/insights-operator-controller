@@ -728,3 +728,25 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	}
 	return nil
 }
+
+func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
+	// retrieve cluster ID
+	clusterInfo, err := storage.GetClusterByName(clusterName)
+	clusterId := clusterInfo.Id
+
+	if err != nil {
+		return err
+	}
+
+	statement, err := storage.connections.Prepare("UPDATE trigger SET active=0 WHERE cluster = ? and id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(clusterId, triggerId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

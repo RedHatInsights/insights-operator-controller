@@ -88,4 +88,25 @@ func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Reque
 }
 
 func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	cluster, found := mux.Vars(request)["cluster"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Cluster name needs to be specified")
+		return
+	}
+
+	triggerId, found := mux.Vars(request)["trigger"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger ID needs to be specified")
+		return
+	}
+
+	err := storage.AckTrigger(cluster, triggerId)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
 }
