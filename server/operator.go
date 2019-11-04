@@ -67,3 +67,6 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 	writer.WriteHeader(http.StatusCreated)
 	io.WriteString(writer, "Registered")
 }
+
+func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+}
