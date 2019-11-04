@@ -619,20 +619,8 @@ func (storage Storage) DeleteClusterConfigurationById(id string) error {
 	return nil
 }
 
-func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
+func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	triggers := []Trigger{}
-
-	rows, err := storage.connections.Query(`
-SELECT trigger.id, trigger_type.type, cluster.name,
-       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
-       trigger.parameters, trigger.active
-  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
-               JOIN cluster ON trigger.cluster=cluster.id
- WHERE cluster.name = ?`, clusterName)
-
-	if err != nil {
-		return triggers, err
-	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -650,4 +638,41 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 	}
 
 	return triggers, nil
+}
+
+func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE cluster.name = ?`, clusterName)
+
+	if err != nil {
+		return triggers, err
+	}
+
+	return storage.getTriggers(rows)
+}
+
+func (storage Storage) ListActiveClusterTriggers(clusterName string) ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE trigger.active = 1
+   AND cluster.name = ?`, clusterName)
+
+	if err != nil {
+		return triggers, err
+	}
+
+	return storage.getTriggers(rows)
 }

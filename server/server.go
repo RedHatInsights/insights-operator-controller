@@ -130,6 +130,7 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage, splunk) }).Methods("GET", "PUT")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 	operatorRouter.HandleFunc("/triggers/{cluster}", func(w http.ResponseWriter, r *http.Request) { getActiveTriggersForCluster(w, r, storage) }).Methods("GET")
+	operatorRouter.HandleFunc("/trigger/{cluster}/ack/{trigger}", func(w http.ResponseWriter, r *http.Request) { ackTriggerForCluster(w, r, storage) }).Methods("GET")
 
 	// Prometheus metrics
 	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
