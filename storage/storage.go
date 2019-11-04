@@ -676,3 +676,55 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 
 	return storage.getTriggers(rows)
 }
+
+func (storage Storage) GetTriggerId(triggerType string) (int, error) {
+	var id int
+
+	rows, err := storage.connections.Query("SELECT id FROM trigger_type WHERE type = ?", triggerType)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&id)
+		if err == nil {
+			log.Printf("Trigger type %s has id %d\n", triggerType, id)
+		} else {
+			log.Println("error", err)
+		}
+	} else {
+		return 0, errors.New("Unknown trigger type provided")
+	}
+	return id, err
+}
+
+func (storage Storage) NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error {
+	// retrieve cluster ID
+	clusterInfo, err := storage.GetClusterByName(clusterName)
+	clusterId := clusterInfo.Id
+
+	if err != nil {
+		return err
+	}
+
+	triggerId, err := storage.GetTriggerId(triggerType)
+
+	if err != nil {
+		return err
+	}
+	t := time.Now()
+
+	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(triggerId, clusterId, reason, link, t, userName, "", 1)
+	if err != nil {
+		return err
+	}
+	return nil
+}

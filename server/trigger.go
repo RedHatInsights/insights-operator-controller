@@ -43,4 +43,46 @@ func getClusterTriggers(writer http.ResponseWriter, request *http.Request, stora
 }
 
 func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	cluster, found := mux.Vars(request)["cluster"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Cluster name needs to be specified")
+		return
+	}
+
+	triggerType, found := mux.Vars(request)["trigger"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger type needs to be specified")
+		return
+	}
+
+	username, foundUsername := request.URL.Query()["username"]
+	if !foundUsername {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "User name needs to be specified\n")
+		return
+	}
+
+	reason, foundReason := request.URL.Query()["reason"]
+	if !foundReason {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Reason needs to be specified\n")
+		return
+	}
+
+	link, foundReason := request.URL.Query()["link"]
+	if !foundReason {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Link needs to be specified\n")
+		return
+	}
+
+	err := storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
 }
