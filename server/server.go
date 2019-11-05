@@ -121,6 +121,7 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 
 	// triggers
+	clientRouter.HandleFunc("/trigger", func(w http.ResponseWriter, r *http.Request) { getAllTriggers(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/trigger", func(w http.ResponseWriter, r *http.Request) { getClusterTriggers(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/trigger/{trigger}", func(w http.ResponseWriter, r *http.Request) { registerClusterTrigger(w, r, storage) }).Methods("POST")
 
