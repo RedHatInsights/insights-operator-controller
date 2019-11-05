@@ -86,6 +86,7 @@ type Trigger struct {
 	Link        string `json:"link"`
 	TriggeredAt string `json:"triggered_at"`
 	TriggeredBy string `json:"triggered_by"`
+	AckedAt     string `json:"acked_at"`
 	Parameters  string `json:"parameters"`
 	Active      int    `json:"active"`
 }
@@ -629,7 +630,7 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 		err := rows.Scan(&trigger.Id, &trigger.Type, &trigger.Cluster,
 			&trigger.Reason, &trigger.Link,
 			&trigger.TriggeredAt, &trigger.TriggeredBy,
-			&trigger.Parameters, &trigger.Active)
+			&trigger.Parameters, &trigger.Active, &trigger.AckedAt)
 		if err == nil {
 			triggers = append(triggers, trigger)
 		} else {
@@ -640,13 +641,30 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	return triggers, nil
 }
 
+func (storage Storage) ListAllTriggers() ([]Trigger, error) {
+	triggers := []Trigger{}
+
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active, trigger.acked_at
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id`)
+
+	if err != nil {
+		return triggers, err
+	}
+
+	return storage.getTriggers(rows)
+}
+
 func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
 	triggers := []Trigger{}
 
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
-       trigger.parameters, trigger.active
+       trigger.parameters, trigger.active, trigger.acked_at
   FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
                JOIN cluster ON trigger.cluster=cluster.id
  WHERE cluster.name = ?`, clusterName)
@@ -730,6 +748,8 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 }
 
 func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
+	t := time.Now()
+
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(clusterName)
 	clusterId := clusterInfo.Id
@@ -738,13 +758,14 @@ func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
 		return err
 	}
 
-	statement, err := storage.connections.Prepare("UPDATE trigger SET active=0 WHERE cluster = ? and id = ?")
+	statement, err := storage.connections.Prepare("UPDATE trigger SET acked_at=?, active=0 WHERE cluster = ? AND id = ?")
+
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(clusterId, triggerId)
+	_, err = statement.Exec(t, clusterId, triggerId)
 	if err != nil {
 		return err
 	}
