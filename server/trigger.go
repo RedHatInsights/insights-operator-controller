@@ -24,6 +24,17 @@ import (
 	"net/http"
 )
 
+func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	triggers, err := storage.ListAllTriggers()
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(triggers)
+}
+
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
