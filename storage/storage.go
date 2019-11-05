@@ -682,7 +682,7 @@ func (storage Storage) ListActiveClusterTriggers(clusterName string) ([]Trigger,
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
-       trigger.parameters, trigger.active
+       trigger.parameters, trigger.active, trigger.acked_at
   FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
                JOIN cluster ON trigger.cluster=cluster.id
  WHERE trigger.active = 1
