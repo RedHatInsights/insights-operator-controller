@@ -45,6 +45,7 @@ create table trigger (
     link          varchar,
     triggered_at  datetime,
     triggered_by  varchar,
+    acked_at      datetime,
     parameters    varchar,
     active        integer,
     CONSTRAINT fk_type
