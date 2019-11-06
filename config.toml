@@ -1,4 +1,5 @@
 [splunk]
+enabled=false
 address=""
 token=""
 source="test"
