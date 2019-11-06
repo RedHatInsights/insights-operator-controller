@@ -26,12 +26,13 @@ import (
 
 func initializeSplunk() logging.Client {
 	splunkCfg := viper.Sub("splunk")
+	enabled := splunkCfg.GetBool("enabled")
 	address := splunkCfg.GetString("address")
 	token := splunkCfg.GetString("token")
 	source := splunkCfg.GetString("source")
 	source_type := splunkCfg.GetString("source_type")
 	index := splunkCfg.GetString("index")
-	return logging.NewClient(address, token, source, source_type, index)
+	return logging.NewClient(enabled, address, token, source, source_type, index)
 }
 
 // Entry point to the Insights operator controller.
