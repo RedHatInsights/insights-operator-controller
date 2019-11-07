@@ -24,8 +24,6 @@ import (
 	"testing"
 )
 
-const API_URL = "http://localhost:8080/api/v1/"
-
 func readListOfClusters(t *testing.T) []storage.Cluster {
 	response, err := http.Get(API_URL + "client/cluster")
 	if err != nil {
@@ -100,6 +98,9 @@ func compareClusters(t *testing.T, clusters []storage.Cluster, expected []storag
 }
 
 func TestGetListOfClusters(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	clusters := readListOfClusters(t)
 
 	expected := []storage.Cluster{
@@ -113,6 +114,9 @@ func TestGetListOfClusters(t *testing.T) {
 }
 
 func TestAddCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	var client http.Client
 
 	request, err := http.NewRequest("POST", API_URL+"client/cluster/5/cluster5", nil)
@@ -140,6 +144,9 @@ func TestAddCluster(t *testing.T) {
 
 // Check that cluster can be deleted via REST API.
 func TestDeleteCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteClusterTestStep(t, "5")
 
 	clusters := readListOfClusters(t)
@@ -156,6 +163,9 @@ func TestDeleteCluster(t *testing.T) {
 
 // Check that another cluster can be deleted via REST API.
 func TestDeleteAnotherCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteClusterTestStep(t, "4")
 
 	clusters := readListOfClusters(t)
@@ -171,6 +181,9 @@ func TestDeleteAnotherCluster(t *testing.T) {
 
 // Check how is nonexisting cluster handled.
 func TestDeleteNonexistentCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteClusterTestStep(t, "40")
 
 	clusters := readListOfClusters(t)
@@ -186,6 +199,9 @@ func TestDeleteNonexistentCluster(t *testing.T) {
 
 // Check the database after all clusters are deleted.
 func _TestDeleteAllClusters(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteClusterTestStep(t, "0")
 	deleteClusterTestStep(t, "1")
 	deleteClusterTestStep(t, "2")
@@ -199,6 +215,9 @@ func _TestDeleteAllClusters(t *testing.T) {
 
 // Check if new cluster can be created
 func TestCreateCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	createClusterTestStep(t, "5", "cluster5")
 
 	clusters := readListOfClusters(t)
@@ -215,6 +234,9 @@ func TestCreateCluster(t *testing.T) {
 
 // Check if new cluster can be created
 func TestCreateCluster9(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	createClusterTestStep(t, "9", "cluster9")
 
 	clusters := readListOfClusters(t)

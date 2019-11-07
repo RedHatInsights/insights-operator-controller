@@ -17,21 +17,9 @@ limitations under the License.
 package server
 
 import (
-	"net/http"
-	"testing"
+	"os"
 )
 
-func TestMainEndpoint(t *testing.T) {
-	if !RunServiceTests {
-		return
-	}
-	response, err := http.Get(API_URL)
-	if err != nil {
-		t.Errorf("Communication error with the server %v", err)
-		return
-	}
-	if response.StatusCode != http.StatusOK {
-		t.Errorf("Expected HTTP status 200 OK, got %d", response.StatusCode)
-		return
-	}
-}
+const API_URL = "http://localhost:8080/api/v1/"
+
+var RunServiceTests = os.Getenv("RUN_SERVICE_TESTS") == "y"
