@@ -35,6 +35,24 @@ func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage s
 	json.NewEncoder(writer).Encode(triggers)
 }
 
+func getTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger ID needs to be specified")
+		return
+	}
+
+	triggers, err := storage.GetTriggerById(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(triggers)
+}
+
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
