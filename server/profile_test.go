@@ -83,6 +83,9 @@ func compareConfigurationProfiles(t *testing.T, profiles []storage.Configuration
 }
 
 func TestGetListOfConfigurationProfiles(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	profiles := readListOfConfigurationProfiles(t)
 
 	expected := []storage.ConfigurationProfile{
@@ -95,6 +98,9 @@ func TestGetListOfConfigurationProfiles(t *testing.T) {
 }
 
 func TestGetConfigurationProfile(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	response, err := http.Get(API_URL + "client/profile/0")
 	if err != nil {
 		t.Errorf("Communication error with the server %v", err)
@@ -123,6 +129,9 @@ func TestGetConfigurationProfile(t *testing.T) {
 }
 
 func TestChangeConfigurationProfile(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	var client http.Client
 
 	var jsonStr = []byte(`{"no_op":"Z", "watch":[]}`)
@@ -151,6 +160,9 @@ func TestChangeConfigurationProfile(t *testing.T) {
 }
 
 func TestDeleteConfigurationProfile(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteProfileTestTest(t, "3")
 
 	profiles := readListOfConfigurationProfiles(t)
@@ -164,6 +176,9 @@ func TestDeleteConfigurationProfile(t *testing.T) {
 }
 
 func TestDeleteNonexistingConfigurationProfile(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	deleteProfileTestTest(t, "35")
 
 	profiles := readListOfConfigurationProfiles(t)
@@ -177,6 +192,9 @@ func TestDeleteNonexistingConfigurationProfile(t *testing.T) {
 }
 
 func TestCreateNewConfigurationProfile(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	var client http.Client
 
 	var jsonStr = []byte(`{"no_op":"W", "watch":[]}`)

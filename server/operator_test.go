@@ -26,6 +26,9 @@ import (
 type OperatorConfiguration map[string]interface{}
 
 func TestRegisterCluster(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	var client http.Client
 
 	request, err := http.NewRequest("PUT", API_URL+"operator/register/cluster6", nil)
@@ -43,6 +46,9 @@ func TestRegisterCluster(t *testing.T) {
 }
 
 func TestReadClusterConfiguration(t *testing.T) {
+	if !RunServiceTests {
+		return
+	}
 	var client http.Client
 
 	request, err := http.NewRequest("GET", API_URL+"operator/configuration/cluster0", nil)
