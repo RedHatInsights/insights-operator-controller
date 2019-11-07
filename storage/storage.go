@@ -760,7 +760,7 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	}
 	t := time.Now()
 
-	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active, acked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '')")
 	if err != nil {
 		return err
 	}
