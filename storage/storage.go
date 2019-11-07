@@ -18,6 +18,7 @@ package storage
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"time"
@@ -639,6 +640,31 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	}
 
 	return triggers, nil
+}
+
+func (storage Storage) GetTriggerById(id string) (Trigger, error) {
+	rows, err := storage.connections.Query(`
+SELECT trigger.id, trigger_type.type, cluster.name,
+       trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
+       trigger.parameters, trigger.active, trigger.acked_at
+  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ WHERE trigger.id=?`, id)
+
+	if err != nil {
+		return Trigger{}, err
+	}
+
+	triggers, err := storage.getTriggers(rows)
+	if err != nil {
+		return Trigger{}, err
+	}
+
+	if len(triggers) >= 1 {
+		return triggers[0], nil
+	} else {
+		return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
+	}
 }
 
 func (storage Storage) ListAllTriggers() ([]Trigger, error) {
