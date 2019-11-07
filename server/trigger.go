@@ -53,6 +53,24 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 	json.NewEncoder(writer).Encode(triggers)
 }
 
+func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger ID needs to be specified")
+		return
+	}
+
+	err := storage.DeleteTriggerById(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	io.WriteString(writer, "Deleted")
+}
+
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
