@@ -42,7 +42,7 @@ func initializeSplunk() logging.Client {
 // - TODO: initialize connection to the logging service
 func main() {
 	// parse the configuration
-	viper.SetConfigName("config_my")
+	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
