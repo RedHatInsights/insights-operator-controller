@@ -669,10 +669,19 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 
 func (storage Storage) DeleteTriggerById(id string) error {
 	statement, err := storage.connections.Prepare(`
-DELETE FROM trigger WHERE trigger.id = ?`)
+DELETE FROM trigger WHERE trigger.id=?`)
 	defer statement.Close()
 
 	_, err = statement.Exec(id)
+	return err
+}
+
+func (storage Storage) ChangeStateOfTriggerById(id string, active int) error {
+	statement, err := storage.connections.Prepare(`
+UPDATE trigger SET active=? WHERE trigger.id=?`)
+	defer statement.Close()
+
+	_, err = statement.Exec(active, id)
 	return err
 }
 
