@@ -78,7 +78,7 @@ func logRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
-func Initialize(address string, storage storage.Storage, splunk logging.Client) {
+func Initialize(address string, useHttps bool, storage storage.Storage, splunk logging.Client) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
@@ -143,7 +143,13 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 	log.Println("Starting HTTP server at", address)
 
 	splunk.Log("Action", "starting service at address "+address)
-	err := http.ListenAndServe(address, router)
+	var err error
+
+	if useHttps {
+		err = http.ListenAndServeTLS(address, "server.crt", "server.key", router)
+	} else {
+		err = http.ListenAndServe(address, router)
+	}
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
 		splunk.Log("Error", "service can not be started at address "+address)

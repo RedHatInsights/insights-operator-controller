@@ -59,5 +59,9 @@ func main() {
 
 	splunk := initializeSplunk()
 
-	server.Initialize(":8080", storage, splunk)
+	serviceCfg := viper.Sub("service")
+	useHttps := serviceCfg.GetBool("use_https")
+	address := serviceCfg.GetString("address")
+
+	server.Initialize(address, useHttps, storage, splunk)
 }
