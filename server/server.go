@@ -124,6 +124,8 @@ func Initialize(address string, storage storage.Storage, splunk logging.Client) 
 	clientRouter.HandleFunc("/trigger", func(w http.ResponseWriter, r *http.Request) { getAllTriggers(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/trigger/{id}", func(w http.ResponseWriter, r *http.Request) { getTrigger(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/trigger/{id}", func(w http.ResponseWriter, r *http.Request) { deleteTrigger(w, r, storage) }).Methods("DELETE")
+	clientRouter.HandleFunc("/trigger/{id}/activate", func(w http.ResponseWriter, r *http.Request) { activateTrigger(w, r, storage) }).Methods("PUT", "POST")
+	clientRouter.HandleFunc("/trigger/{id}/deactivate", func(w http.ResponseWriter, r *http.Request) { deactivateTrigger(w, r, storage) }).Methods("PUT", "POST")
 	clientRouter.HandleFunc("/cluster/{cluster}/trigger", func(w http.ResponseWriter, r *http.Request) { getClusterTriggers(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{cluster}/trigger/{trigger}", func(w http.ResponseWriter, r *http.Request) { registerClusterTrigger(w, r, storage) }).Methods("POST")
 

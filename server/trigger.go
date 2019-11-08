@@ -71,6 +71,42 @@ func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage st
 	io.WriteString(writer, "Deleted")
 }
 
+func activateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger ID needs to be specified")
+		return
+	}
+
+	err := storage.ChangeStateOfTriggerById(id, 1)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	io.WriteString(writer, "Activated")
+}
+
+func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+	id, found := mux.Vars(request)["id"]
+	if !found {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, "Trigger ID needs to be specified")
+		return
+	}
+
+	err := storage.ChangeStateOfTriggerById(id, 0)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		io.WriteString(writer, err.Error())
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	io.WriteString(writer, "Deactivated")
+}
+
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
