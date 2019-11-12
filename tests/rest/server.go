@@ -18,9 +18,47 @@ package tests
 
 import "github.com/verdverm/frisby"
 
-func ServerTests() {
+func checkRestApiEntryPoint() {
 	f := frisby.Create("Check the entry point to REST API").Get(API_URL)
 	f.Send()
 	f.ExpectStatus(200)
 	f.PrintReport()
+}
+
+func checkNonExistentEntryPoint() {
+	f := frisby.Create("Check the non-existent entry point to REST API").Get(API_URL + "foobar")
+	f.Send()
+	f.ExpectStatus(404)
+	f.PrintReport()
+}
+
+func checkWrongEntryPoint() {
+	f := frisby.Create("Check the wrong entry point to REST API").Get(API_URL + "../")
+	f.Send()
+	f.ExpectStatus(404)
+	f.PrintReport()
+}
+
+func checkWrongMethodsForEntryPoint() {
+	f := frisby.Create("Check the entry point to REST API with wrong method: POST").Post(API_URL)
+	f.Send()
+	f.ExpectStatus(405)
+	f.PrintReport()
+
+	f = frisby.Create("Check the entry point to REST API with wrong method: PUT").Put(API_URL)
+	f.Send()
+	f.ExpectStatus(405)
+	f.PrintReport()
+
+	f = frisby.Create("Check the entry point to REST API with wrong method: DELETE").Delete(API_URL)
+	f.Send()
+	f.ExpectStatus(405)
+	f.PrintReport()
+}
+
+func ServerTests() {
+	checkRestApiEntryPoint()
+	checkNonExistentEntryPoint()
+	checkWrongEntryPoint()
+	checkWrongMethodsForEntryPoint()
 }
