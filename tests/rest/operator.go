@@ -18,8 +18,6 @@ package tests
 
 import "github.com/verdverm/frisby"
 
-type OperatorConfiguration map[string]interface{}
-
 func checkConfigurationForCluster0() {
 	f := frisby.Create("Check /operator/configuration/cluster0")
 	f.Get(API_URL + "/operator/configuration/cluster0")
@@ -39,6 +37,7 @@ func checkRegisterNewCluster() {
 	f.Put(API_URL + "/operator/register/cluster6")
 	f.Send()
 	f.ExpectStatus(201)
+	f.PrintReport()
 }
 
 func OperatorTests() {
