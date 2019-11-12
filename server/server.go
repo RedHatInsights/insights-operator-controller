@@ -84,7 +84,7 @@ func Initialize(address string, useHttps bool, storage storage.Storage, splunk l
 	router.Use(logRequest)
 
 	// common REST API endpoints
-	router.HandleFunc(API_PREFIX, mainEndpoint)
+	router.HandleFunc(API_PREFIX, mainEndpoint).Methods("GET")
 
 	// REST API endpoints used by client
 	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
