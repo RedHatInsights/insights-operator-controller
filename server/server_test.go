@@ -15,23 +15,3 @@ limitations under the License.
 */
 
 package server
-
-import (
-	"net/http"
-	"testing"
-)
-
-func TestMainEndpoint(t *testing.T) {
-	if !RunServiceTests {
-		return
-	}
-	response, err := http.Get(API_URL)
-	if err != nil {
-		t.Errorf("Communication error with the server %v", err)
-		return
-	}
-	if response.StatusCode != http.StatusOK {
-		t.Errorf("Expected HTTP status 200 OK, got %d", response.StatusCode)
-		return
-	}
-}
