@@ -32,3 +32,30 @@ Change the following lines in `config.toml`:
 
 Please note that the service (when run locally) use the self-signed certificate.
 You'd need to use `certs.pem` file on client side (curl, web browser etc.)
+
+## Testing
+
+### Unit tests
+
+The following command run all unit tests:
+
+```
+go test ./...
+```
+
+It is also possible to increase verbosity level:
+
+```
+go test -v ./...
+```
+
+### REST API tests
+
+REST API tests needs the running service and the test database to be prepared. In order to
+perform REST API tests, start the following script:
+
+```
+./test.sh
+```
+
+Please note that the service should not be running at the same moment (as it used the same port).
