@@ -75,9 +75,9 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		writer.WriteHeader(http.StatusCreated)
 		addJsonHeader(writer)
 		addJson(writer, clusters)
+		writer.WriteHeader(http.StatusCreated)
 	}
 }
 
@@ -128,9 +128,9 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		writer.WriteHeader(http.StatusAccepted)
 		addJsonHeader(writer)
 		addJson(writer, clusters)
+		writer.WriteHeader(http.StatusAccepted)
 	}
 }
 
