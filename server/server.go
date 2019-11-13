@@ -78,6 +78,10 @@ func logRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
+func addJsonHeader(writer http.ResponseWriter) {
+	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
+}
+
 func Initialize(address string, useHttps bool, storage storage.Storage, splunk logging.Client) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
