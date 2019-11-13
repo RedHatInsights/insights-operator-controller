@@ -1,8 +1,8 @@
-insert into cluster (id, name) values (0, 'cluster0');
-insert into cluster (id, name) values (1, 'cluster1');
-insert into cluster (id, name) values (2, 'cluster2');
-insert into cluster (id, name) values (3, 'cluster3');
-insert into cluster (id, name) values (4, 'cluster4');
+insert into cluster (id, name) values (0, '00000000-0000-0000-0000-000000000000');
+insert into cluster (id, name) values (1, '00000000-0000-0000-0000-000000000001');
+insert into cluster (id, name) values (2, '00000000-0000-0000-0000-000000000002');
+insert into cluster (id, name) values (3, '00000000-0000-0000-0000-000000000003');
+insert into cluster (id, name) values (4, '00000000-0000-0000-0000-000000000004');
 
 insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (0, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg1');
 insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (1, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg2');

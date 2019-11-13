@@ -19,8 +19,8 @@ package tests
 import "github.com/verdverm/frisby"
 
 func checkConfigurationForCluster0() {
-	f := frisby.Create("Check /operator/configuration/cluster0")
-	f.Get(API_URL + "/operator/configuration/cluster0")
+	f := frisby.Create("Check reading the configuration for cluster 00000000-0000-0000-0000-000000000000")
+	f.Get(API_URL + "/operator/configuration/00000000-0000-0000-0000-000000000000")
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
@@ -35,15 +35,26 @@ func checkConfigurationForCluster0() {
 
 func checkRegisterNewCluster() {
 	f := frisby.Create("Check if new cluster can be registered")
-	f.Put(API_URL + "/operator/register/cluster6")
+	f.Put(API_URL + "/operator/register/00000000-0000-0000-0000-000000000006")
 	f.Send()
 	f.ExpectStatus(201)
 	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
+}
 
+func checkNonExistingConfiguration() {
+	f := frisby.Create("Try to read configuration that does not exist")
+	// configuration can't exists
+	f.Get(API_URL + "/operator/configuration/00000000-0000-0000-0000-000000000006")
+	f.Send()
+	f.ExpectStatus(400)
 	f.PrintReport()
 }
 
 func OperatorTests() {
 	checkConfigurationForCluster0()
+	// configuration for non-existing cluster
+	checkNonExistingConfiguration()
 	checkRegisterNewCluster()
+	// configuration for newly created cluster
+	checkNonExistingConfiguration()
 }
