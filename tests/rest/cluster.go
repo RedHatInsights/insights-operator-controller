@@ -74,11 +74,11 @@ func checkInitialListOfClusters() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -88,24 +88,24 @@ func checkAddCluster() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
 	}
 	compareClusters(f, clusters, expected)
 
-	createCluster(f, "5", "cluster5")
+	createCluster(f, "5", "00000000-0000-0000-0000-000000000005")
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
-		{5, "cluster5"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
+		{5, "00000000-0000-0000-0000-000000000005"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -115,12 +115,12 @@ func checkDeleteCluster() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
-		{5, "cluster5"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
+		{5, "00000000-0000-0000-0000-000000000005"},
 	}
 	compareClusters(f, clusters, expected)
 
@@ -128,11 +128,11 @@ func checkDeleteCluster() {
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -142,11 +142,11 @@ func checkDeleteAnotherCluster() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{4, "cluster4"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{4, "00000000-0000-0000-0000-000000000004"},
 	}
 	compareClusters(f, clusters, expected)
 
@@ -154,10 +154,10 @@ func checkDeleteAnotherCluster() {
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -167,10 +167,10 @@ func checkDeleteNonexistentCluster() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
 	}
 	compareClusters(f, clusters, expected)
 
@@ -178,10 +178,10 @@ func checkDeleteNonexistentCluster() {
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -191,10 +191,10 @@ func checkDeleteAllClusters() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
 	}
 	compareClusters(f, clusters, expected)
 
@@ -214,22 +214,22 @@ func checkCreateNewCluster() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
 	}
 	compareClusters(f, clusters, expected)
 
-	createCluster(f, "5", "cluster5")
+	createCluster(f, "5", "00000000-0000-0000-0000-000000000005")
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{5, "cluster5"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{5, "00000000-0000-0000-0000-000000000005"},
 	}
 	compareClusters(f, clusters, expected)
 }
@@ -239,24 +239,24 @@ func checkCreateCluster1234() {
 
 	clusters := readListOfClusters(f)
 	expected := []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{5, "cluster5"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{5, "00000000-0000-0000-0000-000000000005"},
 	}
 	compareClusters(f, clusters, expected)
 
-	createCluster(f, "1234", "cluster1234")
+	createCluster(f, "1234", "00000001-0002-0003-0004-000000000005")
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
-		{0, "cluster0"},
-		{1, "cluster1"},
-		{2, "cluster2"},
-		{3, "cluster3"},
-		{5, "cluster5"},
-		{1234, "cluster1234"},
+		{0, "00000000-0000-0000-0000-000000000000"},
+		{1, "00000000-0000-0000-0000-000000000001"},
+		{2, "00000000-0000-0000-0000-000000000002"},
+		{3, "00000000-0000-0000-0000-000000000003"},
+		{5, "00000000-0000-0000-0000-000000000005"},
+		{1234, "00000001-0002-0003-0004-000000000005"},
 	}
 	compareClusters(f, clusters, expected)
 }
