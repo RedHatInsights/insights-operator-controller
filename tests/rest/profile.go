@@ -122,6 +122,7 @@ func checkChangeConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(202)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkListOfConfigurationProfilesWithUpdatedItem() {
@@ -151,6 +152,7 @@ func checkChangeNonExistingConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(202)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkDeleteConfigurationProfile() {
@@ -178,6 +180,7 @@ func checkCreateNewConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(201)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkListOfConfigurationProfilesWithDeletedItem() {
