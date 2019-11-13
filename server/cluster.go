@@ -19,7 +19,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
@@ -38,7 +37,7 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 		io.WriteString(writer, err.Error())
 	} else {
 		addJsonHeader(writer)
-		json.NewEncoder(writer).Encode(clusters)
+		addJson(writer, clusters)
 	}
 }
 
@@ -78,7 +77,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 	} else {
 		writer.WriteHeader(http.StatusCreated)
 		addJsonHeader(writer)
-		json.NewEncoder(writer).Encode(clusters)
+		addJson(writer, clusters)
 	}
 }
 
@@ -98,7 +97,7 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 			io.WriteString(writer, err.Error())
 		} else {
 			addJsonHeader(writer)
-			json.NewEncoder(writer).Encode(cluster)
+			addJson(writer, cluster)
 		}
 	}
 }
@@ -131,7 +130,7 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 	} else {
 		writer.WriteHeader(http.StatusAccepted)
 		addJsonHeader(writer)
-		json.NewEncoder(writer).Encode(clusters)
+		addJson(writer, clusters)
 	}
 }
 
@@ -155,7 +154,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 				io.WriteString(writer, err.Error())
 			} else {
 				addJsonHeader(writer)
-				json.NewEncoder(writer).Encode(cluster)
+				addJson(writer, cluster)
 			}
 		}
 	} else if foundName {
@@ -166,7 +165,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			io.WriteString(writer, err.Error())
 		} else {
 			addJsonHeader(writer)
-			json.NewEncoder(writer).Encode(cluster)
+			addJson(writer, cluster)
 		}
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
