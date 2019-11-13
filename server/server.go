@@ -17,6 +17,7 @@ limitations under the License.
 package server
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -80,6 +81,10 @@ func logRequest(nextHandler http.Handler) http.Handler {
 
 func addJsonHeader(writer http.ResponseWriter) {
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
+}
+
+func addJson(writer http.ResponseWriter, data interface{}) {
+	json.NewEncoder(writer).Encode(data)
 }
 
 func Initialize(address string, useHttps bool, storage storage.Storage, splunk logging.Client) {
