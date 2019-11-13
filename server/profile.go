@@ -17,7 +17,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
@@ -30,7 +29,8 @@ import (
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	profiles, err := storage.ListConfigurationProfiles()
 	if err == nil {
-		json.NewEncoder(writer).Encode(profiles)
+		addJsonHeader(writer)
+		addJson(writer, profiles)
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -48,7 +48,8 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 
 	profile, err := storage.GetConfigurationProfile(int(id))
 	if err == nil {
-		json.NewEncoder(writer).Encode(profile)
+		addJsonHeader(writer)
+		addJson(writer, profile)
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -85,8 +86,9 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
+		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusCreated)
-		json.NewEncoder(writer).Encode(profiles)
 	}
 }
 
@@ -105,8 +107,9 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
+		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusOK)
-		json.NewEncoder(writer).Encode(profiles)
 	}
 }
 
@@ -147,7 +150,8 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
+		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusAccepted)
-		json.NewEncoder(writer).Encode(profiles)
 	}
 }

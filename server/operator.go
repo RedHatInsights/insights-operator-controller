@@ -17,7 +17,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
@@ -83,8 +82,9 @@ func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Reque
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
+	addJson(writer, triggers)
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(triggers)
 }
 
 func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {

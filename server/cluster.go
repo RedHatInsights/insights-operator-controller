@@ -19,7 +19,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
@@ -37,7 +36,8 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	} else {
-		json.NewEncoder(writer).Encode(clusters)
+		addJsonHeader(writer)
+		addJson(writer, clusters)
 	}
 }
 
@@ -75,8 +75,9 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
+		addJson(writer, clusters)
 		writer.WriteHeader(http.StatusCreated)
-		json.NewEncoder(writer).Encode(clusters)
 	}
 }
 
@@ -95,7 +96,8 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
-			json.NewEncoder(writer).Encode(cluster)
+			addJsonHeader(writer)
+			addJson(writer, cluster)
 		}
 	}
 }
@@ -126,8 +128,9 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
+		addJson(writer, clusters)
 		writer.WriteHeader(http.StatusAccepted)
-		json.NewEncoder(writer).Encode(clusters)
 	}
 }
 
@@ -150,7 +153,8 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 				writer.WriteHeader(http.StatusBadRequest)
 				io.WriteString(writer, err.Error())
 			} else {
-				json.NewEncoder(writer).Encode(cluster)
+				addJsonHeader(writer)
+				addJson(writer, cluster)
 			}
 		}
 	} else if foundName {
@@ -160,7 +164,8 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
-			json.NewEncoder(writer).Encode(cluster)
+			addJsonHeader(writer)
+			addJson(writer, cluster)
 		}
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
