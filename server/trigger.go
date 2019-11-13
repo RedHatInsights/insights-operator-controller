@@ -17,7 +17,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
@@ -31,8 +30,9 @@ func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage s
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(triggers)
+	addJson(writer, triggers)
 }
 
 func getTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -49,8 +49,9 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(triggers)
+	addJson(writer, triggers)
 }
 
 func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -121,8 +122,9 @@ func getClusterTriggers(writer http.ResponseWriter, request *http.Request, stora
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(triggers)
+	addJson(writer, triggers)
 }
 
 func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
