@@ -42,6 +42,7 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
 	io.WriteString(writer, configuration)
 }

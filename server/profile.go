@@ -87,8 +87,8 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		io.WriteString(writer, err.Error())
 	} else {
 		addJsonHeader(writer)
-		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusCreated)
+		addJson(writer, profiles)
 	}
 }
 
@@ -108,8 +108,8 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		io.WriteString(writer, err.Error())
 	} else {
 		addJsonHeader(writer)
-		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusOK)
+		addJson(writer, profiles)
 	}
 }
 
@@ -151,7 +151,7 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		io.WriteString(writer, err.Error())
 	} else {
 		addJsonHeader(writer)
-		addJson(writer, profiles)
 		writer.WriteHeader(http.StatusAccepted)
+		addJson(writer, profiles)
 	}
 }
