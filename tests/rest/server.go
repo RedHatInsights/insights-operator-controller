@@ -22,6 +22,7 @@ func checkRestApiEntryPoint() {
 	f := frisby.Create("Check the entry point to REST API").Get(API_URL)
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
 	f.PrintReport()
 }
 
@@ -29,6 +30,7 @@ func checkNonExistentEntryPoint() {
 	f := frisby.Create("Check the non-existent entry point to REST API").Get(API_URL + "foobar")
 	f.Send()
 	f.ExpectStatus(404)
+	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
 	f.PrintReport()
 }
 
@@ -36,6 +38,7 @@ func checkWrongEntryPoint() {
 	f := frisby.Create("Check the wrong entry point to REST API").Get(API_URL + "../")
 	f.Send()
 	f.ExpectStatus(404)
+	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
 	f.PrintReport()
 }
 
