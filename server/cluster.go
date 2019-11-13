@@ -37,6 +37,7 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	} else {
+		addJsonHeader(writer)
 		json.NewEncoder(writer).Encode(clusters)
 	}
 }
@@ -76,6 +77,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		io.WriteString(writer, err.Error())
 	} else {
 		writer.WriteHeader(http.StatusCreated)
+		addJsonHeader(writer)
 		json.NewEncoder(writer).Encode(clusters)
 	}
 }
@@ -95,6 +97,7 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
+			addJsonHeader(writer)
 			json.NewEncoder(writer).Encode(cluster)
 		}
 	}
@@ -127,6 +130,7 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		io.WriteString(writer, err.Error())
 	} else {
 		writer.WriteHeader(http.StatusAccepted)
+		addJsonHeader(writer)
 		json.NewEncoder(writer).Encode(clusters)
 	}
 }
@@ -150,6 +154,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 				writer.WriteHeader(http.StatusBadRequest)
 				io.WriteString(writer, err.Error())
 			} else {
+				addJsonHeader(writer)
 				json.NewEncoder(writer).Encode(cluster)
 			}
 		}
@@ -160,6 +165,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
+			addJsonHeader(writer)
 			json.NewEncoder(writer).Encode(cluster)
 		}
 	} else {
