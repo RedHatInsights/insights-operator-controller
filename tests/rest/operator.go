@@ -23,6 +23,7 @@ func checkConfigurationForCluster0() {
 	f.Get(API_URL + "/operator/configuration/cluster0")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
 	// check the content JSON response
 	f.ExpectJson("no_op", "X")
@@ -37,6 +38,8 @@ func checkRegisterNewCluster() {
 	f.Put(API_URL + "/operator/register/cluster6")
 	f.Send()
 	f.ExpectStatus(201)
+	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
+
 	f.PrintReport()
 }
 

@@ -75,6 +75,7 @@ func checkInitialListOfConfigurationProfiles() {
 	f.Get(API_URL + "/client/profile")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
@@ -94,6 +95,7 @@ func checkGetExistingConfigurationProfile() {
 	f.Get(API_URL + "/client/profile/0")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
 	profile := readConfigurationProfileFromResponse(f)
 	expected := ConfigurationProfile{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"}
@@ -120,6 +122,7 @@ func checkChangeConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(202)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkListOfConfigurationProfilesWithUpdatedItem() {
@@ -127,6 +130,7 @@ func checkListOfConfigurationProfilesWithUpdatedItem() {
 	f.Get(API_URL + "/client/profile")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
@@ -148,6 +152,7 @@ func checkChangeNonExistingConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(202)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkDeleteConfigurationProfile() {
@@ -156,6 +161,7 @@ func checkDeleteConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkDeleteNonexistingConfigurationProfile() {
@@ -164,6 +170,7 @@ func checkDeleteNonexistingConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkCreateNewConfigurationProfile() {
@@ -173,6 +180,7 @@ func checkCreateNewConfigurationProfile() {
 
 	f.Send()
 	f.ExpectStatus(201)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkListOfConfigurationProfilesWithDeletedItem() {
@@ -180,6 +188,7 @@ func checkListOfConfigurationProfilesWithDeletedItem() {
 	f.Get(API_URL + "/client/profile")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	f.ExpectJsonLength("", 3)
 
 	profiles := readConfigurationProfilesFromResponse(f)
@@ -198,6 +207,7 @@ func checkListOfConfigurationProfilesWithAddedItem() {
 	f.Get(API_URL + "/client/profile")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
