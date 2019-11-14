@@ -56,11 +56,21 @@ func (storage Storage) Close() {
 	}
 }
 
+// Representation of cluster record in the controller service.
+//     ID: unique key
+//     Name: cluster GUID in the following format:
+//         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
+// Representation of configuration profile record in the controller service.
+//     ID: unique key
+//     Configuration: a JSON structure stored in a string
+//     ChangeAt: username of admin that created or updated the configuration
+//     ChangeBy: timestamp of the last configuration change
+//     Description: a string with any comment(s) about the configuration
 type ConfigurationProfile struct {
 	Id            int    `json:"id"`
 	Configuration string `json:"configuration"`
@@ -69,6 +79,14 @@ type ConfigurationProfile struct {
 	Description   string `json:"description"`
 }
 
+// Representation of cluster configuration record in the controller service.
+//     ID: unique key
+//     Cluster: cluster ID (not name)
+//     Configuration: a JSON structure stored in a string
+//     ChangeAt: timestamp of the last configuration change
+//     ChangeBy: username of admin that created or updated the configuration
+//     Active: flag indicating whether the configuration is active or not
+//     Reason: a string with any comment(s) about the cluster configuration
 type ClusterConfiguration struct {
 	Id            int    `json:"id"`
 	Cluster       string `json:"cluster"`
@@ -79,6 +97,17 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
+// Representation of trigger record in the controller service
+//     ID: unique key
+//     Type: ID of trigger type
+//     Cluster: cluster ID (not name)
+//     Reason: a string with any comment(s) about the trigger
+//     Link: link to any document with customer ACK with the trigger
+//     TriggeredAt: timestamp of the last configuration change
+//     TriggeredBy: username of admin that created or updated the trigger
+//     AckedAt: timestamp where the insights operator acked the trigger
+//     Parameters: parameters that needs to be pass to trigger code
+//     Active: flag indicating whether the trigger is still active or not
 type Trigger struct {
 	Id          int    `json:"id"`
 	Type        string `json:"type"`
