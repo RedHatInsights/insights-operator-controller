@@ -28,6 +28,19 @@ type Storage struct {
 	connections *sql.DB
 }
 
+func enableForeignKeys(connections *sql.DB) {
+	log.Println("Enabling foreign_keys pragma for sqlite")
+	statement, err := connections.Prepare("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal("Can prepare statement set PRAGMA for sqlite", err)
+	}
+	defer statement.Close()
+	_, err = statement.Exec()
+	if err != nil {
+		log.Fatal("Can not set PRAGMA for sqlite", err)
+	}
+}
+
 func New(driverName string, dataSourceName string) Storage {
 	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
@@ -36,13 +49,10 @@ func New(driverName string, dataSourceName string) Storage {
 		log.Fatal("Can not connect to data storage", err)
 	}
 
-	statement, err := connections.Prepare("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal("Can not set PRAGMA for sqlite", err)
+	if driverName == "sqlite3" {
+		enableForeignKeys(connections)
 	}
-	defer statement.Close()
 
-	_, err = statement.Exec()
 	return Storage{connections}
 }
 
