@@ -270,4 +270,7 @@ func ClusterTests() {
 	// checkDeleteAllClusters() - not used ATM, DB constraint
 	checkCreateNewCluster()
 	checkCreateCluster1234()
+	// TODO:
+	// add new cluster with improper name
+	// delete a cluster with improper name
 }
