@@ -57,6 +57,21 @@ func (client Client) LogAction(action string, user string, description string) e
 
 }
 
+func (client Client) LogTriggerAction(action string, user string, cluster string, trigger string) error {
+	if client.ClientImpl != nil {
+		err := client.ClientImpl.Log(
+			map[string]string{
+				"action":  action,
+				"user":    user,
+				"cluster": cluster,
+				"trigger": trigger})
+		return err
+	} else {
+		return nil
+	}
+
+}
+
 func (client Client) LogWithTime(time int64, key string, value string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.LogWithTime(
