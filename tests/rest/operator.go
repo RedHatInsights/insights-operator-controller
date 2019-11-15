@@ -57,4 +57,6 @@ func OperatorTests() {
 	checkRegisterNewCluster()
 	// configuration for newly created cluster
 	checkNonExistingConfiguration()
+	// TODO:
+	// working with clusters with improper names
 }
