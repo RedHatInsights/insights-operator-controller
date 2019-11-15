@@ -18,6 +18,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"io"
 	"net/http"
@@ -54,7 +55,7 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 	addJson(writer, triggers)
 }
 
-func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -62,6 +63,7 @@ func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage st
 		return
 	}
 
+	splunk.LogAction("DeleteTrigger", "tester", id)
 	err := storage.DeleteTriggerById(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -72,7 +74,7 @@ func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage st
 	io.WriteString(writer, "Deleted")
 }
 
-func activateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func activateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -80,6 +82,7 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 		return
 	}
 
+	splunk.LogAction("ActivateTrigger", "tester", id)
 	err := storage.ChangeStateOfTriggerById(id, 1)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -90,7 +93,7 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 	io.WriteString(writer, "Activated")
 }
 
-func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -98,6 +101,7 @@ func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storag
 		return
 	}
 
+	splunk.LogAction("DeactivateTrigger", "tester", id)
 	err := storage.ChangeStateOfTriggerById(id, 0)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -127,7 +131,7 @@ func getClusterTriggers(writer http.ResponseWriter, request *http.Request, stora
 	addJson(writer, triggers)
 }
 
-func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -163,6 +167,7 @@ func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, s
 		return
 	}
 
+	splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
 	err := storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
