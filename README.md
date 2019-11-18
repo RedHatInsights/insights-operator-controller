@@ -1,5 +1,7 @@
 # Insights operator controller
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-operator-controller)](https://goreportcard.com/report/github.com/RedHatInsights/insights-operator-controller)
+
 ## Description
 
 A service to be used to store Insights operator configuration and to offer the configuration to selected operator.
