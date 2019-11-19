@@ -503,6 +503,9 @@ func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 	if rows.Next() {
 		var configurationId int
 		err = rows.Scan(&configurationId)
+		if err != nil {
+			return -1, err
+		}
 		log.Printf("Configuration stored under ID=%d\n", configurationId)
 		return configurationId, nil
 	} else {
@@ -618,6 +621,9 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 		return []ClusterConfiguration{}, err
 	}
 	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=0, changed_at=?, changed_by=?, reason=? WHERE id=?")
+	if err != nil {
+		return []ClusterConfiguration{}, err
+	}
 	defer statement.Close()
 
 	t := time.Now()
@@ -709,6 +715,10 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 func (storage Storage) DeleteTriggerById(id string) error {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id=?`)
+	if err != nil {
+		return err
+	}
+
 	defer statement.Close()
 
 	_, err = statement.Exec(id)
@@ -718,6 +728,10 @@ DELETE FROM trigger WHERE trigger.id=?`)
 func (storage Storage) ChangeStateOfTriggerById(id string, active int) error {
 	statement, err := storage.connections.Prepare(`
 UPDATE trigger SET active=? WHERE trigger.id=?`)
+	if err != nil {
+		return err
+	}
+
 	defer statement.Close()
 
 	_, err = statement.Exec(active, id)
