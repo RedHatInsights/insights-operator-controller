@@ -46,7 +46,7 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 }, []string{"url"})
 
 type Status struct {
-	Status string
+	Status string `json:"status"`
 }
 
 var OkStatus = Status{
