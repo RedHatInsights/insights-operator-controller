@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -95,10 +95,26 @@ func addJson(writer http.ResponseWriter, data interface{}) {
 	json.NewEncoder(writer).Encode(data)
 }
 
+func addDefaultHeaders(nextHandler http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if origin := r.Header.Get("Origin"); origin != "" {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+			}
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			nextHandler.ServeHTTP(w, r)
+		})
+}
+
 func Initialize(address string, useHttps bool, storage storage.Storage, splunk logging.Client) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
+	if os.Getenv("ENV") != "production" {
+		router.Use(addDefaultHeaders)
+	}
 
 	// common REST API endpoints
 	router.HandleFunc(API_PREFIX, mainEndpoint).Methods("GET")
