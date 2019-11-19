@@ -45,6 +45,14 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: prometheus.LinearBuckets(0, 20, 20),
 }, []string{"url"})
 
+type Status struct {
+	Status string
+}
+
+var OkStatus = Status{
+	Status: "ok",
+}
+
 func countEndpoint(request *http.Request, start time.Time) {
 	url := request.URL.String()
 	duration := time.Since(start)
