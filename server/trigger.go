@@ -89,8 +89,9 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	io.WriteString(writer, "Activated")
+	addJson(writer, OkStatus)
 }
 
 func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -108,8 +109,9 @@ func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storag
 		io.WriteString(writer, err.Error())
 		return
 	}
+	addJsonHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	io.WriteString(writer, "Deactivated")
+	addJson(writer, OkStatus)
 }
 
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {

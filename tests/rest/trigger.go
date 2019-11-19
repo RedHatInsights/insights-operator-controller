@@ -102,6 +102,7 @@ func checkActivateExistingTrigger() {
 	f.Post(API_URL + "client/trigger/1/activate")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
 	f.ExpectJsonLength("", 4)
@@ -134,6 +135,7 @@ func checkDeactivateExistingTrigger() {
 	f.Post(API_URL + "client/trigger/1/deactivate")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
 	f.ExpectJsonLength("", 4)
@@ -166,6 +168,7 @@ func checkActivateAlreadyActivatedTrigger() {
 	f.Post(API_URL + "client/trigger/2/activate")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
 	f.ExpectJsonLength("", 4)
@@ -198,6 +201,7 @@ func checkDeactivateAlreadyDeactivatedTrigger() {
 	f.Post(API_URL + "client/trigger/3/deactivate")
 	f.Send()
 	f.ExpectStatus(200)
+	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
 	f.ExpectJsonLength("", 4)
