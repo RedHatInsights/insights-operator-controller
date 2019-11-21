@@ -149,7 +149,7 @@ func Initialize(address string, useHttps bool, storage storage.Storage, splunk l
 	// clusters and its configurations
 	// (handlers are implemented in the file configuration.go)
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { getClusterConfiguration(w, r, storage) }).Methods("GET")
-	clientRouter.HandleFunc("/cluster/{cluster}/configuration", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage, splunk) }).Methods("POST")
+	clientRouter.HandleFunc("/cluster/{cluster}/configuration/create", func(w http.ResponseWriter, r *http.Request) { newClusterConfiguration(w, r, storage, splunk) }).Methods("POST")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/enable", func(w http.ResponseWriter, r *http.Request) { enableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 	clientRouter.HandleFunc("/cluster/{cluster}/configuration/disable", func(w http.ResponseWriter, r *http.Request) { disableClusterConfiguration(w, r, storage, splunk) }).Methods("PUT")
 

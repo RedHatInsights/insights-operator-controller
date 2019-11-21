@@ -545,11 +545,12 @@ func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int,
 func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(cluster)
-	clusterId := clusterInfo.Id
 
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
+
+	clusterId := clusterInfo.Id
 
 	// begin transaction
 	tx, err := storage.connections.Begin()
