@@ -20,7 +20,7 @@ fi
 
 echo "Creating test database"
 rm -f test.db
-./local_storage/create_test_database.sh
+./local_storage/create_test_database_sqlite.sh
 echo "Done"
 
 echo "Starting service"
