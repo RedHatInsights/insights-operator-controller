@@ -394,8 +394,9 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 func (storage Storage) ListAllClusterConfigurations() ([]ClusterConfiguration, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
-  FROM operator_configuration, cluster
-    ON cluster.id = operator_configuration.cluster`)
+  FROM operator_configuration JOIN cluster
+    ON (cluster.id = operator_configuration.cluster)
+ORDER BY operator_configuration.id`)
 
 	if err != nil {
 		log.Print(err)
@@ -407,9 +408,9 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
-  FROM operator_configuration, cluster
-    ON cluster.id = operator_configuration.cluster
- WHERE cluster.name=?`, cluster)
+  FROM operator_configuration JOIN cluster
+    ON (cluster.id = operator_configuration.cluster)
+ WHERE cluster.name = $1`, cluster)
 
 	if err != nil {
 		log.Print(err)
@@ -424,9 +425,9 @@ func (storage Storage) GetClusterConfigurationById(id string) (string, error) {
 
 	row, err := storage.connections.Query(`
 SELECT configuration_profile.configuration
-  FROM operator_configuration, configuration_profile
-    ON configuration_profile.id = operator_configuration.configuration
- WHERE operator_configuration.id=?`, id)
+  FROM operator_configuration JOIN configuration_profile
+    ON (configuration_profile.id = operator_configuration.configuration)
+ WHERE operator_configuration.id = $1`, id)
 
 	if err != nil {
 		log.Print(err)
@@ -450,9 +451,9 @@ func (storage Storage) GetClusterActiveConfiguration(cluster string) (string, er
 	row, err := storage.connections.Query(`
 SELECT configuration_profile.configuration
   FROM operator_configuration, cluster, configuration_profile
-    ON cluster.id = operator_configuration.cluster
+ WHERE cluster.id = operator_configuration.cluster
    AND configuration_profile.id = operator_configuration.configuration
- WHERE operator_configuration.active = '1' AND cluster.name=?
+   AND operator_configuration.active = '1' AND cluster.name = $1
  LIMIT 1`, cluster)
 
 	if err != nil {
@@ -510,7 +511,19 @@ func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration s
 }
 
 func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
-	rows, err := tx.Query(`SELECT rowid FROM configuration_profile ORDER BY rowid DESC limit 1`)
+	var rows *sql.Rows
+	var err error
+
+	// We need to get the ID from the last insert. Unfortunatelly it seems there is not
+	// one existing solution that works for all databases.
+	switch storage.driver {
+	case "sqlite3":
+		rows, err = tx.Query(`SELECT rowid FROM configuration_profile ORDER BY rowid DESC limit 1`)
+	case "postgres":
+		rows, err = tx.Query(`SELECT currval('configuration_profile_id_seq')`)
+	default:
+		return -1, errors.New("unknown DB driver:" + storage.driver)
+	}
 	if err != nil {
 		log.Print(err)
 		return -1, err
@@ -771,8 +784,9 @@ func (storage Storage) ListAllTriggers() ([]Trigger, error) {
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
        trigger.parameters, trigger.active, trigger.acked_at
-  FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
-               JOIN cluster ON trigger.cluster=cluster.id`)
+FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
+               JOIN cluster ON trigger.cluster=cluster.id
+ORDER BY trigger.id`)
 
 	if err != nil {
 		return triggers, err
@@ -790,7 +804,8 @@ SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.parameters, trigger.active, trigger.acked_at
   FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
                JOIN cluster ON trigger.cluster=cluster.id
- WHERE cluster.name = ?`, clusterName)
+ WHERE cluster.name = $1
+ ORDER BY trigger.id`, clusterName)
 
 	if err != nil {
 		return triggers, err
@@ -851,22 +866,23 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 		return err
 	}
 
-	triggerId, err := storage.GetTriggerId(triggerType)
+	triggerTypeId, err := storage.GetTriggerId(triggerType)
 
 	if err != nil {
 		log.Print(err)
 		return err
 	}
 	t := time.Now()
+	ackedAt := time.Unix(0, 0).UTC()
 
-	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active, acked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '')")
+	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active, acked_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)")
 	if err != nil {
 		log.Print(err)
 		return err
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(triggerId, clusterId, reason, link, t, userName, "", 1)
+	_, err = statement.Exec(triggerTypeId, clusterId, reason, link, t, userName, "", 1, ackedAt)
 	if err != nil {
 		log.Print(err)
 		return err
