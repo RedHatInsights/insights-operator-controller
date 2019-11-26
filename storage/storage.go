@@ -159,7 +159,7 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 func (storage Storage) GetCluster(id int) (Cluster, error) {
 	var cluster Cluster
 
-	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE id = ?", id)
+	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE id = $1", id)
 	if err != nil {
 		return cluster, err
 	}
@@ -183,7 +183,7 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 }
 
 func (storage Storage) RegisterNewCluster(name string) error {
-	statement, err := storage.connections.Prepare("INSERT INTO cluster(name) VALUES (?)")
+	statement, err := storage.connections.Prepare("INSERT INTO cluster(name) VALUES ($1)")
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func (storage Storage) RegisterNewCluster(name string) error {
 }
 
 func (storage Storage) CreateNewCluster(id string, name string) error {
-	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES (?, ?)")
+	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES ($1, $2)")
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 }
 
 func (storage Storage) DeleteCluster(id string) error {
-	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id=?")
+	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id = $1")
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func (storage Storage) DeleteCluster(id string) error {
 func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	var cluster Cluster
 
-	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE name = ?", name)
+	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE name = $1", name)
 	if err != nil {
 		return cluster, err
 	}
@@ -272,7 +272,7 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, error) {
 	var profile ConfigurationProfile
 
-	rows, err := storage.connections.Query("SELECT id, configuration, changed_at, changed_by, description FROM configuration_profile WHERE id = ?", id)
+	rows, err := storage.connections.Query("SELECT id, configuration, changed_at, changed_by, description FROM configuration_profile WHERE id = $1", id)
 	if err != nil {
 		return profile, err
 	}
@@ -306,7 +306,7 @@ func (storage Storage) StoreConfigurationProfile(username string, description st
 
 	t := time.Now()
 
-	statement, err := storage.connections.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
+	statement, err := storage.connections.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES ($1, $2, $3, $4)")
 	if err != nil {
 		return profiles, err
 	}
@@ -325,7 +325,7 @@ func (storage Storage) ChangeConfigurationProfile(id int, username string, descr
 
 	t := time.Now()
 
-	statement, err := storage.connections.Prepare("UPDATE configuration_profile SET configuration=?, changed_at=?, changed_by=?, description=? WHERE id=?")
+	statement, err := storage.connections.Prepare("UPDATE configuration_profile SET configuration = $1, changed_at = $2, changed_by = $3, description = $4 WHERE id = $5")
 	if err != nil {
 		return profiles, err
 	}
@@ -342,7 +342,7 @@ func (storage Storage) ChangeConfigurationProfile(id int, username string, descr
 func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
-	statement, err := storage.connections.Prepare("DELETE FROM configuration_profile WHERE id=?")
+	statement, err := storage.connections.Prepare("DELETE FROM configuration_profile WHERE id = $1")
 	if err != nil {
 		return profiles, err
 	}
@@ -462,7 +462,7 @@ func (storage Storage) GetConfigurationIdForCluster(cluster string) (int, error)
 SELECT operator_configuration.id
   FROM operator_configuration, cluster
     ON cluster.id = operator_configuration.cluster
- WHERE cluster.name=?`, cluster)
+ WHERE cluster.name = $1`, cluster)
 
 	if err != nil {
 		return 0, err
@@ -482,7 +482,7 @@ SELECT operator_configuration.id
 func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool {
 	t := time.Now()
 
-	statement, err := tx.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES (?, ?, ?, ?)")
+	statement, err := tx.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES ($1, $2, $3, $4)")
 	if err != nil {
 		return false
 	}
@@ -516,7 +516,7 @@ func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 }
 
 func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterId int) error {
-	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster=?")
+	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
 	defer stmt.Close()
 
 	if err != nil {
@@ -531,7 +531,7 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterId in
 
 func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int, configurationId int, username string, reason string) error {
 	t := time.Now()
-	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES (?, ?, ?, ?, ?, ?)")
+	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
 	defer statement.Close()
 	if err != nil {
 		return err
@@ -602,7 +602,7 @@ func (storage Storage) EnableClusterConfiguration(cluster string, username strin
 		return []ClusterConfiguration{}, err
 	}
 
-	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=1, changed_at=?, changed_by=?, reason=? WHERE id=?")
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=1, changed_at = $1, changed_by = $2, reason = $3 WHERE id = $4")
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
@@ -623,7 +623,7 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
-	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=0, changed_at=?, changed_by=?, reason=? WHERE id=?")
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=0, changed_at = $1, changed_by = $2, reason = $3 WHERE id = $4")
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
@@ -639,7 +639,7 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 }
 
 func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active string) error {
-	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active=?, changed_at=? WHERE id=?")
+	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active = $1, changed_at = $2 WHERE id = $3")
 	if err != nil {
 		return err
 	}
@@ -656,7 +656,7 @@ func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active
 
 // TODO: copy & paste, needs to be refactored later
 func (storage Storage) DeleteClusterConfigurationById(id string) error {
-	statement, err := storage.connections.Prepare("DELETE FROM operator_configuration WHERE id=?")
+	statement, err := storage.connections.Prepare("DELETE FROM operator_configuration WHERE id = $1")
 	if err != nil {
 		return err
 	}
@@ -697,7 +697,7 @@ SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.parameters, trigger.active, trigger.acked_at
   FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
                JOIN cluster ON trigger.cluster=cluster.id
- WHERE trigger.id=?`, id)
+ WHERE trigger.id = $1`, id)
 
 	if err != nil {
 		return Trigger{}, err
@@ -717,7 +717,7 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 
 func (storage Storage) DeleteTriggerById(id string) error {
 	statement, err := storage.connections.Prepare(`
-DELETE FROM trigger WHERE trigger.id=?`)
+DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
 		return err
 	}
@@ -730,7 +730,7 @@ DELETE FROM trigger WHERE trigger.id=?`)
 
 func (storage Storage) ChangeStateOfTriggerById(id string, active int) error {
 	statement, err := storage.connections.Prepare(`
-UPDATE trigger SET active=? WHERE trigger.id=?`)
+UPDATE trigger SET active= $1 WHERE trigger.id = $2`)
 	if err != nil {
 		return err
 	}
@@ -786,7 +786,7 @@ SELECT trigger.id, trigger_type.type, cluster.name,
   FROM trigger JOIN trigger_type ON trigger.type=trigger_type.id
                JOIN cluster ON trigger.cluster=cluster.id
  WHERE trigger.active = 1
-   AND cluster.name = ?`, clusterName)
+   AND cluster.name = $1`, clusterName)
 
 	if err != nil {
 		return triggers, err
@@ -798,7 +798,7 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 func (storage Storage) GetTriggerId(triggerType string) (int, error) {
 	var id int
 
-	rows, err := storage.connections.Query("SELECT id FROM trigger_type WHERE type = ?", triggerType)
+	rows, err := storage.connections.Query("SELECT id FROM trigger_type WHERE type = $1", triggerType)
 	if err != nil {
 		return 0, err
 	}
@@ -858,7 +858,7 @@ func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
 		return err
 	}
 
-	statement, err := storage.connections.Prepare("UPDATE trigger SET acked_at=?, active=0 WHERE cluster = ? AND id = ?")
+	statement, err := storage.connections.Prepare("UPDATE trigger SET acked_at = $1, active=0 WHERE cluster = $2 AND id = $3")
 
 	if err != nil {
 		return err
