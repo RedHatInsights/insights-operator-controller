@@ -6,6 +6,8 @@ create table cluster (
     name    text not null
 );
 
+ALTER SEQUENCE cluster_id_seq MINVALUE 0 RESTART WITH 0;
+
 create table configuration_profile (
     ID            serial primary key,
     configuration varchar not null,
@@ -13,6 +15,8 @@ create table configuration_profile (
     changed_by    varchar,
     description   varchar
 );
+
+ALTER SEQUENCE configuration_profile_id_seq MINVALUE 0 RESTART WITH 0;
 
 create table operator_configuration (
     ID            serial primary key,

@@ -1,13 +1,13 @@
-insert into cluster (id, name) values (0, 'cluster0');
-insert into cluster (id, name) values (1, 'cluster1');
-insert into cluster (id, name) values (2, 'cluster2');
-insert into cluster (id, name) values (3, 'cluster3');
-insert into cluster (id, name) values (4, 'cluster4');
+insert into cluster (id, name) values (default, '00000000-0000-0000-0000-000000000000');
+insert into cluster (id, name) values (default, '00000000-0000-0000-0000-000000000001');
+insert into cluster (id, name) values (default, '00000000-0000-0000-0000-000000000002');
+insert into cluster (id, name) values (default, '00000000-0000-0000-0000-000000000003');
+insert into cluster (id, name) values (default, '00000000-0000-0000-0000-000000000004');
 
-insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (0, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg1');
-insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (1, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg2');
-insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (2, '{"no_op":"X", "watch":["a","b","c"]}', '2019-10-11', 'tester', 'cfg3');
-insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (3, '{"no_op":"Y", "watch":["d","e"]}', '2019-10-11', 'tester', 'cfg3');
+insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (default, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg1');
+insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (default, '{"no_op":"X", "watch":["a","b","c"]}', '2019-01-01', 'tester', 'cfg2');
+insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (default, '{"no_op":"X", "watch":["a","b","c"]}', '2019-10-11', 'tester', 'cfg3');
+insert into configuration_profile (id, configuration, changed_at, changed_by, description) values (default, '{"no_op":"Y", "watch":["d","e"]}', '2019-10-11', 'tester', 'cfg3');
 
 insert into operator_configuration (id, cluster, configuration, changed_at, changed_by, active, reason) values (0, 0, 0, '2019-01-01', 'tester', 0, 'no reason');
 insert into operator_configuration (id, cluster, configuration, changed_at, changed_by, active, reason) values (1, 0, 1, '2019-01-01', 'tester', 0, 'no reason');
