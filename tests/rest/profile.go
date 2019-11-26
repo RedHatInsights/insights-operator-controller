@@ -48,6 +48,26 @@ func compareConfigurationProfiles(f *frisby.Frisby, profiles []ConfigurationProf
 	}
 }
 
+func compareConfigurationProfilesWithoutId(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
+	if len(profiles) != len(expected) {
+		f.AddError(fmt.Sprintf("%d configuration profiles are expected, but got %d", len(expected), len(profiles)))
+	}
+
+	for i := 0; i < len(expected); i++ {
+		// just ignore IDs
+		profiles[i].Id = 0
+		expected[i].Id = 0
+		// just ignore timestamp as we are going to test REST API w/o mocking the database
+		profiles[i].ChangedAt = ""
+		expected[i].ChangedAt = ""
+		if profiles[i] != expected[i] {
+			f.AddError(fmt.Sprintf("Different profile info returned: %v != %v", profiles[i], expected[i]))
+			fmt.Println(profiles[i].Configuration)
+			fmt.Println(expected[i].Configuration)
+		}
+	}
+}
+
 func readConfigurationProfileFromResponse(f *frisby.Frisby) ConfigurationProfile {
 	profile := ConfigurationProfile{}
 	text, err := f.Resp.Content()
@@ -217,7 +237,7 @@ func checkListOfConfigurationProfilesWithAddedItem() {
 		{2, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-10-11T00:00:00Z", "tester", "cfg3"},
 		{3, `{"no_op":"W", "watch":[]}`, "2019-10-11T00:00:00Z", "tester2", "description"},
 	}
-	compareConfigurationProfiles(f, profiles, expected)
+	compareConfigurationProfilesWithoutId(f, profiles, expected)
 
 	f.PrintReport()
 }

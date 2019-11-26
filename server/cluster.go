@@ -43,16 +43,7 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 
 // Create a record with new cluster in a database. The updated list of all clusters is returned to client.
 func newCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	clusterId, foundId := mux.Vars(request)["id"]
 	clusterName, foundName := mux.Vars(request)["name"]
-
-	// check parameters provided by client
-	if !foundId {
-		log.Println("Cluster ID is not provided")
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
-		return
-	}
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
@@ -62,7 +53,8 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 	}
 
 	splunk.LogAction("CreateNewCluster", "tester", clusterName)
-	err := storage.CreateNewCluster(clusterId, clusterName)
+	//err := storage.CreateNewCluster(clusterId, clusterName)
+	err := storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
 		writer.WriteHeader(http.StatusInternalServerError)

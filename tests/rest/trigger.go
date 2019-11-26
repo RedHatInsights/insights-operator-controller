@@ -423,8 +423,9 @@ func checkCreateNewTrigger() {
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
 		{3, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
 		{4, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
-		{5, "must-gather", "00000000-0000-0000-0000-000000000001", "r", "l", "1970-01-01T00:00:00Z", "tester", "0001-01-01T00:00:00Z", "", 1},
+		{5, "must-gather", "00000000-0000-0000-0000-000000000001", "r", "l", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "", 1},
 	}
+
 	compareTriggers(f, triggers, expected)
 	f.PrintReport()
 }
@@ -442,7 +443,7 @@ func checkCreateNewTriggerForWrongCluster() {
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
 		{3, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
 		{4, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
-		{5, "must-gather", "00000000-0000-0000-0000-000000000001", "r", "l", "1970-01-01T00:00:00Z", "tester", "0001-01-01T00:00:00Z", "", 1},
+		{5, "must-gather", "00000000-0000-0000-0000-000000000001", "r", "l", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "", 1},
 	}
 	compareTriggers(f, triggers, expected)
 	f.PrintReport()
@@ -450,14 +451,16 @@ func checkCreateNewTriggerForWrongCluster() {
 
 func TriggerTests() {
 	checkInitialListOfTriggers()
+
+	// trigger activation and deactivation - basic cases
 	checkActivateExistingTrigger()
-
 	checkDeactivateExistingTrigger()
-	checkActivateNonExistingTrigger()
 
-	checkDeactivateAlreadyDeactivatedTrigger()
+	// trigger activation and deactivation - already activated and deactivated triggers
 	checkActivateAlreadyActivatedTrigger()
+	checkDeactivateAlreadyDeactivatedTrigger()
 
+	// trigger activation and deactivation - non-existing triggers
 	checkActivateNonExistingTrigger()
 	checkDeactivateNonExistingTrigger()
 
