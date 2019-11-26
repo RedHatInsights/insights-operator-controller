@@ -69,6 +69,22 @@ func compareClusters(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
 	}
 }
 
+func compareClustersWithoutId(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
+	if len(clusters) != len(expected) {
+		f.AddError(fmt.Sprintf("%d clusters are expected, but got %d", len(expected), len(clusters)))
+		return
+	}
+
+	for i := 0; i < len(expected); i++ {
+		// we are not interested in comparing IDs
+		clusters[i].Id = 0
+		expected[i].Id = 0
+		if clusters[i] != expected[i] {
+			f.AddError(fmt.Sprintf("Different cluster info returned: %v != %v", clusters[i], expected[i]))
+		}
+	}
+}
+
 func checkInitialListOfClusters() {
 	f := frisby.Create("Check the initial list of clusters")
 
@@ -96,7 +112,7 @@ func checkAddCluster() {
 	}
 	compareClusters(f, clusters, expected)
 
-	createCluster(f, "5", "00000000-0000-0000-0000-000000000005")
+	createCluster(f, "50", "00000000-0000-0000-0000-000000000005")
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
@@ -221,7 +237,7 @@ func checkCreateNewCluster() {
 	}
 	compareClusters(f, clusters, expected)
 
-	createCluster(f, "5", "00000000-0000-0000-0000-000000000005")
+	createCluster(f, "50", "00000000-0000-0000-0000-000000000005")
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
@@ -229,9 +245,9 @@ func checkCreateNewCluster() {
 		{1, "00000000-0000-0000-0000-000000000001"},
 		{2, "00000000-0000-0000-0000-000000000002"},
 		{3, "00000000-0000-0000-0000-000000000003"},
-		{5, "00000000-0000-0000-0000-000000000005"},
+		{4, "00000000-0000-0000-0000-000000000005"},
 	}
-	compareClusters(f, clusters, expected)
+	compareClustersWithoutId(f, clusters, expected)
 }
 
 func checkCreateCluster1234() {
@@ -243,9 +259,9 @@ func checkCreateCluster1234() {
 		{1, "00000000-0000-0000-0000-000000000001"},
 		{2, "00000000-0000-0000-0000-000000000002"},
 		{3, "00000000-0000-0000-0000-000000000003"},
-		{5, "00000000-0000-0000-0000-000000000005"},
+		{4, "00000000-0000-0000-0000-000000000005"},
 	}
-	compareClusters(f, clusters, expected)
+	compareClustersWithoutId(f, clusters, expected)
 
 	createCluster(f, "1234", "00000001-0002-0003-0004-000000000005")
 
@@ -255,10 +271,10 @@ func checkCreateCluster1234() {
 		{1, "00000000-0000-0000-0000-000000000001"},
 		{2, "00000000-0000-0000-0000-000000000002"},
 		{3, "00000000-0000-0000-0000-000000000003"},
-		{5, "00000000-0000-0000-0000-000000000005"},
-		{1234, "00000001-0002-0003-0004-000000000005"},
+		{4, "00000000-0000-0000-0000-000000000005"},
+		{5, "00000001-0002-0003-0004-000000000005"},
 	}
-	compareClusters(f, clusters, expected)
+	compareClustersWithoutId(f, clusters, expected)
 }
 
 func ClusterTests() {
