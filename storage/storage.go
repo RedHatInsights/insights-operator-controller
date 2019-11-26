@@ -19,6 +19,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"time"
@@ -26,6 +27,7 @@ import (
 
 type Storage struct {
 	connections *sql.DB
+	driver      string
 }
 
 func enableForeignKeys(connections *sql.DB) {
@@ -53,7 +55,7 @@ func New(driverName string, dataSourceName string) Storage {
 		enableForeignKeys(connections)
 	}
 
-	return Storage{connections}
+	return Storage{connections, driverName}
 }
 
 func (storage Storage) Close() {
