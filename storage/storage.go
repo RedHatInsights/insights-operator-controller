@@ -196,6 +196,7 @@ func (storage Storage) RegisterNewCluster(name string) error {
 func (storage Storage) CreateNewCluster(id string, name string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES ($1, $2)")
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	defer statement.Close()
@@ -207,6 +208,7 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 func (storage Storage) DeleteCluster(id string) error {
 	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id = $1")
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	defer statement.Close()
@@ -220,6 +222,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 
 	rows, err := storage.connections.Query("SELECT id, name FROM cluster WHERE name = $1", name)
 	if err != nil {
+		log.Print(err)
 		return cluster, err
 	}
 	defer rows.Close()
@@ -247,6 +250,7 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 
 	rows, err := storage.connections.Query("SELECT id, configuration, changed_at, changed_by, description FROM configuration_profile")
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 	defer rows.Close()
@@ -308,12 +312,14 @@ func (storage Storage) StoreConfigurationProfile(username string, description st
 
 	statement, err := storage.connections.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES ($1, $2, $3, $4)")
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 	defer statement.Close()
 
 	_, err = statement.Exec(configuration, t, username, description)
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 
@@ -327,12 +333,14 @@ func (storage Storage) ChangeConfigurationProfile(id int, username string, descr
 
 	statement, err := storage.connections.Prepare("UPDATE configuration_profile SET configuration = $1, changed_at = $2, changed_by = $3, description = $4 WHERE id = $5")
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 	defer statement.Close()
 
 	_, err = statement.Exec(configuration, t, username, description, id)
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 
@@ -344,12 +352,14 @@ func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfil
 
 	statement, err := storage.connections.Prepare("DELETE FROM configuration_profile WHERE id = $1")
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 	defer statement.Close()
 
 	_, err = statement.Exec(id)
 	if err != nil {
+		log.Print(err)
 		return profiles, err
 	}
 
@@ -388,6 +398,7 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
     ON cluster.id = operator_configuration.cluster`)
 
 	if err != nil {
+		log.Print(err)
 		return []ClusterConfiguration{}, err
 	}
 	return storage.readClusterConfigurations(rows)
@@ -401,6 +412,7 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
  WHERE cluster.name=?`, cluster)
 
 	if err != nil {
+		log.Print(err)
 		return []ClusterConfiguration{}, err
 	}
 
@@ -417,6 +429,7 @@ SELECT configuration_profile.configuration
  WHERE operator_configuration.id=?`, id)
 
 	if err != nil {
+		log.Print(err)
 		return configuration, err
 	}
 	defer row.Close()
@@ -443,6 +456,7 @@ SELECT configuration_profile.configuration
  LIMIT 1`, cluster)
 
 	if err != nil {
+		log.Print(err)
 		return configuration, err
 	}
 	defer row.Close()
@@ -498,6 +512,7 @@ func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration s
 func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 	rows, err := tx.Query(`SELECT rowid FROM configuration_profile ORDER BY rowid DESC limit 1`)
 	if err != nil {
+		log.Print(err)
 		return -1, err
 	}
 	defer rows.Close()
@@ -549,6 +564,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	clusterInfo, err := storage.GetClusterByName(cluster)
 
 	if err != nil {
+		log.Print(err)
 		return []ClusterConfiguration{}, err
 	}
 
@@ -557,12 +573,14 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	// begin transaction
 	tx, err := storage.connections.Begin()
 	if err != nil {
+		log.Print(err)
 		log.Println("Transaction failed")
 		return []ClusterConfiguration{}, err
 	}
 
 	// insert new configuration profile
 	if !storage.InsertNewConfigurationProfile(tx, configuration, username, description) {
+		log.Print(err)
 		_ = tx.Rollback()
 		return []ClusterConfiguration{}, err
 	}
@@ -570,6 +588,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	// retrieve configuration ID for newly created configuration
 	configurationId, err := storage.SelectConfigurationProfileId(tx)
 	if err != nil {
+		log.Print(err)
 		_ = tx.Rollback()
 		return []ClusterConfiguration{}, err
 	}
@@ -577,6 +596,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	// deactivate all previous configurations
 	err = storage.DeactivatePreviousConfigurations(tx, clusterId)
 	if err != nil {
+		log.Print(err)
 		_ = tx.Rollback()
 		return []ClusterConfiguration{}, err
 	}
@@ -584,12 +604,14 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	// and insert new one that will be activated
 	err = storage.InsertNewOperatorConfiguration(tx, clusterId, configurationId, username, reason)
 	if err != nil {
+		log.Print(err)
 		_ = tx.Rollback()
 		return []ClusterConfiguration{}, err
 	}
 
 	// end the transaction
 	if err := tx.Commit(); err != nil {
+		log.Print(err)
 		return []ClusterConfiguration{}, err
 	}
 
@@ -719,6 +741,7 @@ func (storage Storage) DeleteTriggerById(id string) error {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
@@ -824,24 +847,28 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	clusterId := clusterInfo.Id
 
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
 	triggerId, err := storage.GetTriggerId(triggerType)
 
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	t := time.Now()
 
 	statement, err := storage.connections.Prepare("INSERT INTO trigger(type, cluster, reason, link, triggered_at, triggered_by, parameters, active, acked_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '')")
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	defer statement.Close()
 
 	_, err = statement.Exec(triggerId, clusterId, reason, link, t, userName, "", 1)
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	return nil
