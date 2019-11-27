@@ -22,8 +22,12 @@ import (
 	"github.com/verdverm/frisby"
 )
 
+// Cluster represents cluster record in the controller service.
+//     ID: unique key
+//     Name: cluster GUID in the following format:
+//         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -43,14 +47,14 @@ func readListOfClusters(f *frisby.Frisby) []Cluster {
 	return clusters
 }
 
-func createCluster(f *frisby.Frisby, clusterId string, clusterName string) {
-	f.Post(API_URL + "client/cluster/" + clusterId + "/" + clusterName)
+func createCluster(f *frisby.Frisby, clusterID string, clusterName string) {
+	f.Post(API_URL + "client/cluster/" + clusterID + "/" + clusterName)
 	f.Send()
 	f.ExpectStatus(201)
 }
 
-func deleteCluster(f *frisby.Frisby, clusterId string) {
-	f.Delete(API_URL + "client/cluster/" + clusterId)
+func deleteCluster(f *frisby.Frisby, clusterID string) {
+	f.Delete(API_URL + "client/cluster/" + clusterID)
 	f.Send()
 	f.ExpectStatus(202)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
@@ -69,7 +73,7 @@ func compareClusters(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
 	}
 }
 
-func compareClustersWithoutId(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
+func compareClustersWithoutID(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
 	if len(clusters) != len(expected) {
 		f.AddError(fmt.Sprintf("%d clusters are expected, but got %d", len(expected), len(clusters)))
 		return
@@ -77,8 +81,8 @@ func compareClustersWithoutId(f *frisby.Frisby, clusters []Cluster, expected []C
 
 	for i := 0; i < len(expected); i++ {
 		// we are not interested in comparing IDs
-		clusters[i].Id = 0
-		expected[i].Id = 0
+		clusters[i].ID = 0
+		expected[i].ID = 0
 		if clusters[i] != expected[i] {
 			f.AddError(fmt.Sprintf("Different cluster info returned: %v != %v", clusters[i], expected[i]))
 		}
@@ -247,7 +251,7 @@ func checkCreateNewCluster() {
 		{3, "00000000-0000-0000-0000-000000000003"},
 		{4, "00000000-0000-0000-0000-000000000005"},
 	}
-	compareClustersWithoutId(f, clusters, expected)
+	compareClustersWithoutID(f, clusters, expected)
 }
 
 func checkCreateCluster1234() {
@@ -261,7 +265,7 @@ func checkCreateCluster1234() {
 		{3, "00000000-0000-0000-0000-000000000003"},
 		{4, "00000000-0000-0000-0000-000000000005"},
 	}
-	compareClustersWithoutId(f, clusters, expected)
+	compareClustersWithoutID(f, clusters, expected)
 
 	createCluster(f, "1234", "00000001-0002-0003-0004-000000000005")
 
@@ -274,9 +278,10 @@ func checkCreateCluster1234() {
 		{4, "00000000-0000-0000-0000-000000000005"},
 		{5, "00000001-0002-0003-0004-000000000005"},
 	}
-	compareClustersWithoutId(f, clusters, expected)
+	compareClustersWithoutID(f, clusters, expected)
 }
 
+// ClusterTests run all cluster-related REST API tests.
 func ClusterTests() {
 	checkInitialListOfClusters()
 	checkAddCluster()

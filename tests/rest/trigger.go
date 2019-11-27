@@ -22,8 +22,19 @@ import (
 	"github.com/verdverm/frisby"
 )
 
+// Trigger represents trigger record in the controller service
+//     ID: unique key
+//     Type: ID of trigger type
+//     Cluster: cluster ID (not name)
+//     Reason: a string with any comment(s) about the trigger
+//     Link: link to any document with customer ACK with the trigger
+//     TriggeredAt: timestamp of the last configuration change
+//     TriggeredBy: username of admin that created or updated the trigger
+//     AckedAt: timestamp where the insights operator acked the trigger
+//     Parameters: parameters that needs to be pass to trigger code
+//     Active: flag indicating whether the trigger is still active or not
 type Trigger struct {
-	Id          int    `json:"id"`
+	ID          int    `json:"id"`
 	Type        string `json:"type"`
 	Cluster     string `json:"cluster"`
 	Reason      string `json:"reason"`
@@ -449,6 +460,7 @@ func checkCreateNewTriggerForWrongCluster() {
 	f.PrintReport()
 }
 
+// TriggerTests run all trigger-related REST API tests.
 func TriggerTests() {
 	checkInitialListOfTriggers()
 
