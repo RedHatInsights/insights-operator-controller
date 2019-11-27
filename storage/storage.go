@@ -13,14 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package storage
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"           // PostgreSQL database driver
+	_ "github.com/mattn/go-sqlite3" // SQLite database driver
 	"log"
 	"time"
 )
@@ -489,9 +490,8 @@ SELECT operator_configuration.id
 
 		err = rows.Scan(&id)
 		return id, err
-	} else {
-		return 0, errors.New("Unknown operator name provided")
 	}
+	return 0, errors.New("Unknown operator name provided")
 }
 
 func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool {
@@ -510,7 +510,7 @@ func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration s
 	return true
 }
 
-func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
+func (storage Storage) SelectConfigurationProfileID(tx *sql.Tx) (int, error) {
 	var rows *sql.Rows
 	var err error
 
@@ -538,9 +538,8 @@ func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 		}
 		log.Printf("Configuration stored under ID=%d\n", configurationID)
 		return configurationID, nil
-	} else {
-		return -1, errors.New("can not retrieve last configuration ID")
 	}
+	return -1, errors.New("can not retrieve last configuration ID")
 }
 
 func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID int) error {
@@ -599,7 +598,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	}
 
 	// retrieve configuration ID for newly created configuration
-	configurationID, err := storage.SelectConfigurationProfileId(tx)
+	configurationID, err := storage.SelectConfigurationProfileID(tx)
 	if err != nil {
 		log.Print(err)
 		_ = tx.Rollback()
@@ -745,9 +744,8 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 
 	if len(triggers) >= 1 {
 		return triggers[0], nil
-	} else {
-		return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
 	}
+	return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
 }
 
 func (storage Storage) DeleteTriggerByID(id string) error {
