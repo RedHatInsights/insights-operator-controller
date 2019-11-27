@@ -40,10 +40,20 @@ Please note that the service (when run locally) use the self-signed certificate.
 You'd need to use `certs.pem` file on client side (curl, web browser etc.)
 
 
+### Configuration file
+
+Default configuration file is `config.toml`. It is possible to specify config file via environment variable
+named `INSIGHTS_CONTROLLER_CONFIG_FILE`. For example:
+
+```
+export INSIGHTS_CONTROLLER_CONFIG_FILE=~/config.toml
+./insights-operator-controller
+```
+
 
 ## Data storage
 
-Data storage used by the service is configurable via the `config.tom` file. Currently it is possible to configure the following data storages:
+Data storage used by the service is configurable via the command line parameters. Currently it is possible to configure the following data storages:
 * SQLite local database: `controller.db` for the local deployment and `data.db` for functional tests
 * PostgreSQL database: for local deployment and to be able to deploy the application to developer development
 
