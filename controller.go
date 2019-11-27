@@ -30,9 +30,9 @@ func initializeSplunk() logging.Client {
 	address := splunkCfg.GetString("address")
 	token := splunkCfg.GetString("token")
 	source := splunkCfg.GetString("source")
-	source_type := splunkCfg.GetString("source_type")
+	sourceType := splunkCfg.GetString("source_type")
 	index := splunkCfg.GetString("index")
-	return logging.NewClient(enabled, address, token, source, source_type, index)
+	return logging.NewClient(enabled, address, token, source, sourceType, index)
 }
 
 // Entry point to the Insights operator controller.
@@ -46,7 +46,7 @@ func main() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
 	// parse all command-line arguments
@@ -60,8 +60,8 @@ func main() {
 	splunk := initializeSplunk()
 
 	serviceCfg := viper.Sub("service")
-	useHttps := serviceCfg.GetBool("use_https")
+	useHTTPS := serviceCfg.GetBool("use_https")
 	address := serviceCfg.GetString("address")
 
-	server.Initialize(address, useHttps, storage, splunk)
+	server.Initialize(address, useHTTPS, storage, splunk)
 }
