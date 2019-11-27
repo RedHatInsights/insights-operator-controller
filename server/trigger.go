@@ -44,7 +44,7 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 		return
 	}
 
-	triggers, err := storage.GetTriggerById(id)
+	triggers, err := storage.GetTriggerByID(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -64,7 +64,7 @@ func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage st
 	}
 
 	splunk.LogAction("DeleteTrigger", "tester", id)
-	err := storage.DeleteTriggerById(id)
+	err := storage.DeleteTriggerByID(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -83,7 +83,7 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 	}
 
 	splunk.LogAction("ActivateTrigger", "tester", id)
-	err := storage.ChangeStateOfTriggerById(id, 1)
+	err := storage.ChangeStateOfTriggerByID(id, 1)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -103,7 +103,7 @@ func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storag
 	}
 
 	splunk.LogAction("DeactivateTrigger", "tester", id)
-	err := storage.ChangeStateOfTriggerById(id, 0)
+	err := storage.ChangeStateOfTriggerByID(id, 0)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())

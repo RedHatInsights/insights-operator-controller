@@ -33,7 +33,7 @@ func getConfiguration(writer http.ResponseWriter, request *http.Request, storage
 		return
 	}
 
-	configuration, err := storage.GetClusterConfigurationById(id)
+	configuration, err := storage.GetClusterConfigurationByID(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -51,7 +51,7 @@ func deleteConfiguration(writer http.ResponseWriter, request *http.Request, stor
 	}
 
 	splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
-	err := storage.DeleteClusterConfigurationById(id)
+	err := storage.DeleteClusterConfigurationByID(id)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -103,7 +103,7 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 	} else {
 		splunk.LogAction("EnableClusterConfiguration", "tester", id)
 	}
-	err := storage.EnableOrDisableClusterConfigurationById(id, active)
+	err := storage.EnableOrDisableClusterConfigurationByID(id, active)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
