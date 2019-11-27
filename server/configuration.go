@@ -68,8 +68,8 @@ func getAllConfigurations(writer http.ResponseWriter, request *http.Request, sto
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
-	addJson(writer, configuration)
+	addJSONHeader(writer)
+	addJSON(writer, configuration)
 }
 
 func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -86,8 +86,8 @@ func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
-	addJson(writer, configuration)
+	addJSONHeader(writer)
+	addJSON(writer, configuration)
 }
 
 func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client, active string) {
@@ -168,8 +168,8 @@ func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 	splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
-	addJsonHeader(writer)
-	addJson(writer, configurations)
+	addJSONHeader(writer)
+	addJSON(writer, configurations)
 }
 
 func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -202,8 +202,8 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
-	addJson(writer, configurations)
+	addJSONHeader(writer)
+	addJSON(writer, configurations)
 }
 
 func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -236,6 +236,6 @@ func disableClusterConfiguration(writer http.ResponseWriter, request *http.Reque
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
-	addJson(writer, configurations)
+	addJSONHeader(writer)
+	addJSON(writer, configurations)
 }

@@ -18,7 +18,7 @@ package tests
 
 import "github.com/verdverm/frisby"
 
-func checkRestApiEntryPoint() {
+func checkRestAPIEntryPoint() {
 	f := frisby.Create("Check the entry point to REST API").Get(API_URL)
 	f.Send()
 	f.ExpectStatus(200)
@@ -59,8 +59,9 @@ func checkWrongMethodsForEntryPoint() {
 	f.PrintReport()
 }
 
+// ServerTests run all tests for basic REST API endpoints
 func ServerTests() {
-	checkRestApiEntryPoint()
+	checkRestAPIEntryPoint()
 	checkNonExistentEntryPoint()
 	checkWrongEntryPoint()
 	checkWrongMethodsForEntryPoint()

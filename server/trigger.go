@@ -31,9 +31,9 @@ func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage s
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	addJson(writer, triggers)
+	addJSON(writer, triggers)
 }
 
 func getTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -50,9 +50,9 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	addJson(writer, triggers)
+	addJSON(writer, triggers)
 }
 
 func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -89,9 +89,9 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	addJson(writer, OkStatus)
+	addJSON(writer, OkStatus)
 }
 
 func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
@@ -109,9 +109,9 @@ func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storag
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	addJson(writer, OkStatus)
+	addJSON(writer, OkStatus)
 }
 
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
@@ -128,9 +128,9 @@ func getClusterTriggers(writer http.ResponseWriter, request *http.Request, stora
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
-	addJson(writer, triggers)
+	addJSON(writer, triggers)
 }
 
 func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {

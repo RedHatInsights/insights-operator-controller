@@ -29,8 +29,8 @@ import (
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	profiles, err := storage.ListConfigurationProfiles()
 	if err == nil {
-		addJsonHeader(writer)
-		addJson(writer, profiles)
+		addJSONHeader(writer)
+		addJSON(writer, profiles)
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -39,7 +39,7 @@ func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request
 
 // Read profile specified by its ID
 func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	id, err := retrieveIdRequestParameter(request)
+	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Error reading profile ID from request\n")
@@ -48,8 +48,8 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 
 	profile, err := storage.GetConfigurationProfile(int(id))
 	if err == nil {
-		addJsonHeader(writer)
-		addJson(writer, profile)
+		addJSONHeader(writer)
+		addJSON(writer, profile)
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
@@ -86,15 +86,15 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
+		addJSONHeader(writer)
 		writer.WriteHeader(http.StatusCreated)
-		addJson(writer, profiles)
+		addJSON(writer, profiles)
 	}
 }
 
 // Delete configuration profile
 func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	id, err := retrieveIdRequestParameter(request)
+	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Error reading profile ID from request\n")
@@ -107,15 +107,15 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
+		addJSONHeader(writer)
 		writer.WriteHeader(http.StatusOK)
-		addJson(writer, profiles)
+		addJSON(writer, profiles)
 	}
 }
 
 // Change configuration profile
 func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	id, err := retrieveIdRequestParameter(request)
+	id, err := retrieveIDRequestParameter(request)
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
 
@@ -150,8 +150,8 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
+		addJSONHeader(writer)
 		writer.WriteHeader(http.StatusAccepted)
-		addJson(writer, profiles)
+		addJSON(writer, profiles)
 	}
 }

@@ -25,7 +25,7 @@ import (
 	"net/http"
 )
 
-// Read configuration for the operator
+// Read configuration for the operator.
 func readConfigurationForOperator(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -42,11 +42,12 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
+	addJSONHeader(writer)
 	writer.WriteHeader(http.StatusOK)
 	io.WriteString(writer, configuration)
 }
 
+// Register new cluster.
 func registerCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	clusterName, foundName := mux.Vars(request)["cluster"]
 
@@ -83,8 +84,8 @@ func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Reque
 		io.WriteString(writer, err.Error())
 		return
 	}
-	addJsonHeader(writer)
-	addJson(writer, triggers)
+	addJSONHeader(writer)
+	addJSON(writer, triggers)
 	writer.WriteHeader(http.StatusOK)
 }
 
@@ -96,14 +97,14 @@ func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, sto
 		return
 	}
 
-	triggerId, found := mux.Vars(request)["trigger"]
+	triggerID, found := mux.Vars(request)["trigger"]
 	if !found {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Trigger ID needs to be specified")
 		return
 	}
 
-	err := storage.AckTrigger(cluster, triggerId)
+	err := storage.AckTrigger(cluster, triggerID)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())

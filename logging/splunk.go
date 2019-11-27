@@ -13,36 +13,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package logging
 
 import (
 	"github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk"
 )
 
+// Client represents a Splunk client instance.
 type Client struct {
 	ClientImpl *splunk.Client
 }
 
-func NewClient(enabled bool, address string, token string, source string, source_type string, index string) Client {
+// NewClient creates a new instance of Splunk client.
+func NewClient(enabled bool, address string, token string, source string, sourceType string, index string) Client {
 	if enabled {
 		url := address + "/services/collector/raw"
-		splunk := splunk.NewClient(nil, url, token, source, source_type, index)
+		splunk := splunk.NewClient(nil, url, token, source, sourceType, index)
 		return Client{ClientImpl: splunk}
-	} else {
-		return Client{ClientImpl: nil}
 	}
+	return Client{ClientImpl: nil}
 }
 
+// Log add a new message into the Splunk log.
 func (client Client) Log(key string, value string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
 			map[string]string{key: value})
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
+// LogAction add a new message about performed action into the Splunk log.
 func (client Client) LogAction(action string, user string, description string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
@@ -51,12 +54,11 @@ func (client Client) LogAction(action string, user string, description string) e
 				"user":        user,
 				"description": description})
 		return err
-	} else {
-		return nil
 	}
-
+	return nil
 }
 
+// LogTriggerAction add a new message about performed trigger-related action into the Splunk log.
 func (client Client) LogTriggerAction(action string, user string, cluster string, trigger string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
@@ -66,19 +68,17 @@ func (client Client) LogTriggerAction(action string, user string, cluster string
 				"cluster": cluster,
 				"trigger": trigger})
 		return err
-	} else {
-		return nil
 	}
-
+	return nil
 }
 
+// LogWithTime add a new message with timestamp into the Splunk log.
 func (client Client) LogWithTime(time int64, key string, value string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.LogWithTime(
 			time,
 			map[string]string{key: value})
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }

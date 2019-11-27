@@ -50,6 +50,7 @@ func checkNonExistingConfiguration() {
 	f.PrintReport()
 }
 
+// OperatorTests run all operator-related REST API tests.
 func OperatorTests() {
 	checkConfigurationForCluster0()
 	// configuration for non-existing cluster

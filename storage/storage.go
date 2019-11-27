@@ -514,7 +514,7 @@ func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 	var rows *sql.Rows
 	var err error
 
-	// We need to get the ID from the last insert. Unfortunatelly it seems there is not
+	// We need to get the ID from the last insert. Unfortunately it seems there is not
 	// one existing solution that works for all databases.
 	switch storage.driver {
 	case "sqlite3":

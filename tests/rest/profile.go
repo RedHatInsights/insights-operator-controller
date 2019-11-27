@@ -23,8 +23,14 @@ import (
 	"strings"
 )
 
+// ConfigurationProfile represents configuration profile record in the controller service.
+//     ID: unique key
+//     Configuration: a JSON structure stored in a string
+//     ChangeAt: username of admin that created or updated the configuration
+//     ChangeBy: timestamp of the last configuration change
+//     Description: a string with any comment(s) about the configuration
 type ConfigurationProfile struct {
-	Id            int    `json:"id"`
+	ID            int    `json:"id"`
 	Configuration string `json:"configuration"`
 	ChangedAt     string `json:"changed_at"`
 	ChangedBy     string `json:"changed_by"`
@@ -48,15 +54,15 @@ func compareConfigurationProfiles(f *frisby.Frisby, profiles []ConfigurationProf
 	}
 }
 
-func compareConfigurationProfilesWithoutId(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
+func compareConfigurationProfilesWithoutID(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
 	if len(profiles) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configuration profiles are expected, but got %d", len(expected), len(profiles)))
 	}
 
 	for i := 0; i < len(expected); i++ {
 		// just ignore IDs
-		profiles[i].Id = 0
-		expected[i].Id = 0
+		profiles[i].ID = 0
+		expected[i].ID = 0
 		// just ignore timestamp as we are going to test REST API w/o mocking the database
 		profiles[i].ChangedAt = ""
 		expected[i].ChangedAt = ""
@@ -237,11 +243,12 @@ func checkListOfConfigurationProfilesWithAddedItem() {
 		{2, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-10-11T00:00:00Z", "tester", "cfg3"},
 		{3, `{"no_op":"W", "watch":[]}`, "2019-10-11T00:00:00Z", "tester2", "description"},
 	}
-	compareConfigurationProfilesWithoutId(f, profiles, expected)
+	compareConfigurationProfilesWithoutID(f, profiles, expected)
 
 	f.PrintReport()
 }
 
+// ProfileTests run all configuration profile-related REST API tests.
 func ProfileTests() {
 	checkInitialListOfConfigurationProfiles()
 	checkGetExistingConfigurationProfile()
