@@ -36,8 +36,8 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 		writer.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
-		addJson(writer, clusters)
+		addJSONHeader(writer)
+		addJSON(writer, clusters)
 	}
 }
 
@@ -67,16 +67,16 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
+		addJSONHeader(writer)
 		writer.WriteHeader(http.StatusCreated)
-		addJson(writer, clusters)
+		addJSON(writer, clusters)
 	}
 }
 
 // Read cluster specified by its ID and return it to a client.
-func getClusterById(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+func getClusterByID(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	// try to retrieve cluster ID from query
-	id, err := retrieveIdRequestParameter(request)
+	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
 		writer.WriteHeader(http.StatusBadRequest)
@@ -88,26 +88,26 @@ func getClusterById(writer http.ResponseWriter, request *http.Request, storage s
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
-			addJsonHeader(writer)
-			addJson(writer, cluster)
+			addJSONHeader(writer)
+			addJSON(writer, cluster)
 		}
 	}
 }
 
 // Delete a cluster
 func deleteCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	clusterId, foundId := mux.Vars(request)["id"]
+	clusterID, foundID := mux.Vars(request)["id"]
 
 	// check parameter provided by client
-	if !foundId {
+	if !foundID {
 		log.Println("Cluster ID is not provided")
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, "Cluster ID needs to be specified")
 		return
 	}
 
-	splunk.LogAction("DeleteCluster", "tester", clusterId)
-	err := storage.DeleteCluster(clusterId)
+	splunk.LogAction("DeleteCluster", "tester", clusterID)
+	err := storage.DeleteCluster(clusterID)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -120,19 +120,19 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		writer.WriteHeader(http.StatusBadRequest)
 		io.WriteString(writer, err.Error())
 	} else {
-		addJsonHeader(writer)
+		addJSONHeader(writer)
 		writer.WriteHeader(http.StatusAccepted)
-		addJson(writer, clusters)
+		addJSON(writer, clusters)
 	}
 }
 
 // Search for a cluster specified by its ID or name.
 func searchCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	idParam, foundId := request.URL.Query()["id"]
+	idParam, foundID := request.URL.Query()["id"]
 	nameParam, foundName := request.URL.Query()["name"]
 
 	// either cluster id or its name needs to be specified
-	if foundId {
+	if foundID {
 		id, err := strconv.ParseInt(idParam[0], 10, 0)
 		if err != nil {
 			log.Println("Error reading and decoding cluster ID from query", err)
@@ -145,8 +145,8 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 				writer.WriteHeader(http.StatusBadRequest)
 				io.WriteString(writer, err.Error())
 			} else {
-				addJsonHeader(writer)
-				addJson(writer, cluster)
+				addJSONHeader(writer)
+				addJSON(writer, cluster)
 			}
 		}
 	} else if foundName {
@@ -156,8 +156,8 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			writer.WriteHeader(http.StatusBadRequest)
 			io.WriteString(writer, err.Error())
 		} else {
-			addJsonHeader(writer)
-			addJson(writer, cluster)
+			addJSONHeader(writer)
+			addJSON(writer, cluster)
 		}
 	} else {
 		writer.WriteHeader(http.StatusBadRequest)
