@@ -32,7 +32,8 @@ import (
 	"time"
 )
 
-const API_PREFIX = "/api/v1/"
+// APIPrefix is appended before all REST API endpoint addresses
+const APIPrefix = "/api/v1/"
 
 var apiRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 	Name: "api_endpoints_requests",
@@ -45,10 +46,12 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: prometheus.LinearBuckets(0, 20, 20),
 }, []string{"url"})
 
+// Status represents the JSON payload with status message sent back to client
 type Status struct {
 	Status string `json:"status"`
 }
 
+// OkStatus represents the JSON payload with "OK" status message sent back to client
 var OkStatus = Status{
 	Status: "ok",
 }
@@ -63,9 +66,9 @@ func countEndpoint(request *http.Request, start time.Time) {
 	apiResponses.With(prometheus.Labels{"url": url}).Observe(float64(duration.Microseconds()))
 }
 
-func retrieveIdRequestParameter(request *http.Request) (int64, error) {
-	id_var := mux.Vars(request)["id"]
-	return strconv.ParseInt(id_var, 10, 0)
+func retrieveIDRequestParameter(request *http.Request) (int64, error) {
+	idVar := mux.Vars(request)["id"]
+	return strconv.ParseInt(idVar, 10, 0)
 }
 
 func mainEndpoint(writer http.ResponseWriter, request *http.Request) {
@@ -87,11 +90,11 @@ func logRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
-func addJsonHeader(writer http.ResponseWriter) {
+func addJSONHeader(writer http.ResponseWriter) {
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 }
 
-func addJson(writer http.ResponseWriter, data interface{}) {
+func addJSON(writer http.ResponseWriter, data interface{}) {
 	json.NewEncoder(writer).Encode(data)
 }
 
@@ -108,7 +111,8 @@ func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 		})
 }
 
-func Initialize(address string, useHttps bool, storage storage.Storage, splunk logging.Client) {
+// Initialize perform the server initialization
+func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk logging.Client) {
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
@@ -117,16 +121,16 @@ func Initialize(address string, useHttps bool, storage storage.Storage, splunk l
 	}
 
 	// common REST API endpoints
-	router.HandleFunc(API_PREFIX, mainEndpoint).Methods("GET")
+	router.HandleFunc(APIPrefix, mainEndpoint).Methods("GET")
 
 	// REST API endpoints used by client
-	clientRouter := router.PathPrefix(API_PREFIX + "client").Subrouter()
+	clientRouter := router.PathPrefix(APIPrefix + "client").Subrouter()
 
 	// clusters-related operations
 	// (handlers are implemented in the file cluster.go)
 	clientRouter.HandleFunc("/cluster", func(w http.ResponseWriter, r *http.Request) { getClusters(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{id:[0-9]+}/{name}", func(w http.ResponseWriter, r *http.Request) { newCluster(w, r, storage, splunk) }).Methods("POST")
-	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterById(w, r, storage) }).Methods("GET")
+	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { getClusterByID(w, r, storage) }).Methods("GET")
 	clientRouter.HandleFunc("/cluster/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) { deleteCluster(w, r, storage, splunk) }).Methods("DELETE")
 	clientRouter.HandleFunc("/cluster/search", func(w http.ResponseWriter, r *http.Request) { searchCluster(w, r, storage) }).Methods("GET")
 
@@ -164,7 +168,7 @@ func Initialize(address string, useHttps bool, storage storage.Storage, splunk l
 
 	// REST API endpoints used by insights operator
 	// (handlers are implemented in the file operator.go)
-	operatorRouter := router.PathPrefix(API_PREFIX + "operator").Subrouter()
+	operatorRouter := router.PathPrefix(APIPrefix + "operator").Subrouter()
 	operatorRouter.HandleFunc("/register/{cluster}", func(w http.ResponseWriter, r *http.Request) { registerCluster(w, r, storage, splunk) }).Methods("GET", "PUT")
 	operatorRouter.HandleFunc("/configuration/{cluster}", func(w http.ResponseWriter, r *http.Request) { readConfigurationForOperator(w, r, storage) }).Methods("GET")
 	operatorRouter.HandleFunc("/triggers/{cluster}", func(w http.ResponseWriter, r *http.Request) { getActiveTriggersForCluster(w, r, storage) }).Methods("GET")
@@ -178,7 +182,7 @@ func Initialize(address string, useHttps bool, storage storage.Storage, splunk l
 	splunk.Log("Action", "starting service at address "+address)
 	var err error
 
-	if useHttps {
+	if useHTTPS {
 		err = http.ListenAndServeTLS(address, "server.crt", "server.key", router)
 	} else {
 		err = http.ListenAndServe(address, router)
