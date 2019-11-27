@@ -13,18 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package storage
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"           // PostgreSQL database driver
+	_ "github.com/mattn/go-sqlite3" // SQLite database driver
 	"log"
 	"time"
 )
 
+// Storage represents an interface to any relational database based on SQL language
 type Storage struct {
 	connections *sql.DB
 	driver      string
@@ -43,6 +45,7 @@ func enableForeignKeys(connections *sql.DB) {
 	}
 }
 
+// New function creates and initializes a new instance of Storage structure
 func New(driverName string, dataSourceName string) Storage {
 	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
@@ -58,6 +61,7 @@ func New(driverName string, dataSourceName string) Storage {
 	return Storage{connections, driverName}
 }
 
+// Close method closes the connection to database. Needs to be called at the end of application lifecycle.
 func (storage Storage) Close() {
 	log.Println("Closing connection to data storage")
 	if storage.connections != nil {
@@ -68,30 +72,30 @@ func (storage Storage) Close() {
 	}
 }
 
-// Representation of cluster record in the controller service.
+// Cluster represents cluster record in the controller service.
 //     ID: unique key
 //     Name: cluster GUID in the following format:
 //         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-// Representation of configuration profile record in the controller service.
+// ConfigurationProfile represents configuration profile record in the controller service.
 //     ID: unique key
 //     Configuration: a JSON structure stored in a string
 //     ChangeAt: username of admin that created or updated the configuration
 //     ChangeBy: timestamp of the last configuration change
 //     Description: a string with any comment(s) about the configuration
 type ConfigurationProfile struct {
-	Id            int    `json:"id"`
+	ID            int    `json:"id"`
 	Configuration string `json:"configuration"`
 	ChangedAt     string `json:"changed_at"`
 	ChangedBy     string `json:"changed_by"`
 	Description   string `json:"description"`
 }
 
-// Representation of cluster configuration record in the controller service.
+// ClusterConfiguration represents cluster configuration record in the controller service.
 //     ID: unique key
 //     Cluster: cluster ID (not name)
 //     Configuration: a JSON structure stored in a string
@@ -100,7 +104,7 @@ type ConfigurationProfile struct {
 //     Active: flag indicating whether the configuration is active or not
 //     Reason: a string with any comment(s) about the cluster configuration
 type ClusterConfiguration struct {
-	Id            int    `json:"id"`
+	ID            int    `json:"id"`
 	Cluster       string `json:"cluster"`
 	Configuration string `json:"configuration"`
 	ChangedAt     string `json:"changed_at"`
@@ -109,7 +113,7 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
-// Representation of trigger record in the controller service
+// Trigger represents trigger record in the controller service
 //     ID: unique key
 //     Type: ID of trigger type
 //     Cluster: cluster ID (not name)
@@ -121,7 +125,7 @@ type ClusterConfiguration struct {
 //     Parameters: parameters that needs to be pass to trigger code
 //     Active: flag indicating whether the trigger is still active or not
 type Trigger struct {
-	Id          int    `json:"id"`
+	ID          int    `json:"id"`
 	Type        string `json:"type"`
 	Cluster     string `json:"cluster"`
 	Reason      string `json:"reason"`
@@ -133,6 +137,7 @@ type Trigger struct {
 	Active      int    `json:"active"`
 }
 
+// ListOfClusters method selects all clusters from database.
 func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	clusters := []Cluster{}
 
@@ -156,6 +161,7 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	return clusters, nil
 }
 
+// GetCluster method selects the specified cluster from database. Also see GetClusterByName.
 func (storage Storage) GetCluster(id int) (Cluster, error) {
 	var cluster Cluster
 
@@ -171,7 +177,7 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.Id = id
+			cluster.ID = id
 			cluster.Name = name
 		} else {
 			log.Println("error", err)
@@ -182,6 +188,8 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 	return cluster, err
 }
 
+// RegisterNewCluster inserts information about new cluster into the database.
+// It differs from CreateNewCluster, because ID is not specified explicitly here.
 func (storage Storage) RegisterNewCluster(name string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO cluster(name) VALUES ($1)")
 	if err != nil {
@@ -193,6 +201,8 @@ func (storage Storage) RegisterNewCluster(name string) error {
 	return err
 }
 
+// CreateNewCluster creates a new cluster with specified ID and name.
+// It differs from RegisterNewCluster, because ID is specified explicitly here.
 func (storage Storage) CreateNewCluster(id string, name string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES ($1, $2)")
 	if err != nil {
@@ -205,6 +215,7 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 	return err
 }
 
+// DeleteCluster deletes cluster with specified ID from the database.
 func (storage Storage) DeleteCluster(id string) error {
 	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id = $1")
 	if err != nil {
@@ -217,6 +228,7 @@ func (storage Storage) DeleteCluster(id string) error {
 	return err
 }
 
+// GetClusterByName selects a cluster specified by its name. Also see GetCluster.
 func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	var cluster Cluster
 
@@ -233,7 +245,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.Id = id
+			cluster.ID = id
 			cluster.Name = name
 			log.Printf("Cluster name %s has id %d\n", name, id)
 		} else {
@@ -245,6 +257,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	return cluster, err
 }
 
+// ListConfigurationProfiles selects list of all configuration profiles from database.
 func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, error) {
 	profiles := []ConfigurationProfile{}
 
@@ -258,13 +271,13 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 	for rows.Next() {
 		var id int
 		var configuration string
-		var changed_at string
-		var changed_by string
+		var changedAt string
+		var changedBy string
 		var description string
 
-		err = rows.Scan(&id, &configuration, &changed_at, &changed_by, &description)
+		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profiles = append(profiles, ConfigurationProfile{id, configuration, changed_at, changed_by, description})
+			profiles = append(profiles, ConfigurationProfile{id, configuration, changedAt, changedBy, description})
 		} else {
 			log.Println("error", err)
 		}
@@ -273,6 +286,7 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 	return profiles, nil
 }
 
+// GetConfigurationProfile selects one configuration profile identified by its ID.
 func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, error) {
 	var profile ConfigurationProfile
 
@@ -285,16 +299,16 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 	if rows.Next() {
 		var id int
 		var configuration string
-		var changed_at string
-		var changed_by string
+		var changedAt string
+		var changedBy string
 		var description string
 
-		err = rows.Scan(&id, &configuration, &changed_at, &changed_by, &description)
+		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profile.Id = id
+			profile.ID = id
 			profile.Configuration = configuration
-			profile.ChangedAt = changed_at
-			profile.ChangedBy = changed_by
+			profile.ChangedAt = changedAt
+			profile.ChangedBy = changedBy
 			profile.Description = description
 		} else {
 			log.Println("error", err)
@@ -305,6 +319,7 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 	return profile, err
 }
 
+// StoreConfigurationProfile stores a given configuration profile (string ATM) into the database.
 func (storage Storage) StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
@@ -326,6 +341,7 @@ func (storage Storage) StoreConfigurationProfile(username string, description st
 	return storage.ListConfigurationProfiles()
 }
 
+// ChangeConfigurationProfile updates the existing configuration profile specified by its ID.
 func (storage Storage) ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
@@ -347,6 +363,7 @@ func (storage Storage) ChangeConfigurationProfile(id int, username string, descr
 	return storage.ListConfigurationProfiles()
 }
 
+// DeleteConfigurationProfile deletes a configuration profile specified by its name.
 func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
@@ -375,14 +392,14 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 		var id int
 		var cluster string
 		var configuration string
-		var changed_at string
-		var changed_by string
+		var changedAt string
+		var changedBy string
 		var active string
 		var reason string
 
-		err := rows.Scan(&id, &cluster, &configuration, &changed_at, &changed_by, &active, &reason)
+		err := rows.Scan(&id, &cluster, &configuration, &changedAt, &changedBy, &active, &reason)
 		if err == nil {
-			configurations = append(configurations, ClusterConfiguration{id, cluster, configuration, changed_at, changed_by, active, reason})
+			configurations = append(configurations, ClusterConfiguration{id, cluster, configuration, changedAt, changedBy, active, reason})
 		} else {
 			log.Println("error", err)
 		}
@@ -391,6 +408,7 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 	return configurations, nil
 }
 
+// ListAllClusterConfigurations selects all cluster configurations from the database.
 func (storage Storage) ListAllClusterConfigurations() ([]ClusterConfiguration, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
@@ -405,6 +423,7 @@ ORDER BY operator_configuration.id`)
 	return storage.readClusterConfigurations(rows)
 }
 
+// ListClusterConfiguration selects cluster configuration from the database for the specified cluster.
 func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
@@ -420,7 +439,8 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 	return storage.readClusterConfigurations(rows)
 }
 
-func (storage Storage) GetClusterConfigurationById(id string) (string, error) {
+// GetClusterConfigurationByID reads cluster configuration for the specified configuration ID.
+func (storage Storage) GetClusterConfigurationByID(id string) (string, error) {
 	var configuration string
 
 	row, err := storage.connections.Query(`
@@ -445,6 +465,7 @@ SELECT configuration_profile.configuration
 	return configuration, errors.New("unable to read any active configuration")
 }
 
+// GetClusterActiveConfiguration reads one active configuration for the selected cluster.
 func (storage Storage) GetClusterActiveConfiguration(cluster string) (string, error) {
 	var configuration string
 
@@ -472,7 +493,8 @@ SELECT configuration_profile.configuration
 	return configuration, errors.New("unable to read any active configuration")
 }
 
-func (storage Storage) GetConfigurationIdForCluster(cluster string) (int, error) {
+// GetConfigurationIDForCluster reads the ID for the specified cluster name.
+func (storage Storage) GetConfigurationIDForCluster(cluster string) (int, error) {
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id
   FROM operator_configuration, cluster
@@ -489,11 +511,11 @@ SELECT operator_configuration.id
 
 		err = rows.Scan(&id)
 		return id, err
-	} else {
-		return 0, errors.New("Unknown operator name provided")
 	}
+	return 0, errors.New("Unknown operator name provided")
 }
 
+// InsertNewConfigurationProfile inserts new configuration profile into a database (in transaction).
 func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool {
 	t := time.Now()
 
@@ -510,7 +532,8 @@ func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration s
 	return true
 }
 
-func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
+// SelectConfigurationProfileID selects the ID of lately inserted/created configuration profile. To be used in transaction.
+func (storage Storage) SelectConfigurationProfileID(tx *sql.Tx) (int, error) {
 	var rows *sql.Rows
 	var err error
 
@@ -531,33 +554,36 @@ func (storage Storage) SelectConfigurationProfileId(tx *sql.Tx) (int, error) {
 	defer rows.Close()
 
 	if rows.Next() {
-		var configurationId int
-		err = rows.Scan(&configurationId)
+		var configurationID int
+		err = rows.Scan(&configurationID)
 		if err != nil {
 			return -1, err
 		}
-		log.Printf("Configuration stored under ID=%d\n", configurationId)
-		return configurationId, nil
-	} else {
-		return -1, errors.New("can not retrieve last configuration ID")
+		log.Printf("Configuration stored under ID=%d\n", configurationID)
+		return configurationID, nil
 	}
+	return -1, errors.New("can not retrieve last configuration ID")
 }
 
-func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterId int) error {
+// DeactivatePreviousConfigurations deactivate all previous configurations for the specified trigger.
+// To be called inside transaction.
+func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID int) error {
 	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
 	defer stmt.Close()
 
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(clusterId)
+	_, err = stmt.Exec(clusterID)
 	if err == nil {
-		log.Printf("All previous configuration has been deactivated for clusterID %d\n", clusterId)
+		log.Printf("All previous configuration has been deactivated for clusterID %d\n", clusterID)
 	}
 	return err
 }
 
-func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int, configurationId int, username string, reason string) error {
+// InsertNewOperatorConfiguration inserts the new configuration for selected operator/cluster.
+// To be called inside transaction.
+func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID int, configurationID int, username string, reason string) error {
 	t := time.Now()
 	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
 	defer statement.Close()
@@ -565,13 +591,14 @@ func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterId int,
 		return err
 	}
 
-	_, err = statement.Exec(clusterId, configurationId, t, username, "1", reason)
+	_, err = statement.Exec(clusterID, configurationID, t, username, "1", reason)
 	if err == nil {
-		log.Printf("New operator configuration %d has been assigned to cluster %d\n", configurationId, clusterId)
+		log.Printf("New operator configuration %d has been assigned to cluster %d\n", configurationID, clusterID)
 	}
 	return err
 }
 
+// CreateClusterConfiguration creates new configuration for specified cluster.
 func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(cluster)
@@ -581,7 +608,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 		return []ClusterConfiguration{}, err
 	}
 
-	clusterId := clusterInfo.Id
+	clusterID := clusterInfo.ID
 
 	// begin transaction
 	tx, err := storage.connections.Begin()
@@ -599,7 +626,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	}
 
 	// retrieve configuration ID for newly created configuration
-	configurationId, err := storage.SelectConfigurationProfileId(tx)
+	configurationID, err := storage.SelectConfigurationProfileID(tx)
 	if err != nil {
 		log.Print(err)
 		_ = tx.Rollback()
@@ -607,7 +634,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	}
 
 	// deactivate all previous configurations
-	err = storage.DeactivatePreviousConfigurations(tx, clusterId)
+	err = storage.DeactivatePreviousConfigurations(tx, clusterID)
 	if err != nil {
 		log.Print(err)
 		_ = tx.Rollback()
@@ -615,7 +642,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	}
 
 	// and insert new one that will be activated
-	err = storage.InsertNewOperatorConfiguration(tx, clusterId, configurationId, username, reason)
+	err = storage.InsertNewOperatorConfiguration(tx, clusterID, configurationID, username, reason)
 	if err != nil {
 		log.Print(err)
 		_ = tx.Rollback()
@@ -631,8 +658,9 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 	return storage.ListClusterConfiguration(cluster)
 }
 
+// EnableClusterConfiguration enables the specified cluster configuration (set the 'active' flag).
 func (storage Storage) EnableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
-	id, err := storage.GetConfigurationIdForCluster(cluster)
+	id, err := storage.GetConfigurationIDForCluster(cluster)
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
@@ -652,9 +680,10 @@ func (storage Storage) EnableClusterConfiguration(cluster string, username strin
 	return storage.ListClusterConfiguration(cluster)
 }
 
+// DisableClusterConfiguration disables the specified cluster configuration (reset the 'active' flag).
 // TODO: copy & paste, needs to be refactored later
 func (storage Storage) DisableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
-	id, err := storage.GetConfigurationIdForCluster(cluster)
+	id, err := storage.GetConfigurationIDForCluster(cluster)
 	if err != nil {
 		return []ClusterConfiguration{}, err
 	}
@@ -673,7 +702,9 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 	return storage.ListClusterConfiguration(cluster)
 }
 
-func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active string) error {
+// EnableOrDisableClusterConfigurationByID enables or disables the specified cluster configuration (set or reset the 'active' flag).
+// Please see also EnableClusterConfiguration and DisableClusterConfiguration
+func (storage Storage) EnableOrDisableClusterConfigurationByID(id string, active string) error {
 	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active = $1, changed_at = $2 WHERE id = $3")
 	if err != nil {
 		return err
@@ -689,8 +720,9 @@ func (storage Storage) EnableOrDisableClusterConfigurationById(id string, active
 	return nil
 }
 
+// DeleteClusterConfigurationByID deletes cluster configuration specified by its ID.
 // TODO: copy & paste, needs to be refactored later
-func (storage Storage) DeleteClusterConfigurationById(id string) error {
+func (storage Storage) DeleteClusterConfigurationByID(id string) error {
 	statement, err := storage.connections.Prepare("DELETE FROM operator_configuration WHERE id = $1")
 	if err != nil {
 		return err
@@ -711,7 +743,7 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	for rows.Next() {
 		var trigger Trigger
 
-		err := rows.Scan(&trigger.Id, &trigger.Type, &trigger.Cluster,
+		err := rows.Scan(&trigger.ID, &trigger.Type, &trigger.Cluster,
 			&trigger.Reason, &trigger.Link,
 			&trigger.TriggeredAt, &trigger.TriggeredBy,
 			&trigger.Parameters, &trigger.Active, &trigger.AckedAt)
@@ -725,7 +757,8 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	return triggers, nil
 }
 
-func (storage Storage) GetTriggerById(id string) (Trigger, error) {
+// GetTriggerByID selects all informations about the trigger specified by its ID.
+func (storage Storage) GetTriggerByID(id string) (Trigger, error) {
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
@@ -745,12 +778,12 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 
 	if len(triggers) >= 1 {
 		return triggers[0], nil
-	} else {
-		return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
 	}
+	return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
 }
 
-func (storage Storage) DeleteTriggerById(id string) error {
+// DeleteTriggerByID deletes trigger specified by its ID.
+func (storage Storage) DeleteTriggerByID(id string) error {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
@@ -764,7 +797,8 @@ DELETE FROM trigger WHERE trigger.id = $1`)
 	return err
 }
 
-func (storage Storage) ChangeStateOfTriggerById(id string, active int) error {
+// ChangeStateOfTriggerByID change the state ('active', 'inactive') of trigger specified by its ID.
+func (storage Storage) ChangeStateOfTriggerByID(id string, active int) error {
 	statement, err := storage.connections.Prepare(`
 UPDATE trigger SET active= $1 WHERE trigger.id = $2`)
 	if err != nil {
@@ -777,6 +811,7 @@ UPDATE trigger SET active= $1 WHERE trigger.id = $2`)
 	return err
 }
 
+// ListAllTriggers selects all triggers from the database.
 func (storage Storage) ListAllTriggers() ([]Trigger, error) {
 	triggers := []Trigger{}
 
@@ -795,6 +830,7 @@ ORDER BY trigger.id`)
 	return storage.getTriggers(rows)
 }
 
+// ListClusterTriggers selects all triggers assigned to the specified cluster.
 func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
 	triggers := []Trigger{}
 
@@ -814,6 +850,7 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 	return storage.getTriggers(rows)
 }
 
+// ListActiveClusterTriggers selects all active triggers assigned to the specified cluster.
 func (storage Storage) ListActiveClusterTriggers(clusterName string) ([]Trigger, error) {
 	triggers := []Trigger{}
 
@@ -833,7 +870,8 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 	return storage.getTriggers(rows)
 }
 
-func (storage Storage) GetTriggerId(triggerType string) (int, error) {
+// GetTriggerID select ID for specified trigger type (name).
+func (storage Storage) GetTriggerID(triggerType string) (int, error) {
 	var id int
 
 	rows, err := storage.connections.Query("SELECT id FROM trigger_type WHERE type = $1", triggerType)
@@ -856,17 +894,18 @@ func (storage Storage) GetTriggerId(triggerType string) (int, error) {
 	return id, err
 }
 
+// NewTrigger constructs new trigger in a database.
 func (storage Storage) NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error {
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(clusterName)
-	clusterId := clusterInfo.Id
+	clusterID := clusterInfo.ID
 
 	if err != nil {
 		log.Print(err)
 		return err
 	}
 
-	triggerTypeId, err := storage.GetTriggerId(triggerType)
+	triggerTypeID, err := storage.GetTriggerID(triggerType)
 
 	if err != nil {
 		log.Print(err)
@@ -882,7 +921,7 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(triggerTypeId, clusterId, reason, link, t, userName, "", 1, ackedAt)
+	_, err = statement.Exec(triggerTypeID, clusterID, reason, link, t, userName, "", 1, ackedAt)
 	if err != nil {
 		log.Print(err)
 		return err
@@ -890,12 +929,13 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	return nil
 }
 
-func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
+// AckTrigger sets a timestamp to the selected trigger + updates the 'active' flag.
+func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
 	t := time.Now()
 
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(clusterName)
-	clusterId := clusterInfo.Id
+	clusterID := clusterInfo.ID
 
 	if err != nil {
 		return err
@@ -908,7 +948,7 @@ func (storage Storage) AckTrigger(clusterName string, triggerId string) error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(t, clusterId, triggerId)
+	_, err = statement.Exec(t, clusterID, triggerID)
 	if err != nil {
 		return err
 	}
