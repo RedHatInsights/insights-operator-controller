@@ -16,4 +16,5 @@ limitations under the License.
 
 package tests
 
+// API_URL represents the entry point to REST API of the controller service
 const API_URL = "http://localhost:8080/api/v1/"
