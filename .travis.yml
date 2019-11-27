@@ -1,7 +1,18 @@
 language: go
 go:
 - 1.13
-before_install:
-  - go build
-script:
-  - go test ./...
+
+jobs:
+  include:
+    - before_install: go build
+      script:
+        - go test ./...
+    - stage: style
+      script:
+        - ./.travis.gofmt.sh
+        - ./.travis.govet.sh
+        - ./.travis.golint.sh
+
+stages:
+  - style
+  - test
