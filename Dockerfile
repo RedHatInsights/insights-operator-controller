@@ -16,4 +16,4 @@ RUN curl -L https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init
 
 USER 1001
 
-CMD ["dumb-init", "/insights-operator-controller"]
+ENTRYPOINT ["dumb-init", "/insights-operator-controller"]
