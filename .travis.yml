@@ -12,6 +12,7 @@ jobs:
         - ./.travis.gofmt.sh
         - ./.travis.govet.sh
         - ./.travis.golint.sh
+        - ./.travis.gocyclo.sh
 
 stages:
   - style
