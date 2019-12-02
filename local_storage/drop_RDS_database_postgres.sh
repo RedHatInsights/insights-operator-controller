@@ -4,7 +4,7 @@ SUPERUSER= #<master username>
 SU_PASSWORD= #<master password> 
 
 DATABASE=controller
-DB_SERVER= # <DB instance endpoint>
+DB_SERVER= #  <DB_instance_endpoint:port>
 
 USER=tester
 USER_PASSWORD=tester
