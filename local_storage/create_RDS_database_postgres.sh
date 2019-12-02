@@ -1,11 +1,10 @@
 #!/bin/sh
 
+SUPERUSER= #<master username>
+SU_PASSWORD= #<master password> 
 
-SUPERUSER=samuelRHadmin
-SU_PASSWORD=v3ry53cur3
-
-DATABASE=controller_test_db
-DB_SERVER=rhtestinstance.cux1erificun.us-east-1.rds.amazonaws.com
+DATABASE=controller
+DB_SERVER= # <DB instance endpoint>
 
 USER=tester
 USER_PASSWORD=tester
@@ -19,7 +18,7 @@ psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/postgres" -c "CREATE
 psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/postgres" -c "CREATE USER ${USER} PASSWORD '${USER_PASSWORD}';" 
 
 #create schema 
-cat "${SCRIPT_DIR}/schema.sql" | psql  "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" 
+cat "${SCRIPT_DIR}/schema_postgres.sql" | psql  "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" 
 
 # grant priviliges to user 
 psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" -c "GRANT  SELECT, INSERT, UPDATE,  DELETE 
@@ -31,14 +30,5 @@ psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" -c "GRA
     GRANT USAGE ON SCHEMA public TO ${USER};"
 
 # insert data as user 
-cat "${SCRIPT_DIR}/test_data.sql" | psql "postgresql://${USER}:${USER_PASSWORD}@${DB_SERVER}/${DATABASE}" 
-
-
-
-#questions for Pavel :
-# 		do i use integer or serial ? 
-
-
-
-
+cat "${SCRIPT_DIR}/test_data_postgres.sql" | psql "postgresql://${USER}:${USER_PASSWORD}@${DB_SERVER}/${DATABASE}" 
 
