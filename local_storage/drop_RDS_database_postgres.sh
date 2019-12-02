@@ -1,10 +1,10 @@
 #!/bin/sh
 
-SUPERUSER=samuelRHadmin
-SU_PASSWORD=v3ry53cur3
+SUPERUSER= #<master username>
+SU_PASSWORD= #<master password> 
 
-DATABASE=controller_test_db
-DB_SERVER=rhtestinstance.cux1erificun.us-east-1.rds.amazonaws.com
+DATABASE=controller
+DB_SERVER= # <DB instance endpoint>
 
 USER=tester
 USER_PASSWORD=tester
