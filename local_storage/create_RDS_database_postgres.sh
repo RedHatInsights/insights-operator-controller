@@ -1,11 +1,28 @@
 #!/bin/sh
 
+if [[ -z "$RDS_MASTERUSER" ]]; then
+  echo '$RDS_MASTERUSER not set !'
+  exit 1
+else
+  SUPERUSER= $RDS_MASTERUSER #<master username>
+fi
 
-SUPERUSER=samuelRHadmin
-SU_PASSWORD=v3ry53cur3
+if [[ -z "$RDS_MASTERPASSWORD" ]]; then
+  echo '$RDS_MASTEPASSWORD not set !'
+  exit 1
+else
+  SU_PASSWORD= $RDS_MASTERPASSWORD #<master password> 
+fi
+if [[ -z "$RDS_ENDPOINT " ]]; then
+  echo '$RDS_ENDPOINT not set !'
+  exit 1
+else
+  DB_SERVER= $RDS_ENDPOINT # <DB_instance_endpoint:port>
+fi
 
-DATABASE=controller_test_db
-DB_SERVER=rhtestinstance.cux1erificun.us-east-1.rds.amazonaws.com
+
+DATABASE=controller
+
 
 USER=tester
 USER_PASSWORD=tester
@@ -19,7 +36,7 @@ psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/postgres" -c "CREATE
 psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/postgres" -c "CREATE USER ${USER} PASSWORD '${USER_PASSWORD}';" 
 
 #create schema 
-cat "${SCRIPT_DIR}/schema.sql" | psql  "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" 
+cat "${SCRIPT_DIR}/schema_postgres.sql" | psql  "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" 
 
 # grant priviliges to user 
 psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" -c "GRANT  SELECT, INSERT, UPDATE,  DELETE 
@@ -31,14 +48,5 @@ psql "postgresql://${SUPERUSER}:${SU_PASSWORD}@${DB_SERVER}/${DATABASE}" -c "GRA
     GRANT USAGE ON SCHEMA public TO ${USER};"
 
 # insert data as user 
-cat "${SCRIPT_DIR}/test_data.sql" | psql "postgresql://${USER}:${USER_PASSWORD}@${DB_SERVER}/${DATABASE}" 
-
-
-
-#questions for Pavel :
-# 		do i use integer or serial ? 
-
-
-
-
+cat "${SCRIPT_DIR}/test_data_postgres.sql" | psql "postgresql://${USER}:${USER_PASSWORD}@${DB_SERVER}/${DATABASE}" 
 
