@@ -86,7 +86,22 @@ The following two scripts can be used to drop existing database(s):
 * `drop_test_database_postgres.sh` to drop database named `test_db`
 
 
+### RDS AWS PostgreSQL
 
+To set up a database on RDS AWS, an AWS account is needed. To set up the AWS account follow instructions:
+https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
+
+After AWS account is set up, follow instructions to set up a PostreSQL database instance here : https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreatePostgreSQLInstance.html
+Set up the database instance as needed. 
+Set the name of the database as `postgres`. (Not the DB instance identifier.) 
+
+When database instance status becomes available, set environment variables `$RDS_MASTERUSER`, `$RDS_MASTERPASSWORD` and `$RDS_ENDPOINT` with values 
+`master username`, `master password`, and `endpoint` including `port`, of your database instance.
+Run 'create_RDS_database_postgres.sh` to create database.
+
+To drop previously created database, run `drop_RDS_database_postgres.sh`.
+
+ 
 ## Testing
 
 ### Unit tests
