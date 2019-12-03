@@ -87,14 +87,14 @@ func compareConfigurationProfilesWithoutID(f *frisby.Frisby, profiles []Configur
 }
 
 func readConfigurationProfileFromResponse(f *frisby.Frisby) ConfigurationProfile {
-	reponse := ConfigurationProfileResponse{}
+	response := ConfigurationProfileResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &reponse)
+		json.Unmarshal(text, &response)
 	}
-	return reponse.Profile
+	return response.Profile
 }
 
 func readConfigurationProfilesFromResponse(f *frisby.Frisby) []ConfigurationProfile {
