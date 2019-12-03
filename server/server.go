@@ -101,12 +101,15 @@ func addJSON(writer http.ResponseWriter, data interface{}) {
 func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			if origin := r.Header.Get("Origin"); origin != "" {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
+			if os.Getenv("ENV") != "production" {
+				if origin := r.Header.Get("Origin"); origin != "" {
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+				}
+				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token")
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			nextHandler.ServeHTTP(w, r)
 		})
 }
@@ -116,9 +119,8 @@ func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk l
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
-	if os.Getenv("ENV") != "production" {
-		router.Use(addDefaultHeaders)
-	}
+	router.Use(JWTAuthentication)
+	router.Use(addDefaultHeaders)
 
 	// common REST API endpoints
 	router.HandleFunc(APIPrefix, mainEndpoint).Methods("GET")
