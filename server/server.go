@@ -17,7 +17,6 @@ limitations under the License.
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -45,16 +44,6 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Help:    "Response time",
 	Buckets: prometheus.LinearBuckets(0, 20, 20),
 }, []string{"url"})
-
-// Status represents the JSON payload with status message sent back to client
-type Status struct {
-	Status string `json:"status"`
-}
-
-// OkStatus represents the JSON payload with "OK" status message sent back to client
-var OkStatus = Status{
-	Status: "ok",
-}
 
 func countEndpoint(request *http.Request, start time.Time) {
 	url := request.URL.String()
@@ -90,14 +79,6 @@ func logRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
-func addJSONHeader(writer http.ResponseWriter) {
-	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
-}
-
-func addJSON(writer http.ResponseWriter, data interface{}) {
-	json.NewEncoder(writer).Encode(data)
-}
-
 func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +100,9 @@ func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk l
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
-	router.Use(JWTAuthentication)
+	if os.Getenv("ENV") != "test" {
+		router.Use(JWTAuthentication)
+	}
 	router.Use(addDefaultHeaders)
 
 	// common REST API endpoints

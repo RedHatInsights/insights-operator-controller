@@ -20,161 +20,133 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"io"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"net/http"
 )
 
 func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	triggers, err := storage.ListAllTriggers()
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	addJSON(writer, triggers)
+	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
 func getTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger ID needs to be specified")
+		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	triggers, err := storage.GetTriggerByID(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	addJSON(writer, triggers)
+	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
 func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger ID needs to be specified")
+		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	splunk.LogAction("DeleteTrigger", "tester", id)
 	err := storage.DeleteTriggerByID(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
-	io.WriteString(writer, "Deleted")
+	u.SendResponse(writer, u.BuildOkResponse())
 }
 
 func activateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger ID needs to be specified")
+		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	splunk.LogAction("ActivateTrigger", "tester", id)
 	err := storage.ChangeStateOfTriggerByID(id, 1)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	addJSON(writer, OkStatus)
+	u.SendResponse(writer, u.BuildOkResponse())
 }
 
 func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger ID needs to be specified")
+		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	splunk.LogAction("DeactivateTrigger", "tester", id)
 	err := storage.ChangeStateOfTriggerByID(id, 0)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	addJSON(writer, OkStatus)
+	u.SendResponse(writer, u.BuildOkResponse())
 }
 
 func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggers, err := storage.ListClusterTriggers(cluster)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	addJSON(writer, triggers)
+	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
 func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggerType, found := mux.Vars(request)["trigger"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger type needs to be specified")
+		u.SendError(writer, "Trigger type needs to be specified")
 		return
 	}
 
 	username, foundUsername := request.URL.Query()["username"]
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	reason, foundReason := request.URL.Query()["reason"]
 	if !foundReason {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Reason needs to be specified\n")
+		u.SendError(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	link, foundReason := request.URL.Query()["link"]
 	if !foundReason {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Link needs to be specified\n")
+		u.SendError(writer, "Link needs to be specified\n")
 		return
 	}
 
 	splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
 	err := storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
+	u.SendResponse(writer, u.BuildOkResponse())
 }

@@ -46,6 +46,12 @@ type Trigger struct {
 	Active      int    `json:"active"`
 }
 
+// TriggerResponse represents default response for trigger request
+type TriggerResponse struct {
+	Status   string    `json:"status"`
+	Triggers []Trigger `json:"triggers"`
+}
+
 func compareTriggers(f *frisby.Frisby, triggers []Trigger, expected []Trigger) {
 	if len(triggers) != len(expected) {
 		f.AddError(fmt.Sprintf("%d triggers are expected, but got %d", len(expected), len(triggers)))
@@ -69,14 +75,16 @@ func readTriggers(f *frisby.Frisby) []Trigger {
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	triggers := []Trigger{}
+	response := TriggerResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &triggers)
+		json.Unmarshal(text, &response)
+		fmt.Println("Work")
+		fmt.Println(response.Triggers)
 	}
-	return triggers
+	return response.Triggers
 }
 
 func checkInitialListOfTriggers() {
@@ -360,7 +368,7 @@ func checkGetTriggersForCluster0() {
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	triggers := []Trigger{}
+	triggers := TriggerResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
@@ -371,7 +379,7 @@ func checkGetTriggersForCluster0() {
 	expected := []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
 	}
-	compareTriggers(f, triggers, expected)
+	compareTriggers(f, triggers.Triggers, expected)
 
 	f.PrintReport()
 }
@@ -383,7 +391,7 @@ func checkGetTriggersForCluster1() {
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	triggers := []Trigger{}
+	triggers := TriggerResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
@@ -395,7 +403,7 @@ func checkGetTriggersForCluster1() {
 		{3, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
 		{4, "must-gather", "00000000-0000-0000-0000-000000000001", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
 	}
-	compareTriggers(f, triggers, expected)
+	compareTriggers(f, triggers.Triggers, expected)
 
 	f.PrintReport()
 }
@@ -407,7 +415,7 @@ func checkGetTriggersForClusterX() {
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	triggers := []Trigger{}
+	triggers := TriggerResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
@@ -416,7 +424,7 @@ func checkGetTriggersForClusterX() {
 	}
 
 	expected := []Trigger{}
-	compareTriggers(f, triggers, expected)
+	compareTriggers(f, triggers.Triggers, expected)
 
 	f.PrintReport()
 }

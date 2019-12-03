@@ -20,7 +20,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"io"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
 )
@@ -30,21 +30,17 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
 	configuration, err := storage.GetClusterActiveConfiguration(cluster)
 	if err != nil {
 		log.Println("Cannot read cluster configuration", err)
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	writer.WriteHeader(http.StatusOK)
-	io.WriteString(writer, configuration)
+	sendConfiguration(writer, configuration)
 }
 
 // Register new cluster.
@@ -54,8 +50,7 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 	// check parameters provided by client
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -63,52 +58,43 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 	err := storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(writer, err.Error())
+		u.SendInternalServerError(writer, err.Error())
 	}
-	writer.WriteHeader(http.StatusCreated)
-	io.WriteString(writer, "Registered")
+	u.SendCreated(writer, u.BuildOkResponse())
 }
 
 func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggers, err := storage.ListActiveClusterTriggers(cluster)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	addJSON(writer, triggers)
-	writer.WriteHeader(http.StatusOK)
+	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
 func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggerID, found := mux.Vars(request)["trigger"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Trigger ID needs to be specified")
+		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	err := storage.AckTrigger(cluster, triggerID)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
+	u.SendResponse(writer, u.BuildOkResponse())
 }

@@ -22,7 +22,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"io"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
 	"strconv"
@@ -33,11 +33,9 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 	clusters, err := storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(writer, err.Error())
+		u.SendInternalServerError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		addJSON(writer, clusters)
+		u.SendResponse(writer, u.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -47,8 +45,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster name needs to be specified")
+		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -57,19 +54,15 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 	err := storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(writer, err.Error())
+		u.SendInternalServerError(writer, err.Error())
 	}
 
 	clusters, err := storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		writer.WriteHeader(http.StatusCreated)
-		addJSON(writer, clusters)
+		u.SendResponse(writer, u.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -79,17 +72,14 @@ func getClusterByID(writer http.ResponseWriter, request *http.Request, storage s
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Error reading cluster ID from request\n")
+		u.SendError(writer, "Error reading cluster ID from request")
 	} else {
 		cluster, err := storage.GetCluster(int(id))
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			writer.WriteHeader(http.StatusBadRequest)
-			io.WriteString(writer, err.Error())
+			u.SendError(writer, err.Error())
 		} else {
-			addJSONHeader(writer)
-			addJSON(writer, cluster)
+			u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
 		}
 	}
 }
@@ -101,8 +91,7 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 	// check parameter provided by client
 	if !foundID {
 		log.Println("Cluster ID is not provided")
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -110,19 +99,15 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 	err := storage.DeleteCluster(clusterID)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	}
 
 	clusters, err := storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		writer.WriteHeader(http.StatusAccepted)
-		addJSON(writer, clusters)
+		u.SendAccepted(writer, u.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -136,31 +121,25 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 		id, err := strconv.ParseInt(idParam[0], 10, 0)
 		if err != nil {
 			log.Println("Error reading and decoding cluster ID from query", err)
-			writer.WriteHeader(http.StatusBadRequest)
-			io.WriteString(writer, "Error reading and decoding cluster ID from query\n")
+			u.SendError(writer, "Error reading and decoding cluster ID from query\n")
 		} else {
 			cluster, err := storage.GetCluster(int(id))
 			if err != nil {
 				log.Println("Unable to read cluster from database", err)
-				writer.WriteHeader(http.StatusBadRequest)
-				io.WriteString(writer, err.Error())
+				u.SendError(writer, err.Error())
 			} else {
-				addJSONHeader(writer)
-				addJSON(writer, cluster)
+				u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
 			}
 		}
 	} else if foundName {
 		cluster, err := storage.GetClusterByName(nameParam[0])
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			writer.WriteHeader(http.StatusBadRequest)
-			io.WriteString(writer, err.Error())
+			u.SendError(writer, err.Error())
 		} else {
-			addJSONHeader(writer)
-			addJSON(writer, cluster)
+			u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
 		}
 	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Either cluster ID or name needs to be specified")
+		u.SendError(writer, "Either cluster ID or name needs to be specified")
 	}
 }

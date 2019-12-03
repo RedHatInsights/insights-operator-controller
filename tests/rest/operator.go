@@ -26,10 +26,8 @@ func checkConfigurationForCluster0() {
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
 	// check the content JSON response
-	f.ExpectJson("no_op", "X")
-	f.ExpectJson("watch.0", "a")
-	f.ExpectJson("watch.1", "b")
-	f.ExpectJson("watch.2", "c")
+	f.ExpectJson("configuration", "{\"no_op\":\"X\", \"watch\":[\"a\",\"b\",\"c\"]}")
+	f.ExpectJson("status", "ok")
 	f.PrintReport()
 }
 
@@ -38,7 +36,7 @@ func checkRegisterNewCluster() {
 	f.Put(API_URL + "/operator/register/00000000-0000-0000-0000-000000000006")
 	f.Send()
 	f.ExpectStatus(201)
-	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
 func checkNonExistingConfiguration() {

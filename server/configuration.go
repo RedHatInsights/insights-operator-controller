@@ -20,81 +20,76 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"io"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
 )
 
+func sendConfiguration(writer http.ResponseWriter, configuration string) {
+	resp := u.BuildOkResponse()
+	resp["configuration"] = configuration
+	u.SendResponse(writer, resp)
+}
+
 func getConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration ID needs to be specified")
+		u.SendError(writer, "Configuration ID needs to be specified")
 		return
 	}
 
 	configuration, err := storage.GetClusterConfigurationByID(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	io.WriteString(writer, configuration)
+	sendConfiguration(writer, configuration)
 }
 
 func deleteConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration ID needs to be specified")
+		u.SendError(writer, "Configuration ID needs to be specified")
 		return
 	}
 
 	splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
 	err := storage.DeleteClusterConfigurationByID(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
-	io.WriteString(writer, "Deleted")
+	u.SendResponse(writer, u.BuildOkResponse())
 }
 
 func getAllConfigurations(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	configuration, err := storage.ListAllClusterConfigurations()
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	addJSON(writer, configuration)
+	u.SendResponse(writer, u.BuildOkResponseWithData("configuration", configuration))
 }
 
 func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
 	configuration, err := storage.ListClusterConfiguration(cluster)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	addJSON(writer, configuration)
+	u.SendResponse(writer, u.BuildOkResponseWithData("configuration", configuration))
 }
 
 func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client, active string) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration ID needs to be specified")
+		u.SendError(writer, "Configuration ID needs to be specified")
 		return
 	}
 
@@ -105,14 +100,13 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 	}
 	err := storage.EnableOrDisableClusterConfigurationByID(id, active)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
 	if active == "0" {
-		io.WriteString(writer, "disabled")
+		sendConfiguration(writer, "disabled")
 	} else {
-		io.WriteString(writer, "enabled")
+		sendConfiguration(writer, "enabled")
 	}
 }
 
@@ -127,8 +121,7 @@ func disableConfiguration(writer http.ResponseWriter, request *http.Request, sto
 func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -137,46 +130,39 @@ func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Reason needs to be specified\n")
+		u.SendError(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Description needs to be specified\n")
+		u.SendError(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration needs to be provided in the request body")
+		u.SendError(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	configurations, err := storage.CreateClusterConfiguration(cluster, username[0], reason[0], description[0], string(configuration))
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
 	splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
-	addJSONHeader(writer)
-	addJSON(writer, configurations)
+	u.SendResponse(writer, u.BuildOkResponseWithData("configurations", configurations))
 }
 
 func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -184,33 +170,28 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Reason needs to be specified\n")
+		u.SendError(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
 	configurations, err := storage.EnableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	addJSON(writer, configurations)
+	u.SendResponse(writer, u.BuildOkResponseWithData("configurations", configurations))
 }
 
 func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Cluster ID needs to be specified")
+		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -218,24 +199,20 @@ func disableClusterConfiguration(writer http.ResponseWriter, request *http.Reque
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Reason needs to be specified\n")
+		u.SendError(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
 	configurations, err := storage.DisableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 		return
 	}
-	addJSONHeader(writer)
-	addJSON(writer, configurations)
+	u.SendResponse(writer, u.BuildOkResponseWithData("configurations", configurations))
 }
