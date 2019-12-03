@@ -73,18 +73,21 @@ func readConfigurations(f *frisby.Frisby) []ClusterConfiguration {
 		f.AddError(err.Error())
 	} else {
 		json.Unmarshal(text, &response)
-		fmt.Println(response.Configuration)
-		fmt.Println(response.Status)
-		fmt.Println(text)
 	}
 	return response.Configuration
+}
+
+func checkNumberOfConfigurations(f *frisby.Frisby, configurations []ClusterConfiguration, expected int) {
+	if len(configurations) != expected {
+		f.AddError(fmt.Sprintf("Number of returned configurations %d differs from expected number %d", len(configurations), expected))
+	}
 }
 
 func checkInitialListOfConfigurations() {
 	f := frisby.Create("Check list of configurations")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -103,7 +106,7 @@ func checkEnableExistingConfiguration() {
 	f := frisby.Create("Check that configuration can be enabled")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -120,7 +123,7 @@ func checkEnableExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected = []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "1", "no reason"},
@@ -139,7 +142,7 @@ func checkDisableExistingConfiguration() {
 	f := frisby.Create("Check that configuration can be disabled")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "1", "no reason"},
@@ -156,7 +159,7 @@ func checkDisableExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected = []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -175,7 +178,7 @@ func checkEnableNonExistingConfiguration() {
 	f := frisby.Create("Check what happens when non existing configuration is enabled")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -192,7 +195,7 @@ func checkEnableNonExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected = []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -211,7 +214,7 @@ func checkDisableNonExistingConfiguration() {
 	f := frisby.Create("Check what happens when non existing configuration is disabled")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -228,7 +231,7 @@ func checkDisableNonExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected = []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -247,7 +250,7 @@ func checkDeleteExistingConfiguration() {
 	f := frisby.Create("Check what happens when existing configuration is deleted")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 6)
+	checkNumberOfConfigurations(f, configurations, 6)
 
 	expected := []ClusterConfiguration{
 		{0, "00000000-0000-0000-0000-000000000000", "0", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -264,7 +267,7 @@ func checkDeleteExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 5)
+	checkNumberOfConfigurations(f, configurations, 5)
 
 	expected = []ClusterConfiguration{
 		{1, "00000000-0000-0000-0000-000000000000", "1", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -282,7 +285,7 @@ func checkDeleteNonExistingConfiguration() {
 	f := frisby.Create("Check what happens when non existing configuration is deleted")
 
 	configurations := readConfigurations(f)
-	f.ExpectJsonLength("", 5)
+	checkNumberOfConfigurations(f, configurations, 5)
 
 	expected := []ClusterConfiguration{
 		{1, "00000000-0000-0000-0000-000000000000", "1", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
@@ -298,7 +301,7 @@ func checkDeleteNonExistingConfiguration() {
 	f.ExpectStatus(200)
 
 	configurations = readConfigurations(f)
-	f.ExpectJsonLength("", 5)
+	checkNumberOfConfigurations(f, configurations, 5)
 
 	expected = []ClusterConfiguration{
 		{1, "00000000-0000-0000-0000-000000000000", "1", "2019-01-01T00:00:00Z", "tester", "0", "no reason"},
