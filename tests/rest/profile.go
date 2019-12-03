@@ -94,7 +94,7 @@ func readConfigurationProfileFromResponse(f *frisby.Frisby) ConfigurationProfile
 	} else {
 		json.Unmarshal(text, &response)
 	}
-	return reponse.Profile
+	return response.Profile
 }
 
 func readConfigurationProfilesFromResponse(f *frisby.Frisby) []ConfigurationProfile {
