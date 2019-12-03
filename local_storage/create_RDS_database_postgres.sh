@@ -4,20 +4,20 @@ if [[ -z "$RDS_MASTERUSER" ]]; then
   echo '$RDS_MASTERUSER not set !'
   exit 1
 else
-  SUPERUSER= $RDS_MASTERUSER #<master username>
+  SUPERUSER=$RDS_MASTERUSER
 fi
 
 if [[ -z "$RDS_MASTERPASSWORD" ]]; then
   echo '$RDS_MASTEPASSWORD not set !'
   exit 1
 else
-  SU_PASSWORD= $RDS_MASTERPASSWORD #<master password> 
+  SU_PASSWORD=$RDS_MASTERPASSWORD
 fi
 if [[ -z "$RDS_ENDPOINT " ]]; then
   echo '$RDS_ENDPOINT not set !'
   exit 1
 else
-  DB_SERVER= $RDS_ENDPOINT # <DB_instance_endpoint:port>
+  DB_SERVER=$RDS_ENDPOINT
 fi
 
 
