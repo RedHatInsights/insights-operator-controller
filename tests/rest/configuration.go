@@ -40,6 +40,12 @@ type ClusterConfiguration struct {
 	Reason        string `json:"reason"`
 }
 
+// ClusterConfigurationsResponse represents default response for cluster configuration request
+type ClusterConfigurationsResponse struct {
+	Status        string                 `json:"status"`
+	Configuration []ClusterConfiguration `json:"configuration"`
+}
+
 func compareConfigurations(f *frisby.Frisby, configurations []ClusterConfiguration, expected []ClusterConfiguration) {
 	if len(configurations) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configurations are expected, but got %d", len(expected), len(configurations)))
@@ -51,8 +57,6 @@ func compareConfigurations(f *frisby.Frisby, configurations []ClusterConfigurati
 		expected[i].ChangedAt = ""
 		if configurations[i] != expected[i] {
 			f.AddError(fmt.Sprintf("Different configuration info returned: %v != %v", configurations[i], expected[i]))
-			fmt.Println(configurations[i].Configuration)
-			fmt.Println(expected[i].Configuration)
 		}
 	}
 }
@@ -63,14 +67,17 @@ func readConfigurations(f *frisby.Frisby) []ClusterConfiguration {
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	configurations := []ClusterConfiguration{}
+	response := ClusterConfigurationsResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &configurations)
+		json.Unmarshal(text, &response)
+		fmt.Println(response.Configuration)
+		fmt.Println(response.Status)
+		fmt.Println(text)
 	}
-	return configurations
+	return response.Configuration
 }
 
 func checkInitialListOfConfigurations() {
@@ -310,7 +317,7 @@ func checkDescribeExistingConfiguration() {
 	f.Get(API_URL + "client/configuration/1")
 	f.Send()
 	f.ExpectStatus(200)
-	f.ExpectContent(`{"no_op":"X", "watch":["a","b","c"]}`)
+	f.ExpectContent(`{"configuration":"{\"no_op\":\"X\", \"watch\":[\"a\",\"b\",\"c\"]}","status":"ok"}`)
 	f.PrintReport()
 }
 

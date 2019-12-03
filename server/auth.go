@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"net/http"
@@ -10,14 +9,19 @@ import (
 	"strings"
 )
 
-/*
-JWT claims struct
-*/
+type contextKey string
+
+const (
+	contextKeyUser = contextKey("user")
+)
+
+// Token JWT claims struct
 type Token struct {
 	Login string
 	jwt.StandardClaims
 }
 
+// JWTAuthentication middleware for checking auth rights
 func JWTAuthentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +57,7 @@ func JWTAuthentication(next http.Handler) http.Handler {
 		}
 
 		//Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
-		fmt.Sprintf("User %s", tk.Login) //Useful for monitoring
-		ctx := context.WithValue(r.Context(), "user", tk.Login)
+		ctx := context.WithValue(r.Context(), contextKeyUser, tk.Login)
 		r = r.WithContext(ctx)
 		// Proceed to proxy
 		next.ServeHTTP(w, r)

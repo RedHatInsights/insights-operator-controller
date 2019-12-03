@@ -22,7 +22,7 @@ func checkRestAPIEntryPoint() {
 	f := frisby.Create("Check the entry point to REST API").Get(API_URL)
 	f.Send()
 	f.ExpectStatus(200)
-	f.ExpectHeader("Content-Type", "text/plain; charset=utf-8")
+	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	f.PrintReport()
 }
 

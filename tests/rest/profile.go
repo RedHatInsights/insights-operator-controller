@@ -37,6 +37,18 @@ type ConfigurationProfile struct {
 	Description   string `json:"description"`
 }
 
+// ConfigurationProfilesResponse represents default response for configuration profile request
+type ConfigurationProfilesResponse struct {
+	Status   string                 `json:"status"`
+	Profiles []ConfigurationProfile `json:"profiles"`
+}
+
+// ConfigurationProfileResponse represents default response for single configuration profile request
+type ConfigurationProfileResponse struct {
+	Status  string               `json:"status"`
+	Profile ConfigurationProfile `json:"profile"`
+}
+
 func compareConfigurationProfiles(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
 	if len(profiles) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configuration profiles are expected, but got %d", len(expected), len(profiles)))
@@ -75,25 +87,25 @@ func compareConfigurationProfilesWithoutID(f *frisby.Frisby, profiles []Configur
 }
 
 func readConfigurationProfileFromResponse(f *frisby.Frisby) ConfigurationProfile {
-	profile := ConfigurationProfile{}
+	reponse := ConfigurationProfileResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &profile)
+		json.Unmarshal(text, &reponse)
 	}
-	return profile
+	return reponse.Profile
 }
 
 func readConfigurationProfilesFromResponse(f *frisby.Frisby) []ConfigurationProfile {
-	profiles := []ConfigurationProfile{}
+	response := ConfigurationProfilesResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &profiles)
+		json.Unmarshal(text, &response)
 	}
-	return profiles
+	return response.Profiles
 }
 
 func checkInitialListOfConfigurationProfiles() {

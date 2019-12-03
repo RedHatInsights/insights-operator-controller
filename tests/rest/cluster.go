@@ -31,20 +31,26 @@ type Cluster struct {
 	Name string `json:"name"`
 }
 
+// ClusterResponse represents default response for cluster request
+type ClusterResponse struct {
+	Status   string    `json:"status"`
+	Clusters []Cluster `json:"clusters"`
+}
+
 func readListOfClusters(f *frisby.Frisby) []Cluster {
 	f.Get(API_URL + "/client/cluster")
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
-	clusters := []Cluster{}
+	response := ClusterResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &clusters)
+		json.Unmarshal(text, &response)
 	}
-	return clusters
+	return response.Clusters
 }
 
 func createCluster(f *frisby.Frisby, clusterID string, clusterName string) {

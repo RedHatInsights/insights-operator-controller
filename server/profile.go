@@ -19,7 +19,7 @@ package server
 import (
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"io"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -29,11 +29,9 @@ import (
 func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	profiles, err := storage.ListConfigurationProfiles()
 	if err == nil {
-		addJSONHeader(writer)
-		addJSON(writer, profiles)
+		u.SendResponse(writer, u.BuildOkResponseWithData("profiles", profiles))
 	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	}
 }
 
@@ -41,18 +39,15 @@ func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request
 func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Error reading profile ID from request\n")
+		u.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	profile, err := storage.GetConfigurationProfile(int(id))
 	if err == nil {
-		addJSONHeader(writer)
-		addJSON(writer, profile)
+		u.SendResponse(writer, u.BuildOkResponseWithData("profile", profile))
 	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	}
 }
 
@@ -62,33 +57,27 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Description needs to be specified\n")
+		u.SendError(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration needs to be provided in the request body")
+		u.SendError(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(writer, err.Error())
+		u.SendInternalServerError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		writer.WriteHeader(http.StatusCreated)
-		addJSON(writer, profiles)
+		u.SendCreated(writer, u.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -96,20 +85,16 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Error reading profile ID from request\n")
+		u.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
 	profiles, err := storage.DeleteConfigurationProfile(int(id))
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		writer.WriteHeader(http.StatusOK)
-		addJSON(writer, profiles)
+		u.SendResponse(writer, u.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -120,38 +105,31 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Error reading profile ID from request\n")
+		u.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	if !foundUsername {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "User name needs to be specified\n")
+		u.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Description needs to be specified\n")
+		u.SendError(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, "Configuration needs to be provided in the request body")
+		u.SendError(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
 	profiles, err := storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		io.WriteString(writer, err.Error())
+		u.SendError(writer, err.Error())
 	} else {
-		addJSONHeader(writer)
-		writer.WriteHeader(http.StatusAccepted)
-		addJSON(writer, profiles)
+		u.SendAccepted(writer, u.BuildOkResponseWithData("profiles", profiles))
 	}
 }
