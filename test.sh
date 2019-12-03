@@ -1,3 +1,5 @@
+export ENV=test
+
 go build
 
 if [ $? -eq 0 ]
