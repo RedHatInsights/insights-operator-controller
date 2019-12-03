@@ -81,17 +81,21 @@ func readTriggers(f *frisby.Frisby) []Trigger {
 		f.AddError(err.Error())
 	} else {
 		json.Unmarshal(text, &response)
-		fmt.Println("Work")
-		fmt.Println(response.Triggers)
 	}
 	return response.Triggers
+}
+
+func checkNumberOfTriggers(f *frisby.Frisby, triggers []Trigger, expected int) {
+	if len(triggers) != expected {
+		f.AddError(fmt.Sprintf("Number of returned triggers %d differs from expected number %d", len(triggers), expected))
+	}
 }
 
 func checkInitialListOfTriggers() {
 	f := frisby.Create("Check list of triggers")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -108,7 +112,7 @@ func checkActivateExistingTrigger() {
 	f := frisby.Create("Check activate existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -124,7 +128,7 @@ func checkActivateExistingTrigger() {
 	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -141,7 +145,7 @@ func checkDeactivateExistingTrigger() {
 	f := frisby.Create("Check activate existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -157,7 +161,7 @@ func checkDeactivateExistingTrigger() {
 	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -174,7 +178,7 @@ func checkActivateAlreadyActivatedTrigger() {
 	f := frisby.Create("Check activate already activated trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -190,7 +194,7 @@ func checkActivateAlreadyActivatedTrigger() {
 	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -207,7 +211,7 @@ func checkDeactivateAlreadyDeactivatedTrigger() {
 	f := frisby.Create("Check deactivate already deactivated trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -223,7 +227,7 @@ func checkDeactivateAlreadyDeactivatedTrigger() {
 	f.ExpectJson("status", "ok")
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -240,7 +244,7 @@ func checkActivateNonExistingTrigger() {
 	f := frisby.Create("Check activate non existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -255,7 +259,7 @@ func checkActivateNonExistingTrigger() {
 	f.ExpectStatus(200)
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -272,7 +276,7 @@ func checkDeactivateNonExistingTrigger() {
 	f := frisby.Create("Check deactivate non existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -287,7 +291,7 @@ func checkDeactivateNonExistingTrigger() {
 	f.ExpectStatus(200)
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected = []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -304,7 +308,7 @@ func checkDeleteExistingTrigger() {
 	f := frisby.Create("Check delete existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{1, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 0},
@@ -319,7 +323,7 @@ func checkDeleteExistingTrigger() {
 	f.ExpectStatus(200)
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 3)
+	checkNumberOfTriggers(f, triggers, 3)
 
 	expected = []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -335,7 +339,7 @@ func checkDeleteNonExistingTrigger() {
 	f := frisby.Create("Check delete non-existing trigger")
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 3)
+	checkNumberOfTriggers(f, triggers, 3)
 
 	expected := []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -349,7 +353,7 @@ func checkDeleteNonExistingTrigger() {
 	f.ExpectStatus(200)
 
 	triggers = readTriggers(f)
-	f.ExpectJsonLength("", 3)
+	checkNumberOfTriggers(f, triggers, 3)
 
 	expected = []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -436,7 +440,7 @@ func checkCreateNewTrigger() {
 	f.ExpectStatus(200)
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
@@ -456,7 +460,7 @@ func checkCreateNewTriggerForWrongCluster() {
 	f.ExpectStatus(400)
 
 	triggers := readTriggers(f)
-	f.ExpectJsonLength("", 4)
+	checkNumberOfTriggers(f, triggers, 4)
 
 	expected := []Trigger{
 		{2, "must-gather", "00000000-0000-0000-0000-000000000000", "reason", "link", "1970-01-01T00:00:00Z", "tester", "1970-01-01T00:00:00Z", "{}", 1},
