@@ -108,15 +108,22 @@ func readConfigurationProfilesFromResponse(f *frisby.Frisby) []ConfigurationProf
 	return response.Profiles
 }
 
+func checkNumberOfProfiles(f *frisby.Frisby, profiles []ConfigurationProfile, expected int) {
+	if len(profiles) != expected {
+		f.AddError(fmt.Sprintf("Number of returned configuration profiles %d differs from expected number %d", len(profiles), expected))
+	}
+}
+
 func checkInitialListOfConfigurationProfiles() {
 	f := frisby.Create("Check list of configuration profiles")
 	f.Get(API_URL + "/client/profile")
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
-	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
+	checkNumberOfProfiles(f, profiles, 4)
+
 	expected := []ConfigurationProfile{
 		{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"},
 		{1, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg2"},
@@ -169,9 +176,10 @@ func checkListOfConfigurationProfilesWithUpdatedItem() {
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
-	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
+	checkNumberOfProfiles(f, profiles, 4)
+
 	expected := []ConfigurationProfile{
 		{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"},
 		{1, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg2"},
@@ -227,9 +235,10 @@ func checkListOfConfigurationProfilesWithDeletedItem() {
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
-	f.ExpectJsonLength("", 3)
 
 	profiles := readConfigurationProfilesFromResponse(f)
+	checkNumberOfProfiles(f, profiles, 3)
+
 	expected := []ConfigurationProfile{
 		{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"},
 		{1, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg2"},
@@ -246,9 +255,10 @@ func checkListOfConfigurationProfilesWithAddedItem() {
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
-	f.ExpectJsonLength("", 4)
 
 	profiles := readConfigurationProfilesFromResponse(f)
+	checkNumberOfProfiles(f, profiles, 4)
+
 	expected := []ConfigurationProfile{
 		{0, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg1"},
 		{1, `{"no_op":"X", "watch":["a","b","c"]}`, "2019-01-01T00:00:00Z", "tester", "cfg2"},

@@ -62,7 +62,7 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		log.Println("Unable to get list of clusters", err)
 		u.SendError(writer, err.Error())
 	} else {
-		u.SendResponse(writer, u.BuildOkResponseWithData("clusters", clusters))
+		u.SendCreated(writer, u.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
