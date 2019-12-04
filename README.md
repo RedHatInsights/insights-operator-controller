@@ -50,6 +50,9 @@ export INSIGHTS_CONTROLLER_CONFIG_FILE=~/config.toml
 ./insights-operator-controller
 ```
 
+### LDAP Authentication
+
+For authentication we using [Insights operator LDAP Auth](https://github.com/RedHatInsights/insights-operator-ldapauth) that are working as proxy between client and controller. For turning on authentication need set `export ENV=production`, by default for development and test purposes it turned off.
 
 ## Data storage
 

@@ -97,10 +97,11 @@ func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 
 // Initialize perform the server initialization
 func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk logging.Client) {
+	log.Println("Environment: ", os.Getenv("ENV"))
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
-	if os.Getenv("ENV") != "test" {
+	if os.Getenv("ENV") == "production" {
 		router.Use(JWTAuthentication)
 	}
 	router.Use(addDefaultHeaders)
