@@ -54,7 +54,7 @@ export INSIGHTS_CONTROLLER_CONFIG_FILE=~/config.toml
 ## Data storage
 
 Data storage used by the service is configurable via the command line parameters. Currently it is possible to configure the following data storages:
-* SQLite local database: `controller.db` for the local deployment and `data.db` for functional tests
+* SQLite local database: `controller.db` for the local deployment and `test.db` for functional tests
 * PostgreSQL database: for local deployment and to be able to deploy the application to developer development
 
 
@@ -69,7 +69,7 @@ Use the following scripts from the `local_storage` subdirectory to work with SQL
 
 ### PostgreSQL
 
-PostgreSQL needs to be setup correcty:
+PostgreSQL needs to be setup correctly:
 * User `postgres` should have password set to `postgres`
 * In the configuration file `/var/lib/pgsql/data/pg_hba.conf`, the method `md5` needs to be selected for user `postgres` and `all`
 * The PostgreSQL daemon (service) has to be started, of course: `sudo systemctl start postgresql`
@@ -106,7 +106,7 @@ To drop previously created database, run `drop_RDS_database_postgres.sh`.
 
 ### Unit tests
 
-The following command run all unit tests:
+The following command runs all unit tests:
 
 ```
 go test ./...
@@ -120,7 +120,7 @@ go test -v ./...
 
 ### REST API tests
 
-REST API tests needs the running service and the test database to be prepared. In order to
+REST API tests need the running service and the test database to be prepared. In order to
 perform REST API tests, start the following script:
 
 ```
