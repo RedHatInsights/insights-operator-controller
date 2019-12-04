@@ -40,12 +40,12 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 		return
 	}
 
-	triggers, err := storage.GetTriggerByID(id)
+	trigger, err := storage.GetTriggerByID(id)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
 	}
-	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
+	u.SendResponse(writer, u.BuildOkResponseWithData("trigger", trigger))
 }
 
 func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
