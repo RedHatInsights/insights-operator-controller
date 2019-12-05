@@ -1,4 +1,7 @@
-export ENV=test
+
+if [ -z "$CONTROLLER_ENV" ]; then
+    export CONTROLLER_ENV=test
+fi
 
 go build
 

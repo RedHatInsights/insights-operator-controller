@@ -34,6 +34,9 @@ import (
 // APIPrefix is appended before all REST API endpoint addresses
 const APIPrefix = "/api/v1/"
 
+// Environment CONTROLLER_ENV const for specifying production vs test environment
+var Environment = os.Getenv("CONTROLLER_ENV")
+
 var apiRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 	Name: "api_endpoints_requests",
 	Help: "The total number requests per API endpoint",
@@ -82,7 +85,7 @@ func logRequest(nextHandler http.Handler) http.Handler {
 func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			if os.Getenv("ENV") != "production" {
+			if Environment != "production" {
 				if origin := r.Header.Get("Origin"); origin != "" {
 					w.Header().Set("Access-Control-Allow-Origin", origin)
 				}
@@ -97,11 +100,11 @@ func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 
 // Initialize perform the server initialization
 func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk logging.Client) {
-	log.Println("Environment: ", os.Getenv("ENV"))
+	log.Println("Environment: ", Environment)
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
-	if os.Getenv("ENV") == "production" {
+	if Environment == "production" {
 		router.Use(JWTAuthentication)
 	}
 	router.Use(addDefaultHeaders)
