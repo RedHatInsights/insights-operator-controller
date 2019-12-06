@@ -52,7 +52,7 @@ export INSIGHTS_CONTROLLER_CONFIG_FILE=~/config.toml
 
 ### LDAP Authentication
 
-For authentication we using [Insights operator LDAP Auth](https://github.com/RedHatInsights/insights-operator-ldapauth) that are working as proxy between client and controller. For turning on authentication need set `export ENV=production`, by default for development and test purposes it turned off.
+For authentication we using [Insights operator LDAP Auth](https://github.com/RedHatInsights/insights-operator-ldapauth) that are working as proxy between client and controller. For turning on authentication need set `export CONTROLLER_ENV=production`, by default for development and test purposes it turned off.
 
 ## Data storage
 
@@ -80,7 +80,7 @@ PostgreSQL needs to be setup correctly:
 For more information how to install PostgreSQL on Fedora (or RHEL) machine, please follow this guide:
 https://computingforgeeks.com/how-to-install-postgresql-on-fedora/
 
-Use the following scripts from the `local_storage` subdirectory to work with SQLite database:
+Use the following scripts from the `local_storage` subdirectory to work with PostgreSQL database:
 * `create_database_postgres.sh` to create new database named `controller`
 * `create_test_database_postgres.sh` to create new database named `test_db`
 
