@@ -1,0 +1,15 @@
+@startuml
+namespace logging {
+    class Client << (S,Aquamarine) >> {
+        + ClientImpl *splunk.Client
+
+        + Log(key string, value string) error
+        + LogAction(action string, user string, description string) error
+        + LogTriggerAction(action string, user string, cluster string, trigger string) error
+        + LogWithTime(time int64, key string, value string) error
+
+    }
+}
+
+
+@enduml

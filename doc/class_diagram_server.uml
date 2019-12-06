@@ -1,0 +1,14 @@
+@startuml
+namespace server {
+    class Token << (S,Aquamarine) >> {
+        + Login string
+
+    }
+    class server.contextKey << (T, #FF7700) >>  {
+    }
+}
+"jwt-go.StandardClaims" *-- "server.Token"
+
+
+"__builtin__.string" #.. "server.contextKey"
+@enduml
