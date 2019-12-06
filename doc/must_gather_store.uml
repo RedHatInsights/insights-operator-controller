@@ -1,0 +1,84 @@
+// Copyright Pavel Tisnovsky 2019
+//
+// vim:syntax=plantuml
+
+@startuml
+
+header Storing data from must-gather into S3 to be attached into customer case
+footer Page %page% of %lastpage%
+
+participant "Insights operator controller service" as service #99FF99
+participant "Insights operator" as operator #ccccff
+participant "Hydra" as hydra
+database "Amazon S3" as s3
+collections "Customer case" as case
+
+autonumber 1
+== Start of must-gather ==
+operator -> service: Get list of must-gather requests
+service -> operator: List of must-gather requests
+operator -> operator: Run must-gather
+== Must-gather to S3 phase ==
+operator -> hydra: Get credentials for case #
+hydra -> operator: AWS credentials for case #
+operator -> s3: Store data into bucket
+s3 -> operator: Status - ok
+operator -> service: Ack must-gather
+== Customer case attachment ==
+case -> s3: Need attachment for case #
+s3 -> case: Attachment for case #
+
+newpage
+autonumber 1
+== Start of must-gather ==
+operator -> service: Get list of must-gather requests
+note right: Cluster ID
+service -> operator: List of must-gather requests
+note left: Customer case # is included in records
+operator -> operator: Run must-gather
+note right: Take some time to finish...
+
+newpage
+autonumber 4
+== Must-gather to S3 phase ==
+operator -> hydra: Get credentials for case #
+hydra -> operator: AWS credentials for case #
+note right: Access key, secret key, bucket, region, ...
+operator -> s3: Store data into bucket
+note right: We have just write access
+s3 -[#green]> operator: Status - ok
+operator -[#green]> service: Ack must-gather
+note left: This is flagged in a database
+
+newpage
+autonumber 9
+== Customer case attachment ==
+case -> s3: Need attachment for case #
+note right: Actually not in scope of this design (solved already)
+s3 -> case: Attachment for case #
+
+newpage
+autonumber 1
+== Start of must-gather ==
+operator -> service: Get list of must-gather requests
+note right: Cluster ID
+service -> operator: List of must-gather requests
+note left: Customer case # is included in records
+operator -> operator: Run must-gather
+note right: Take some time to finish...
+== Must-gather to S3 phase ==
+operator -> hydra: Get credentials for case #
+hydra -> operator: AWS credentials for case #
+note right: Access key, secret key, bucket, region, ...
+operator -> s3: Store data into bucket
+note right: We have just write access
+s3 -[#green]> operator: Status - ok
+operator -[#green]> service: Ack must-gather
+note left: This is flagged in a database
+header Whole workflow
+== Customer case attachment ==
+case -> s3: Need attachment for case #
+note right: Actually not in scope of this design (solved already)
+s3 -> case: Attachment for case #
+
+@enduml
