@@ -72,13 +72,16 @@ func (storage Storage) Close() {
 	}
 }
 
+// ClusterID represents unique key of cluster stored in database.
+type ClusterID int
+
 // Cluster represents cluster record in the controller service.
 //     ID: unique key
 //     Name: cluster GUID in the following format:
 //         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID   ClusterID `json:"id"`
+	Name string    `json:"name"`
 }
 
 // ConfigurationProfile represents configuration profile record in the controller service.
@@ -153,7 +156,7 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			clusters = append(clusters, Cluster{id, name})
+			clusters = append(clusters, Cluster{ClusterID(id), name})
 		} else {
 			log.Println("error", err)
 		}
@@ -177,7 +180,7 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.ID = id
+			cluster.ID = ClusterID(id)
 			cluster.Name = name
 		} else {
 			log.Println("error", err)
@@ -245,7 +248,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.ID = id
+			cluster.ID = ClusterID(id)
 			cluster.Name = name
 			log.Printf("Cluster name %s has id %d\n", name, id)
 		} else {
@@ -567,7 +570,7 @@ func (storage Storage) SelectConfigurationProfileID(tx *sql.Tx) (int, error) {
 
 // DeactivatePreviousConfigurations deactivate all previous configurations for the specified trigger.
 // To be called inside transaction.
-func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID int) error {
+func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID ClusterID) error {
 	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
 	defer stmt.Close()
 
@@ -583,7 +586,7 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID in
 
 // InsertNewOperatorConfiguration inserts the new configuration for selected operator/cluster.
 // To be called inside transaction.
-func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID int, configurationID int, username string, reason string) error {
+func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error {
 	t := time.Now()
 	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
 	defer statement.Close()
