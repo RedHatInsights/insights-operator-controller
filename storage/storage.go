@@ -72,17 +72,26 @@ func (storage Storage) Close() {
 	}
 }
 
+// ID represents unique ID for any object.
+type ID int
+
 // ClusterID represents unique key of cluster stored in database.
-type ClusterID int
+type ClusterID ID
+
+// ClusterName represents name of cluster in format c8590f31-e97e-4b85-b506-c45ce1911a12
+type ClusterName string
 
 // Cluster represents cluster record in the controller service.
 //     ID: unique key
 //     Name: cluster GUID in the following format:
 //         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
-	ID   ClusterID `json:"id"`
-	Name string    `json:"name"`
+	ID   ClusterID   `json:"id"`
+	Name ClusterName `json:"name"`
 }
+
+// ConfigurationID represents unique key of configuration stored in database.
+type ConfigurationID ID
 
 // ConfigurationProfile represents configuration profile record in the controller service.
 //     ID: unique key
@@ -91,11 +100,11 @@ type Cluster struct {
 //     ChangeBy: timestamp of the last configuration change
 //     Description: a string with any comment(s) about the configuration
 type ConfigurationProfile struct {
-	ID            int    `json:"id"`
-	Configuration string `json:"configuration"`
-	ChangedAt     string `json:"changed_at"`
-	ChangedBy     string `json:"changed_by"`
-	Description   string `json:"description"`
+	ID            ConfigurationID `json:"id"`
+	Configuration string          `json:"configuration"`
+	ChangedAt     string          `json:"changed_at"`
+	ChangedBy     string          `json:"changed_by"`
+	Description   string          `json:"description"`
 }
 
 // ClusterConfiguration represents cluster configuration record in the controller service.
@@ -156,7 +165,7 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			clusters = append(clusters, Cluster{ClusterID(id), name})
+			clusters = append(clusters, Cluster{ClusterID(id), ClusterName(name)})
 		} else {
 			log.Println("error", err)
 		}
@@ -181,7 +190,7 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 		err = rows.Scan(&id, &name)
 		if err == nil {
 			cluster.ID = ClusterID(id)
-			cluster.Name = name
+			cluster.Name = ClusterName(name)
 		} else {
 			log.Println("error", err)
 		}
@@ -249,7 +258,7 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 		err = rows.Scan(&id, &name)
 		if err == nil {
 			cluster.ID = ClusterID(id)
-			cluster.Name = name
+			cluster.Name = ClusterName(name)
 			log.Printf("Cluster name %s has id %d\n", name, id)
 		} else {
 			log.Println("error", err)
@@ -280,7 +289,7 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 
 		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profiles = append(profiles, ConfigurationProfile{id, configuration, changedAt, changedBy, description})
+			profiles = append(profiles, ConfigurationProfile{ConfigurationID(id), configuration, changedAt, changedBy, description})
 		} else {
 			log.Println("error", err)
 		}
@@ -308,7 +317,7 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 
 		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profile.ID = id
+			profile.ID = ConfigurationID(id)
 			profile.Configuration = configuration
 			profile.ChangedAt = changedAt
 			profile.ChangedBy = changedBy
