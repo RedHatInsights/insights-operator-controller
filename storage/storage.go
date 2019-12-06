@@ -72,14 +72,29 @@ func (storage Storage) Close() {
 	}
 }
 
+// ID represents unique ID for any object.
+type ID int
+
+// Name represents common name of object stored in database.
+type Name string
+
+// ClusterID represents unique key of cluster stored in database.
+type ClusterID ID
+
+// ClusterName represents name of cluster in format c8590f31-e97e-4b85-b506-c45ce1911a12
+type ClusterName Name
+
 // Cluster represents cluster record in the controller service.
 //     ID: unique key
 //     Name: cluster GUID in the following format:
 //         c8590f31-e97e-4b85-b506-c45ce1911a12
 type Cluster struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID   ClusterID   `json:"id"`
+	Name ClusterName `json:"name"`
 }
+
+// ConfigurationID represents unique key of configuration stored in database.
+type ConfigurationID ID
 
 // ConfigurationProfile represents configuration profile record in the controller service.
 //     ID: unique key
@@ -88,12 +103,15 @@ type Cluster struct {
 //     ChangeBy: timestamp of the last configuration change
 //     Description: a string with any comment(s) about the configuration
 type ConfigurationProfile struct {
-	ID            int    `json:"id"`
-	Configuration string `json:"configuration"`
-	ChangedAt     string `json:"changed_at"`
-	ChangedBy     string `json:"changed_by"`
-	Description   string `json:"description"`
+	ID            ConfigurationID `json:"id"`
+	Configuration string          `json:"configuration"`
+	ChangedAt     string          `json:"changed_at"`
+	ChangedBy     string          `json:"changed_by"`
+	Description   string          `json:"description"`
 }
+
+// ClusterConfigurationID represents unique key of cluster configuration stored in database.
+type ClusterConfigurationID ID
 
 // ClusterConfiguration represents cluster configuration record in the controller service.
 //     ID: unique key
@@ -104,14 +122,17 @@ type ConfigurationProfile struct {
 //     Active: flag indicating whether the configuration is active or not
 //     Reason: a string with any comment(s) about the cluster configuration
 type ClusterConfiguration struct {
-	ID            int    `json:"id"`
-	Cluster       string `json:"cluster"`
-	Configuration string `json:"configuration"`
-	ChangedAt     string `json:"changed_at"`
-	ChangedBy     string `json:"changed_by"`
-	Active        string `json:"active"`
-	Reason        string `json:"reason"`
+	ID            ClusterConfigurationID `json:"id"`
+	Cluster       string                 `json:"cluster"`
+	Configuration string                 `json:"configuration"`
+	ChangedAt     string                 `json:"changed_at"`
+	ChangedBy     string                 `json:"changed_by"`
+	Active        string                 `json:"active"`
+	Reason        string                 `json:"reason"`
 }
+
+// TriggerID represents unique key of trigger stored in database.
+type TriggerID ID
 
 // Trigger represents trigger record in the controller service
 //     ID: unique key
@@ -125,16 +146,16 @@ type ClusterConfiguration struct {
 //     Parameters: parameters that needs to be pass to trigger code
 //     Active: flag indicating whether the trigger is still active or not
 type Trigger struct {
-	ID          int    `json:"id"`
-	Type        string `json:"type"`
-	Cluster     string `json:"cluster"`
-	Reason      string `json:"reason"`
-	Link        string `json:"link"`
-	TriggeredAt string `json:"triggered_at"`
-	TriggeredBy string `json:"triggered_by"`
-	AckedAt     string `json:"acked_at"`
-	Parameters  string `json:"parameters"`
-	Active      int    `json:"active"`
+	ID          TriggerID `json:"id"`
+	Type        string    `json:"type"`
+	Cluster     string    `json:"cluster"`
+	Reason      string    `json:"reason"`
+	Link        string    `json:"link"`
+	TriggeredAt string    `json:"triggered_at"`
+	TriggeredBy string    `json:"triggered_by"`
+	AckedAt     string    `json:"acked_at"`
+	Parameters  string    `json:"parameters"`
+	Active      int       `json:"active"`
 }
 
 // ListOfClusters method selects all clusters from database.
@@ -153,7 +174,7 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			clusters = append(clusters, Cluster{id, name})
+			clusters = append(clusters, Cluster{ClusterID(id), ClusterName(name)})
 		} else {
 			log.Println("error", err)
 		}
@@ -177,8 +198,8 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.ID = id
-			cluster.Name = name
+			cluster.ID = ClusterID(id)
+			cluster.Name = ClusterName(name)
 		} else {
 			log.Println("error", err)
 		}
@@ -245,8 +266,8 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 
 		err = rows.Scan(&id, &name)
 		if err == nil {
-			cluster.ID = id
-			cluster.Name = name
+			cluster.ID = ClusterID(id)
+			cluster.Name = ClusterName(name)
 			log.Printf("Cluster name %s has id %d\n", name, id)
 		} else {
 			log.Println("error", err)
@@ -277,7 +298,7 @@ func (storage Storage) ListConfigurationProfiles() ([]ConfigurationProfile, erro
 
 		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profiles = append(profiles, ConfigurationProfile{id, configuration, changedAt, changedBy, description})
+			profiles = append(profiles, ConfigurationProfile{ConfigurationID(id), configuration, changedAt, changedBy, description})
 		} else {
 			log.Println("error", err)
 		}
@@ -305,7 +326,7 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 
 		err = rows.Scan(&id, &configuration, &changedAt, &changedBy, &description)
 		if err == nil {
-			profile.ID = id
+			profile.ID = ConfigurationID(id)
 			profile.Configuration = configuration
 			profile.ChangedAt = changedAt
 			profile.ChangedBy = changedBy
@@ -399,7 +420,7 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 
 		err := rows.Scan(&id, &cluster, &configuration, &changedAt, &changedBy, &active, &reason)
 		if err == nil {
-			configurations = append(configurations, ClusterConfiguration{id, cluster, configuration, changedAt, changedBy, active, reason})
+			configurations = append(configurations, ClusterConfiguration{ClusterConfigurationID(id), cluster, configuration, changedAt, changedBy, active, reason})
 		} else {
 			log.Println("error", err)
 		}
@@ -567,7 +588,7 @@ func (storage Storage) SelectConfigurationProfileID(tx *sql.Tx) (int, error) {
 
 // DeactivatePreviousConfigurations deactivate all previous configurations for the specified trigger.
 // To be called inside transaction.
-func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID int) error {
+func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID ClusterID) error {
 	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
 	defer stmt.Close()
 
@@ -583,7 +604,7 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID in
 
 // InsertNewOperatorConfiguration inserts the new configuration for selected operator/cluster.
 // To be called inside transaction.
-func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID int, configurationID int, username string, reason string) error {
+func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error {
 	t := time.Now()
 	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
 	defer statement.Close()
