@@ -131,6 +131,9 @@ type ClusterConfiguration struct {
 	Reason        string                 `json:"reason"`
 }
 
+// TriggerID represents unique key of trigger stored in database.
+type TriggerID ID
+
 // Trigger represents trigger record in the controller service
 //     ID: unique key
 //     Type: ID of trigger type
@@ -143,16 +146,16 @@ type ClusterConfiguration struct {
 //     Parameters: parameters that needs to be pass to trigger code
 //     Active: flag indicating whether the trigger is still active or not
 type Trigger struct {
-	ID          int    `json:"id"`
-	Type        string `json:"type"`
-	Cluster     string `json:"cluster"`
-	Reason      string `json:"reason"`
-	Link        string `json:"link"`
-	TriggeredAt string `json:"triggered_at"`
-	TriggeredBy string `json:"triggered_by"`
-	AckedAt     string `json:"acked_at"`
-	Parameters  string `json:"parameters"`
-	Active      int    `json:"active"`
+	ID          TriggerID `json:"id"`
+	Type        string    `json:"type"`
+	Cluster     string    `json:"cluster"`
+	Reason      string    `json:"reason"`
+	Link        string    `json:"link"`
+	TriggeredAt string    `json:"triggered_at"`
+	TriggeredBy string    `json:"triggered_by"`
+	AckedAt     string    `json:"acked_at"`
+	Parameters  string    `json:"parameters"`
+	Active      int       `json:"active"`
 }
 
 // ListOfClusters method selects all clusters from database.
