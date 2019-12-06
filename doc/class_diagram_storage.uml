@@ -1,0 +1,107 @@
+@startuml
+namespace storage {
+    class Cluster << (S,Aquamarine) >> {
+        + ID ClusterID
+        + Name ClusterName
+
+    }
+    class ClusterConfiguration << (S,Aquamarine) >> {
+        + ID ClusterConfigurationID
+        + Cluster string
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Active string
+        + Reason string
+
+    }
+    class ConfigurationProfile << (S,Aquamarine) >> {
+        + ID ConfigurationID
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Description string
+
+    }
+    class Storage << (S,Aquamarine) >> {
+        - connections *sql.DB
+        - driver string
+
+        - readClusterConfigurations(rows *sql.Rows) ([]ClusterConfiguration, error)
+        - getTriggers(rows *sql.Rows) ([]Trigger, error)
+
+        + Close() 
+        + ListOfClusters() ([]Cluster, error)
+        + GetCluster(id int) (Cluster, error)
+        + RegisterNewCluster(name string) error
+        + CreateNewCluster(id string, name string) error
+        + DeleteCluster(id string) error
+        + GetClusterByName(name string) (Cluster, error)
+        + ListConfigurationProfiles() ([]ConfigurationProfile, error)
+        + GetConfigurationProfile(id int) (ConfigurationProfile, error)
+        + StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error)
+        + ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error)
+        + DeleteConfigurationProfile(id int) ([]ConfigurationProfile, error)
+        + ListAllClusterConfigurations() ([]ClusterConfiguration, error)
+        + ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error)
+        + GetClusterConfigurationByID(id string) (string, error)
+        + GetClusterActiveConfiguration(cluster string) (string, error)
+        + GetConfigurationIDForCluster(cluster string) (int, error)
+        + InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool
+        + SelectConfigurationProfileID(tx *sql.Tx) (int, error)
+        + DeactivatePreviousConfigurations(tx *sql.Tx, clusterID ClusterID) error
+        + InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error
+        + CreateClusterConfiguration(cluster string, username string, reason string, description string, configuration string) ([]ClusterConfiguration, error)
+        + EnableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error)
+        + DisableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error)
+        + EnableOrDisableClusterConfigurationByID(id string, active string) error
+        + DeleteClusterConfigurationByID(id string) error
+        + GetTriggerByID(id string) (Trigger, error)
+        + DeleteTriggerByID(id string) error
+        + ChangeStateOfTriggerByID(id string, active int) error
+        + ListAllTriggers() ([]Trigger, error)
+        + ListClusterTriggers(clusterName string) ([]Trigger, error)
+        + ListActiveClusterTriggers(clusterName string) ([]Trigger, error)
+        + GetTriggerID(triggerType string) (int, error)
+        + NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error
+        + AckTrigger(clusterName string, triggerID string) error
+
+    }
+    class Trigger << (S,Aquamarine) >> {
+        + ID TriggerID
+        + Type string
+        + Cluster string
+        + Reason string
+        + Link string
+        + TriggeredAt string
+        + TriggeredBy string
+        + AckedAt string
+        + Parameters string
+        + Active int
+
+    }
+    class storage.ClusterConfigurationID << (T, #FF7700) >>  {
+    }
+    class storage.ClusterID << (T, #FF7700) >>  {
+    }
+    class storage.ClusterName << (T, #FF7700) >>  {
+    }
+    class storage.ConfigurationID << (T, #FF7700) >>  {
+    }
+    class storage.ID << (T, #FF7700) >>  {
+    }
+    class storage.Name << (T, #FF7700) >>  {
+    }
+    class storage.TriggerID << (T, #FF7700) >>  {
+    }
+}
+
+
+"__builtin__.int" #.. "storage.ID"
+"__builtin__.string" #.. "storage.Name"
+"storage.ID" #.. "storage.ClusterConfigurationID"
+"storage.ID" #.. "storage.ClusterID"
+"storage.ID" #.. "storage.ConfigurationID"
+"storage.ID" #.. "storage.TriggerID"
+"storage.Name" #.. "storage.ClusterName"
+@enduml
