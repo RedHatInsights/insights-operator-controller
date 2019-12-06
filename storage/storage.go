@@ -75,11 +75,14 @@ func (storage Storage) Close() {
 // ID represents unique ID for any object.
 type ID int
 
+// Name represents common name of object stored in database.
+type Name string
+
 // ClusterID represents unique key of cluster stored in database.
 type ClusterID ID
 
 // ClusterName represents name of cluster in format c8590f31-e97e-4b85-b506-c45ce1911a12
-type ClusterName string
+type ClusterName Name
 
 // Cluster represents cluster record in the controller service.
 //     ID: unique key
@@ -107,6 +110,9 @@ type ConfigurationProfile struct {
 	Description   string          `json:"description"`
 }
 
+// ClusterConfigurationID represents unique key of cluster configuration stored in database.
+type ClusterConfigurationID ID
+
 // ClusterConfiguration represents cluster configuration record in the controller service.
 //     ID: unique key
 //     Cluster: cluster ID (not name)
@@ -116,13 +122,13 @@ type ConfigurationProfile struct {
 //     Active: flag indicating whether the configuration is active or not
 //     Reason: a string with any comment(s) about the cluster configuration
 type ClusterConfiguration struct {
-	ID            int    `json:"id"`
-	Cluster       string `json:"cluster"`
-	Configuration string `json:"configuration"`
-	ChangedAt     string `json:"changed_at"`
-	ChangedBy     string `json:"changed_by"`
-	Active        string `json:"active"`
-	Reason        string `json:"reason"`
+	ID            ClusterConfigurationID `json:"id"`
+	Cluster       string                 `json:"cluster"`
+	Configuration string                 `json:"configuration"`
+	ChangedAt     string                 `json:"changed_at"`
+	ChangedBy     string                 `json:"changed_by"`
+	Active        string                 `json:"active"`
+	Reason        string                 `json:"reason"`
 }
 
 // Trigger represents trigger record in the controller service
@@ -411,7 +417,7 @@ func (storage Storage) readClusterConfigurations(rows *sql.Rows) ([]ClusterConfi
 
 		err := rows.Scan(&id, &cluster, &configuration, &changedAt, &changedBy, &active, &reason)
 		if err == nil {
-			configurations = append(configurations, ClusterConfiguration{id, cluster, configuration, changedAt, changedBy, active, reason})
+			configurations = append(configurations, ClusterConfiguration{ClusterConfigurationID(id), cluster, configuration, changedAt, changedBy, active, reason})
 		} else {
 			log.Println("error", err)
 		}
