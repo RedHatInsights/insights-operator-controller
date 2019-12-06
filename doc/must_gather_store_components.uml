@@ -1,0 +1,42 @@
+// Copyright Pavel Tisnovsky 2019
+//
+// vim:syntax=plantuml
+
+@startuml
+
+[Insights operator controller service] as service #99ff99
+[Insights operator] as operator #ccccff
+[Hydra] as hydra
+[Amazon S3] as s3
+
+package "Customer case" {
+  [Attachment]
+}
+
+interface "REST API" as service_http
+service -- service_http
+
+interface "REST API" as hydra_api
+hydra -- hydra_api
+
+interface "Go SDK" as go_sdk
+go_sdk -> s3
+
+service_http - operator
+operator - hydra_api
+operator --> go_sdk
+
+note right of hydra
+    Provide credentials
+    needed to access AWS S3
+end note
+
+note right of s3
+    Store data into specified
+    bucket under
+    selected file name
+end note
+
+s3 --> Attachment
+
+@enduml
