@@ -50,6 +50,12 @@ export INSIGHTS_CONTROLLER_CONFIG_FILE=~/config.toml
 ./insights-operator-controller
 ```
 
+### Environment variables
+
+ * `INSIGHTS_CONTROLLER_CONFIG_FILE` - custom path to config file (default: `./config.toml`)
+ * `CONTROLLER_ENV` - specify environment (`development`, `test`, `production`. Default: `development`)
+ * `CONTROLLER_PREFIX` - specify URL path prefix (Default: `/api/v1/`)
+
 ### LDAP Authentication
 
 For authentication we using [Insights operator LDAP Auth](https://github.com/RedHatInsights/insights-operator-ldapauth) that are working as proxy between client and controller. For turning on authentication need set `export CONTROLLER_ENV=production`, by default for development and test purposes it turned off.
