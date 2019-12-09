@@ -23,6 +23,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
+	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"io"
 	"log"
 	"net/http"
@@ -32,7 +33,7 @@ import (
 )
 
 // APIPrefix is appended before all REST API endpoint addresses
-const APIPrefix = "/api/v1/"
+var APIPrefix = u.GetEnv("CONTROLLER_PREFIX", "/api/v1/")
 
 // Environment CONTROLLER_ENV const for specifying production vs test environment
 var Environment = os.Getenv("CONTROLLER_ENV")
@@ -101,6 +102,7 @@ func addDefaultHeaders(nextHandler http.Handler) http.Handler {
 // Initialize perform the server initialization
 func Initialize(address string, useHTTPS bool, storage storage.Storage, splunk logging.Client) {
 	log.Println("Environment: ", Environment)
+	log.Println("API Prefix: ", APIPrefix)
 	log.Println("Initializing HTTP server at", address)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(logRequest)
