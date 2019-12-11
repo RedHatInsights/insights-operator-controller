@@ -21,10 +21,16 @@ import (
 	"os"
 )
 
+const (
+	contentType = "Content-Type"
+	appJSON     = "application/json; charset=utf-8"
+)
+
 func checkMissingToken() {
 	f := frisby.Create("Check missing authorization token").Get(API_URL)
 	f.Send()
 	f.ExpectStatus(403)
+	f.ExpectHeader(contentType, appJSON)
 	f.ExpectContent("Missing auth token")
 	f.PrintReport()
 }
@@ -34,6 +40,7 @@ func checkMalformedToken() {
 	f.SetHeader("Authorization", "Bearer abcdef1234")
 	f.Send()
 	f.ExpectStatus(403)
+	f.ExpectHeader(contentType, appJSON)
 	f.ExpectContent("Malformed authentication token")
 	f.PrintReport()
 }
@@ -43,6 +50,7 @@ func checkInvalidToken() {
 	f.SetHeader("Authorization", "nonsense")
 	f.Send()
 	f.ExpectStatus(403)
+	f.ExpectHeader(contentType, appJSON)
 	f.ExpectContent("Invalid/Malformed auth token")
 	f.PrintReport()
 }
@@ -55,6 +63,7 @@ func checkSuccessfulAuth() {
 	} else {
 		f.SetHeader("Authorization", "Bearer "+os.Getenv(ldapToken))
 		f.Send()
+		f.ExpectHeader(contentType, appJSON)
 		f.ExpectStatus(200)
 		f.ExpectContent("Hello world!")
 		f.PrintReport()
