@@ -77,5 +77,12 @@ func main() {
 	useHTTPS := serviceCfg.GetBool("use_https")
 	address := serviceCfg.GetString("address")
 
-	server.Initialize(address, useHTTPS, storage, splunk)
+	s := server.Server{
+		Address:  address,
+		UseHTTPS: useHTTPS,
+		Storage:  storage,
+		Splunk:   splunk,
+	}
+
+	s.Initialize()
 }
