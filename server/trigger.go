@@ -18,14 +18,13 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"net/http"
 )
 
-func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	triggers, err := storage.ListAllTriggers()
+// GetAllTriggers - return list of all triggers
+func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request) {
+	triggers, err := s.Storage.ListAllTriggers()
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -33,14 +32,15 @@ func getAllTriggers(writer http.ResponseWriter, request *http.Request, storage s
 	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
-func getTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetTrigger - return single trigger by id
+func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
-	trigger, err := storage.GetTriggerByID(id)
+	trigger, err := s.Storage.GetTriggerByID(id)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -48,15 +48,16 @@ func getTrigger(writer http.ResponseWriter, request *http.Request, storage stora
 	u.SendResponse(writer, u.BuildOkResponseWithData("trigger", trigger))
 }
 
-func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DeleteTrigger - delete single trigger
+func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
-	splunk.LogAction("DeleteTrigger", "tester", id)
-	err := storage.DeleteTriggerByID(id)
+	s.Splunk.LogAction("DeleteTrigger", "tester", id)
+	err := s.Storage.DeleteTriggerByID(id)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -64,15 +65,16 @@ func deleteTrigger(writer http.ResponseWriter, request *http.Request, storage st
 	u.SendResponse(writer, u.BuildOkResponse())
 }
 
-func activateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// ActivateTrigger - active single trigger
+func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
-	splunk.LogAction("ActivateTrigger", "tester", id)
-	err := storage.ChangeStateOfTriggerByID(id, 1)
+	s.Splunk.LogAction("ActivateTrigger", "tester", id)
+	err := s.Storage.ChangeStateOfTriggerByID(id, 1)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -80,15 +82,16 @@ func activateTrigger(writer http.ResponseWriter, request *http.Request, storage 
 	u.SendResponse(writer, u.BuildOkResponse())
 }
 
-func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DeactivateTrigger - deactivate single trigger
+func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
-	splunk.LogAction("DeactivateTrigger", "tester", id)
-	err := storage.ChangeStateOfTriggerByID(id, 0)
+	s.Splunk.LogAction("DeactivateTrigger", "tester", id)
+	err := s.Storage.ChangeStateOfTriggerByID(id, 0)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -96,14 +99,15 @@ func deactivateTrigger(writer http.ResponseWriter, request *http.Request, storag
 	u.SendResponse(writer, u.BuildOkResponse())
 }
 
-func getClusterTriggers(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetClusterTriggers - return list of triggers for single cluster
+func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
-	triggers, err := storage.ListClusterTriggers(cluster)
+	triggers, err := s.Storage.ListClusterTriggers(cluster)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -111,7 +115,8 @@ func getClusterTriggers(writer http.ResponseWriter, request *http.Request, stora
 	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
-func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// RegisterClusterTrigger - register new trigger for cluster
+func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster name needs to be specified")
@@ -142,8 +147,8 @@ func registerClusterTrigger(writer http.ResponseWriter, request *http.Request, s
 		return
 	}
 
-	splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
-	err := storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
+	s.Splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
+	err := s.Storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return

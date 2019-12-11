@@ -40,7 +40,7 @@ type Token struct {
 }
 
 // JWTAuthentication middleware for checking auth rights
-func JWTAuthentication(next http.Handler) http.Handler {
+func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

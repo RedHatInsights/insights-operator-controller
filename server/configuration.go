@@ -18,8 +18,6 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
@@ -31,14 +29,15 @@ func sendConfiguration(writer http.ResponseWriter, configuration string) {
 	u.SendResponse(writer, resp)
 }
 
-func getConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetConfiguration - return single configuration by id
+func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Configuration ID needs to be specified")
 		return
 	}
 
-	configuration, err := storage.GetClusterConfigurationByID(id)
+	configuration, err := s.Storage.GetClusterConfigurationByID(id)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -46,15 +45,16 @@ func getConfiguration(writer http.ResponseWriter, request *http.Request, storage
 	sendConfiguration(writer, configuration)
 }
 
-func deleteConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DeleteConfiguration - remove single configuration by id
+func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Request) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Configuration ID needs to be specified")
 		return
 	}
 
-	splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
-	err := storage.DeleteClusterConfigurationByID(id)
+	s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
+	err := s.Storage.DeleteClusterConfigurationByID(id)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -62,8 +62,9 @@ func deleteConfiguration(writer http.ResponseWriter, request *http.Request, stor
 	u.SendResponse(writer, u.BuildOkResponse())
 }
 
-func getAllConfigurations(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	configuration, err := storage.ListAllClusterConfigurations()
+// GetAllConfigurations - return list of all configurations
+func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.Request) {
+	configuration, err := s.Storage.ListAllClusterConfigurations()
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -71,14 +72,15 @@ func getAllConfigurations(writer http.ResponseWriter, request *http.Request, sto
 	u.SendResponse(writer, u.BuildOkResponseWithData("configuration", configuration))
 }
 
-func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetClusterConfiguration - return list of configuration for single cluster
+func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
-	configuration, err := storage.ListClusterConfiguration(cluster)
+	configuration, err := s.Storage.ListClusterConfiguration(cluster)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -86,7 +88,8 @@ func getClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 	u.SendResponse(writer, u.BuildOkResponseWithData("configuration", configuration))
 }
 
-func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client, active string) {
+// EnableOrDisableConfiguration - enable or disable single configuration
+func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, active string) {
 	id, found := mux.Vars(request)["id"]
 	if !found {
 		u.SendError(writer, "Configuration ID needs to be specified")
@@ -94,11 +97,11 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 	}
 
 	if active == "0" {
-		splunk.LogAction("DisableClusterConfiguration", "tester", id)
+		s.Splunk.LogAction("DisableClusterConfiguration", "tester", id)
 	} else {
-		splunk.LogAction("EnableClusterConfiguration", "tester", id)
+		s.Splunk.LogAction("EnableClusterConfiguration", "tester", id)
 	}
-	err := storage.EnableOrDisableClusterConfigurationByID(id, active)
+	err := s.Storage.EnableOrDisableClusterConfigurationByID(id, active)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -110,15 +113,18 @@ func enableOrDisableConfiguration(writer http.ResponseWriter, request *http.Requ
 	}
 }
 
-func enableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	enableOrDisableConfiguration(writer, request, storage, splunk, "1")
+// EnableConfiguration - enable sinlge configuration
+func (s Server) EnableConfiguration(writer http.ResponseWriter, request *http.Request) {
+	s.EnableOrDisableConfiguration(writer, request, "1")
 }
 
-func disableConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
-	enableOrDisableConfiguration(writer, request, storage, splunk, "0")
+// DisableConfiguration - disable single configuration
+func (s Server) DisableConfiguration(writer http.ResponseWriter, request *http.Request) {
+	s.EnableOrDisableConfiguration(writer, request, "0")
 }
 
-func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// NewClusterConfiguration - create configuration for single cluster
+func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster ID needs to be specified")
@@ -150,16 +156,17 @@ func newClusterConfiguration(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 
-	configurations, err := storage.CreateClusterConfiguration(cluster, username[0], reason[0], description[0], string(configuration))
+	configurations, err := s.Storage.CreateClusterConfiguration(cluster, username[0], reason[0], description[0], string(configuration))
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
 	}
-	splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
+	s.Splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
 	u.SendResponse(writer, u.BuildOkResponseWithData("configurations", configurations))
 }
 
-func enableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// EnableClusterConfiguration - enable cluster configuration
+func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster ID needs to be specified")
@@ -179,8 +186,8 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
-	configurations, err := storage.EnableClusterConfiguration(cluster, username[0], reason[0])
+	s.Splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
+	configurations, err := s.Storage.EnableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -188,7 +195,8 @@ func enableClusterConfiguration(writer http.ResponseWriter, request *http.Reques
 	u.SendResponse(writer, u.BuildOkResponseWithData("configurations", configurations))
 }
 
-func disableClusterConfiguration(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DisableClusterConfiguration - disable cluster configuration
+func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster ID needs to be specified")
@@ -208,8 +216,8 @@ func disableClusterConfiguration(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
-	configurations, err := storage.DisableClusterConfiguration(cluster, username[0], reason[0])
+	s.Splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
+	configurations, err := s.Storage.DisableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return

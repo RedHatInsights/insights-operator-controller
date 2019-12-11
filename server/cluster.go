@@ -20,17 +20,15 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-// Read list of all clusters from database and return it to a client.
-func getClusters(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	clusters, err := storage.ListOfClusters()
+// GetClusters - read list of all clusters from database and return it to a client.
+func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
+	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
 		u.SendInternalServerError(writer, err.Error())
@@ -39,8 +37,8 @@ func getClusters(writer http.ResponseWriter, request *http.Request, storage stor
 	}
 }
 
-// Create a record with new cluster in a database. The updated list of all clusters is returned to client.
-func newCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// NewCluster - create a record with new cluster in a database. The updated list of all clusters is returned to client.
+func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	clusterName, foundName := mux.Vars(request)["name"]
 
 	if !foundName {
@@ -49,15 +47,15 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 		return
 	}
 
-	splunk.LogAction("CreateNewCluster", "tester", clusterName)
+	s.Splunk.LogAction("CreateNewCluster", "tester", clusterName)
 	//err := storage.CreateNewCluster(clusterId, clusterName)
-	err := storage.RegisterNewCluster(clusterName)
+	err := s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
 		u.SendInternalServerError(writer, err.Error())
 	}
 
-	clusters, err := storage.ListOfClusters()
+	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
 		u.SendError(writer, err.Error())
@@ -66,15 +64,15 @@ func newCluster(writer http.ResponseWriter, request *http.Request, storage stora
 	}
 }
 
-// Read cluster specified by its ID and return it to a client.
-func getClusterByID(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetClusterByID - read cluster specified by its ID and return it to a client.
+func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request) {
 	// try to retrieve cluster ID from query
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
 		u.SendError(writer, "Error reading cluster ID from request")
 	} else {
-		cluster, err := storage.GetCluster(int(id))
+		cluster, err := s.Storage.GetCluster(int(id))
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
 			u.SendError(writer, err.Error())
@@ -84,8 +82,8 @@ func getClusterByID(writer http.ResponseWriter, request *http.Request, storage s
 	}
 }
 
-// Delete a cluster
-func deleteCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DeleteCluster - delete a cluster
+func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
 	clusterID, foundID := mux.Vars(request)["id"]
 
 	// check parameter provided by client
@@ -95,14 +93,14 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 		return
 	}
 
-	splunk.LogAction("DeleteCluster", "tester", clusterID)
-	err := storage.DeleteCluster(clusterID)
+	s.Splunk.LogAction("DeleteCluster", "tester", clusterID)
+	err := s.Storage.DeleteCluster(clusterID)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)
 		u.SendError(writer, err.Error())
 	}
 
-	clusters, err := storage.ListOfClusters()
+	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
 		u.SendError(writer, err.Error())
@@ -111,8 +109,8 @@ func deleteCluster(writer http.ResponseWriter, request *http.Request, storage st
 	}
 }
 
-// Search for a cluster specified by its ID or name.
-func searchCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// SearchCluster - search for a cluster specified by its ID or name.
+func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
 	idParam, foundID := request.URL.Query()["id"]
 	nameParam, foundName := request.URL.Query()["name"]
 
@@ -123,7 +121,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			log.Println("Error reading and decoding cluster ID from query", err)
 			u.SendError(writer, "Error reading and decoding cluster ID from query\n")
 		} else {
-			cluster, err := storage.GetCluster(int(id))
+			cluster, err := s.Storage.GetCluster(int(id))
 			if err != nil {
 				log.Println("Unable to read cluster from database", err)
 				u.SendError(writer, err.Error())
@@ -132,7 +130,7 @@ func searchCluster(writer http.ResponseWriter, request *http.Request, storage st
 			}
 		}
 	} else if foundName {
-		cluster, err := storage.GetClusterByName(nameParam[0])
+		cluster, err := s.Storage.GetClusterByName(nameParam[0])
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
 			u.SendError(writer, err.Error())

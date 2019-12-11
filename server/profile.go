@@ -17,17 +17,15 @@ limitations under the License.
 package server
 
 import (
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 )
 
-// Read list of configuration profiles.
-func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
-	profiles, err := storage.ListConfigurationProfiles()
+// ListConfigurationProfiles - read list of configuration profiles.
+func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) {
+	profiles, err := s.Storage.ListConfigurationProfiles()
 	if err == nil {
 		u.SendResponse(writer, u.BuildOkResponseWithData("profiles", profiles))
 	} else {
@@ -35,15 +33,15 @@ func listConfigurationProfiles(writer http.ResponseWriter, request *http.Request
 	}
 }
 
-// Read profile specified by its ID
-func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetConfigurationProfile - read profile specified by its ID
+func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		u.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
-	profile, err := storage.GetConfigurationProfile(int(id))
+	profile, err := s.Storage.GetConfigurationProfile(int(id))
 	if err == nil {
 		u.SendResponse(writer, u.BuildOkResponseWithData("profile", profile))
 	} else {
@@ -51,8 +49,8 @@ func getConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 	}
 }
 
-// Create new configuration profile
-func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// NewConfigurationProfile - create new configuration profile
+func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
 
@@ -72,8 +70,8 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 		return
 	}
 
-	splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
-	profiles, err := storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
+	s.Splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
+	profiles, err := s.Storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
 		u.SendInternalServerError(writer, err.Error())
 	} else {
@@ -81,16 +79,16 @@ func newConfigurationProfile(writer http.ResponseWriter, request *http.Request, 
 	}
 }
 
-// Delete configuration profile
-func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// DeleteConfigurationProfile - delete configuration profile
+func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		u.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
-	splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
-	profiles, err := storage.DeleteConfigurationProfile(int(id))
+	s.Splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
+	profiles, err := s.Storage.DeleteConfigurationProfile(int(id))
 	if err != nil {
 		u.SendError(writer, err.Error())
 	} else {
@@ -98,8 +96,8 @@ func deleteConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 	}
 }
 
-// Change configuration profile
-func changeConfigurationProfile(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// ChangeConfigurationProfile - change configuration profile
+func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	id, err := retrieveIDRequestParameter(request)
 	username, foundUsername := request.URL.Query()["username"]
 	description, foundDescription := request.URL.Query()["description"]
@@ -125,8 +123,8 @@ func changeConfigurationProfile(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
-	profiles, err := storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
+	s.Splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
+	profiles, err := s.Storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if err != nil {
 		u.SendError(writer, err.Error())
 	} else {

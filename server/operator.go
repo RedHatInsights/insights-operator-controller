@@ -18,15 +18,13 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	u "github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
 )
 
-// Read configuration for the operator.
-func readConfigurationForOperator(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// ReadConfigurationForOperator - read configuration for the operator.
+func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
@@ -34,7 +32,7 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	configuration, err := storage.GetClusterActiveConfiguration(cluster)
+	configuration, err := s.Storage.GetClusterActiveConfiguration(cluster)
 	if err != nil {
 		log.Println("Cannot read cluster configuration", err)
 		u.SendError(writer, err.Error())
@@ -43,8 +41,8 @@ func readConfigurationForOperator(writer http.ResponseWriter, request *http.Requ
 	sendConfiguration(writer, configuration)
 }
 
-// Register new cluster.
-func registerCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage, splunk logging.Client) {
+// RegisterCluster - register new cluster.
+func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Request) {
 	clusterName, foundName := mux.Vars(request)["cluster"]
 
 	// check parameters provided by client
@@ -54,8 +52,8 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 		return
 	}
 
-	splunk.LogAction("RegisterCluster", "tester", clusterName)
-	err := storage.RegisterNewCluster(clusterName)
+	s.Splunk.LogAction("RegisterCluster", "tester", clusterName)
+	err := s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
 		u.SendInternalServerError(writer, err.Error())
@@ -63,14 +61,15 @@ func registerCluster(writer http.ResponseWriter, request *http.Request, storage 
 	u.SendCreated(writer, u.BuildOkResponse())
 }
 
-func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// GetActiveTriggersForCluster - return list of triggers for single cluster
+func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
-	triggers, err := storage.ListActiveClusterTriggers(cluster)
+	triggers, err := s.Storage.ListActiveClusterTriggers(cluster)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
@@ -78,7 +77,8 @@ func getActiveTriggersForCluster(writer http.ResponseWriter, request *http.Reque
 	u.SendResponse(writer, u.BuildOkResponseWithData("triggers", triggers))
 }
 
-func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, storage storage.Storage) {
+// AckTriggerForCluster - ack single cluster's trigger
+func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		u.SendError(writer, "Cluster name needs to be specified")
@@ -91,7 +91,7 @@ func ackTriggerForCluster(writer http.ResponseWriter, request *http.Request, sto
 		return
 	}
 
-	err := storage.AckTrigger(cluster, triggerID)
+	err := s.Storage.AckTrigger(cluster, triggerID)
 	if err != nil {
 		u.SendError(writer, err.Error())
 		return
