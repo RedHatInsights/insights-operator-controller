@@ -20,7 +20,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	u "github.com/redhatinsighs/insights-operator-controller/utils"
+	"github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,9 +31,9 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		u.SendInternalServerError(writer, err.Error())
+		utils.SendInternalServerError(writer, err.Error())
 	} else {
-		u.SendResponse(writer, u.BuildOkResponseWithData("clusters", clusters))
+		utils.SendResponse(writer, utils.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -43,7 +43,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		u.SendError(writer, "Cluster name needs to be specified")
+		utils.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -52,15 +52,15 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	err := s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		u.SendInternalServerError(writer, err.Error())
+		utils.SendInternalServerError(writer, err.Error())
 	}
 
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	} else {
-		u.SendCreated(writer, u.BuildOkResponseWithData("clusters", clusters))
+		utils.SendCreated(writer, utils.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -70,14 +70,14 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
-		u.SendError(writer, "Error reading cluster ID from request")
+		utils.SendError(writer, "Error reading cluster ID from request")
 	} else {
 		cluster, err := s.Storage.GetCluster(int(id))
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			u.SendError(writer, err.Error())
+			utils.SendError(writer, err.Error())
 		} else {
-			u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
+			utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
 		}
 	}
 }
@@ -89,7 +89,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	// check parameter provided by client
 	if !foundID {
 		log.Println("Cluster ID is not provided")
-		u.SendError(writer, "Cluster ID needs to be specified")
+		utils.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -97,15 +97,15 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	err := s.Storage.DeleteCluster(clusterID)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	}
 
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	} else {
-		u.SendAccepted(writer, u.BuildOkResponseWithData("clusters", clusters))
+		utils.SendAccepted(writer, utils.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -119,25 +119,25 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 		id, err := strconv.ParseInt(idParam[0], 10, 0)
 		if err != nil {
 			log.Println("Error reading and decoding cluster ID from query", err)
-			u.SendError(writer, "Error reading and decoding cluster ID from query\n")
+			utils.SendError(writer, "Error reading and decoding cluster ID from query\n")
 		} else {
 			cluster, err := s.Storage.GetCluster(int(id))
 			if err != nil {
 				log.Println("Unable to read cluster from database", err)
-				u.SendError(writer, err.Error())
+				utils.SendError(writer, err.Error())
 			} else {
-				u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
+				utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
 			}
 		}
 	} else if foundName {
 		cluster, err := s.Storage.GetClusterByName(nameParam[0])
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			u.SendError(writer, err.Error())
+			utils.SendError(writer, err.Error())
 		} else {
-			u.SendResponse(writer, u.BuildOkResponseWithData("cluster", cluster))
+			utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
 		}
 	} else {
-		u.SendError(writer, "Either cluster ID or name needs to be specified")
+		utils.SendError(writer, "Either cluster ID or name needs to be specified")
 	}
 }

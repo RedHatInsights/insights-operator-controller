@@ -17,7 +17,7 @@ limitations under the License.
 package server
 
 import (
-	u "github.com/redhatinsighs/insights-operator-controller/utils"
+	"github.com/redhatinsighs/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -27,9 +27,9 @@ import (
 func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) {
 	profiles, err := s.Storage.ListConfigurationProfiles()
 	if err == nil {
-		u.SendResponse(writer, u.BuildOkResponseWithData("profiles", profiles))
+		utils.SendResponse(writer, utils.BuildOkResponseWithData("profiles", profiles))
 	} else {
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	}
 }
 
@@ -37,15 +37,15 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		u.SendError(writer, "Error reading profile ID from request\n")
+		utils.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	profile, err := s.Storage.GetConfigurationProfile(int(id))
 	if err == nil {
-		u.SendResponse(writer, u.BuildOkResponseWithData("profile", profile))
+		utils.SendResponse(writer, utils.BuildOkResponseWithData("profile", profile))
 	} else {
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	}
 }
 
@@ -55,27 +55,27 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		u.SendError(writer, "User name needs to be specified\n")
+		utils.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		u.SendError(writer, "Description needs to be specified\n")
+		utils.SendError(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		u.SendError(writer, "Configuration needs to be provided in the request body")
+		utils.SendError(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	s.Splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
 	profiles, err := s.Storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
-		u.SendInternalServerError(writer, err.Error())
+		utils.SendInternalServerError(writer, err.Error())
 	} else {
-		u.SendCreated(writer, u.BuildOkResponseWithData("profiles", profiles))
+		utils.SendCreated(writer, utils.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -83,16 +83,16 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		u.SendError(writer, "Error reading profile ID from request\n")
+		utils.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	s.Splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
 	profiles, err := s.Storage.DeleteConfigurationProfile(int(id))
 	if err != nil {
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	} else {
-		u.SendResponse(writer, u.BuildOkResponseWithData("profiles", profiles))
+		utils.SendResponse(writer, utils.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -103,31 +103,31 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
-		u.SendError(writer, "Error reading profile ID from request\n")
+		utils.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	if !foundUsername {
-		u.SendError(writer, "User name needs to be specified\n")
+		utils.SendError(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		u.SendError(writer, "Description needs to be specified\n")
+		utils.SendError(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		u.SendError(writer, "Configuration needs to be provided in the request body")
+		utils.SendError(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	s.Splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
 	profiles, err := s.Storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if err != nil {
-		u.SendError(writer, err.Error())
+		utils.SendError(writer, err.Error())
 	} else {
-		u.SendAccepted(writer, u.BuildOkResponseWithData("profiles", profiles))
+		utils.SendAccepted(writer, utils.BuildOkResponseWithData("profiles", profiles))
 	}
 }

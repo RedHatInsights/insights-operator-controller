@@ -23,7 +23,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redhatinsighs/insights-operator-controller/logging"
 	"github.com/redhatinsighs/insights-operator-controller/storage"
-	u "github.com/redhatinsighs/insights-operator-controller/utils"
+	"github.com/redhatinsighs/insights-operator-controller/utils"
 	"io"
 	"log"
 	"net/http"
@@ -41,7 +41,7 @@ type Server struct {
 }
 
 // APIPrefix is appended before all REST API endpoint addresses
-var APIPrefix = u.GetEnv("CONTROLLER_PREFIX", "/api/v1/")
+var APIPrefix = utils.GetEnv("CONTROLLER_PREFIX", "/api/v1/")
 
 // Environment CONTROLLER_ENV const for specifying production vs test environment
 var Environment = os.Getenv("CONTROLLER_ENV")
