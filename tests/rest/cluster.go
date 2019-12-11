@@ -54,7 +54,7 @@ func readListOfClusters(f *frisby.Frisby) []Cluster {
 }
 
 func createCluster(f *frisby.Frisby, clusterID string, clusterName string) {
-	f.Post(API_URL + "client/cluster/" + clusterID + "/" + clusterName)
+	f.Post(API_URL + "client/cluster/" + clusterName)
 	f.Send()
 	f.ExpectStatus(201)
 }
