@@ -9,6 +9,10 @@ All methods meant to be used by end-user *must be* documented - **no exceptions!
 Other code quality metrics are measured as well via [Go Report Card](https://goreportcard.com/report/github.com/RedHatInsights/insights-operator-controller)
 
 
+### Naming conventions
+
+Please try to follow [Style guideline for Go packages](https://rakyll.org/style-packages/) and [Package names](https://blog.golang.org/package-names)
+
 
 ## Submitting a pull request
 
