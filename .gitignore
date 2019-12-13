@@ -2,3 +2,4 @@ insights-operator-controller
 rest-api-tests
 *.db
 config_my.toml
+coverage.out

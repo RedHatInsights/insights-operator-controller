@@ -6,7 +6,8 @@ jobs:
   include:
     - before_install: go build
       script:
-        - go test ./...
+        - go test -coverprofile coverage.out $(go list ./... | grep -v tests)
+        - go tool cover -func=coverage.out
     - stage: style
       script:
         - ./.travis.gofmt.sh
