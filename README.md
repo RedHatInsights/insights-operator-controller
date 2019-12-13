@@ -152,4 +152,4 @@ History of checks done by CI is available at [RedHatInsights / insights-operator
 
 ## Contribution
 
-Plasase look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to contribute to this project.
+Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to contribute to this project.
