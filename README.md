@@ -33,8 +33,10 @@ Just run the executable file created by `go build`:
 ### HTTPS instead of HTTP
 
 Change the following lines in `config.toml`:
-- use_https=false
-- address=":4443"
+```
+use_https=true
+address=":4443"
+```
 
 Please note that the service (when run locally) use the self-signed certificate.
 You'd need to use `certs.pem` file on client side (curl, web browser etc.)
