@@ -1,0 +1,71 @@
+// Copyright Pavel Tisnovsky 2019
+
+@startuml
+
+[Insights operator controller service] as service #99ff99
+[Insights operator] as operator #ccccff
+[Hydra] as hydra
+[Amazon S3] as s3
+
+package "Customer case" {
+  [Attachment]
+}
+
+cloud "Internal RH network\n" {
+    [CLI client] as cli
+    interface "HTTP" as cli_to_ldap_auth
+    cli - cli_to_ldap_auth
+
+    [LDAP auth service] as ldap_auth #ccccff
+    interface "TLS" as ldap_auth_tls
+
+    cli_to_ldap_auth - ldap_auth
+
+    ldap_auth --> ldap_auth_tls :> user+password
+
+    [Red Hat LDAP] as rh_ldap
+    ldap_auth_tls <-- rh_ldap :< user+groups
+
+    interface "HTTPS" as ldap_auth_to_service_1
+}
+
+interface "HTTPS" as ldap_auth_to_service_2
+
+ldap_auth - ldap_auth_to_service_1
+ldap_auth_to_service_1 <--> ldap_auth_to_service_2 : mutual authentication scheme
+ldap_auth_to_service_2 <-> service
+
+note left of ldap_auth_to_service_1 : Inside Red Hat network
+note left of ldap_auth_to_service_2 : In the wild
+
+interface "REST API" as service_http
+service -- service_http
+
+interface "REST API" as hydra_api
+hydra_api - hydra
+
+interface "Go SDK" as go_sdk
+go_sdk -> s3
+
+service_http - operator
+operator - hydra_api
+operator --> go_sdk
+s3 --> Attachment
+
+note right of hydra
+    Provide credentials
+    needed to access AWS S3
+end note
+
+note right of s3
+    Store data into specified
+    bucket under
+    selected file name
+end note
+
+note right of service
+    Service needs to be accessible
+    from client clusters
+end note
+
+@enduml

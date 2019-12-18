@@ -1,0 +1,51 @@
+// Copyright Pavel Tisnovsky 2019
+
+@startuml
+
+[Insights operator controller service] as service #99ff99
+
+cloud "Internal RH network" {
+    [CLI client] as cli
+    interface "HTTP" as cli_to_ldap_auth_1
+    interface "HTTP" as cli_to_ldap_auth_2
+    cli - cli_to_ldap_auth_1
+
+    [LDAP auth service] as ldap_auth #ccccff
+    interface "TLS" as ldap_auth_tls_1
+    interface "TLS" as ldap_auth_tls_2
+
+    cli_to_ldap_auth_1 - cli_to_ldap_auth_2
+    cli_to_ldap_auth_2 - ldap_auth
+
+    ldap_auth --> ldap_auth_tls_1 :> user+password
+
+    [Red Hat LDAP] as rh_ldap
+    ldap_auth_tls_1 -- ldap_auth_tls_2
+    ldap_auth_tls_2 <-- rh_ldap :< user+groups
+
+    interface "HTTPS" as ldap_auth_to_service_1
+
+    note left of ldap_auth_tls_1
+       LDAP is contacted
+       with user+password
+    end note
+
+    note left of ldap_auth_tls_2
+       LDAP responds with
+       user info + groups
+    end note
+
+}
+
+interface "HTTPS" as ldap_auth_to_service_2
+
+ldap_auth - ldap_auth_to_service_1
+ldap_auth_to_service_1 <--> ldap_auth_to_service_2 : mutual authentication scheme
+ldap_auth_to_service_2 <-> service
+
+note left of ldap_auth_to_service_1 : Inside Red Hat network
+note left of ldap_auth_to_service_2 : In the wild
+
+note bottom of service : Service needs to be accessible from client clusters
+
+@enduml
