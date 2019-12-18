@@ -1,0 +1,122 @@
+// Copyright Pavel Tisnovsky 2019
+
+@startuml
+
+header Authorization process for insights operator instrumentation service
+footer Page %page% of %lastpage%
+
+collections CLI as cli
+participant "LDAP auth" as ldap_auth #ccccff
+database "RH LDAP" as rh_ldap
+participant "Insights operator controller service" as service #99FF99
+
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+note right: uid=login,ou=users,dc=redhat,dc=com
+note left: cn=ccx-dev
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+note right: uid=login,ou=users,dc=redhat,dc=com
+note left: cn=ccx-dev
+group User+password+group OK
+        rh_ldap -[#green]> ldap_auth: Success+token
+        ldap_auth -[#green]> cli: Success, your token is 'token'
+else User not found
+        autonumber 3
+        rh_ldap -[#red]> ldap_auth: Failure
+        ldap_auth -[#red]> cli: Failure
+else Wrong password
+        autonumber 3
+        rh_ldap -[#red]> ldap_auth: Failure
+        ldap_auth -[#red]> cli: Failure
+else Not in a group
+        autonumber 3
+        rh_ldap -[#red]> ldap_auth: Failure
+        ldap_auth -[#red]> cli: Failure
+end
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+rh_ldap -[#green]> ldap_auth: Success+token
+ldap_auth -[#green]> cli:  Success, your token is 'token'
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+rh_ldap -[#green]> ldap_auth: Success+token
+ldap_auth -[#green]> cli:  Success, your token is 'token'
+== Regular REST API calls ==
+cli -> ldap_auth: REST API request + token in header
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+rh_ldap -[#green]> ldap_auth: Success+token
+ldap_auth -[#green]> cli:  Success, your token is 'token'
+== Regular REST API calls ==
+cli -> ldap_auth: REST API request + token in header
+ldap_auth -> service: REST API request
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+rh_ldap -[#green]> ldap_auth: Success+token
+ldap_auth -[#green]> cli:  Success, your token is 'token'
+== Regular REST API calls ==
+cli -> ldap_auth: REST API request + token in header
+ldap_auth -> service: REST API request
+service -> ldap_auth: REST API response
+
+newpage
+autonumber 1
+== Initialization ==
+cli -> ldap_auth: Login (user+password)
+ldap_auth -> rh_ldap: User+password
+rh_ldap -[#green]> ldap_auth: Success+token
+ldap_auth -[#green]> cli:  Success, your token is 'token'
+== Regular REST API calls ==
+cli -> ldap_auth: REST API request + token in header
+ldap_auth -> service: REST API request
+service -> ldap_auth: REST API response
+ldap_auth -> cli: REST API response
+
+header Possible failures
+
+newpage
+autonumber 1
+== REST API calls without token ==
+autonumber 5
+cli -> ldap_auth: REST API request
+ldap_auth -[#red]> cli: Failuer - no token
+note right: Missing auth token
+== REST API calls with improper token ==
+autonumber 5
+cli -> ldap_auth: REST API request + token in header
+ldap_auth -[#red]> cli: Failuer - wrong token
+note right: Invalid/Malformed auth token
+== REST API calls with token not signed by the server ==
+autonumber 5
+cli -> ldap_auth: REST API request + token in header
+ldap_auth -[#red]> cli: Failuer - wrong token
+note right: Token is not valid
+@enduml
