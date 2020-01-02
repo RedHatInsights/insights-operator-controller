@@ -3,7 +3,7 @@ if [ -z "$CONTROLLER_ENV" ]; then
     export CONTROLLER_ENV=test
 fi
 
-go build
+go build -race
 
 if [ $? -eq 0 ]
 then
