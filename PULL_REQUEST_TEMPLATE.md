@@ -12,6 +12,7 @@ Please delete options that are not relevant.
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] This change requires a documentation update
+- [ ] Refactor (refactoring code, removing useless files)
 
 ## Testing steps
 Please describe how the change was tested locally. If, for some reason, the testing was not done or not done fully, please describe what are the testing steps.
