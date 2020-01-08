@@ -16,6 +16,11 @@ go build
 
 This command should create an executable file named `insights-operator-controller`.
 
+Alternatively you can use *GNU make* to perform the same operation:
+
+```
+make build
+```
 
 
 ## Start
@@ -24,6 +29,12 @@ Just run the executable file created by `go build`:
 
 ```
 ./insights-operator-controller
+```
+
+If you need to start the cleanly built controller, use the following command:
+
+```
+make run
 ```
 
 
@@ -117,7 +128,13 @@ To drop previously created database, run `drop_RDS_database_postgres.sh`.
 
 ### Unit tests
 
-The following command runs all unit tests:
+The following command runs all unit tests against newly built controller:
+
+```
+make test
+```
+
+In case you just need to start unit tests without the clean+build step, use following command:
 
 ```
 go test ./...
@@ -139,6 +156,14 @@ perform REST API tests, start the following script:
 ```
 
 Please note that the service should not be running at the same moment (as it used the same port).
+
+## Code style and cyclomatic complexity checks
+
+All code style checks, cyclomatic complexity measurement etc. can be started from command line by using:
+
+```
+make style
+```
 
 ## CI
 
