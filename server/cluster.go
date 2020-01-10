@@ -127,8 +127,8 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	}
 
 	// either cluster id or its name needs to be specified
-	if req.Id != 0 {
-		cluster, err = s.Storage.GetCluster(req.Id)
+	if req.ID != 0 {
+		cluster, err = s.Storage.GetCluster(req.ID)
 	} else {
 		cluster, err = s.Storage.GetClusterByName(req.Name)
 	}
@@ -141,12 +141,14 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
 }
 
+// SearchClusterRequest defines type safe SearchCluster request
 type SearchClusterRequest struct {
 	utils.Pagination
-	Id   int    `schema:"id"`
+	ID   int    `schema:"id"`
 	Name string `schema:"name"`
 }
 
+// SearchClusterTemplate defines validation rules and messages for SearchCluster
 var SearchClusterTemplate = utils.MergeMaps(map[string]interface{}{
 	// all acceptable fields are listed
 	// case sensitive
@@ -155,8 +157,8 @@ var SearchClusterTemplate = utils.MergeMaps(map[string]interface{}{
 	"":     "oneOfIdOrName~Either cluster ID or name needs to be specified",
 }, utils.PaginationTemplate)
 
-// oneOfIdOrNameValidation validates that id or name is filled
-func oneOfIdOrNameValidation(i interface{}, context interface{}) bool {
+// oneOfIDOrNameValidation validates that id or name is filled
+func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
 	// Tag oneOfIdOrName
 	v, ok := context.(map[string]interface{})
 	if !ok {
@@ -173,5 +175,5 @@ func oneOfIdOrNameValidation(i interface{}, context interface{}) bool {
 }
 
 func init() {
-	govalidator.CustomTypeTagMap.Set("oneOfIdOrName", govalidator.CustomTypeValidator(oneOfIdOrNameValidation))
+	govalidator.CustomTypeTagMap.Set("oneOfIdOrName", govalidator.CustomTypeValidator(oneOfIDOrNameValidation))
 }

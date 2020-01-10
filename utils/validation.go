@@ -119,11 +119,13 @@ func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	return r
 }
 
+// Pagination defines type safe Pagination request components
 type Pagination struct {
 	Limit  int `schema:"limit" valid:"type(int)~Limit has to be a number"`
 	Offset int `schema:"offset" valid:"type(int)~Offset has to be a number"`
 }
 
+// PaginationTemplate contains validation for Pagination components
 var PaginationTemplate = map[string]interface{}{
 	"limit":  "int~Limit has to be a number",
 	"offset": "int~Offset has to be a number",
