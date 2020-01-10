@@ -1,6 +1,6 @@
 # Insights operator controller
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-operator-controller)](https://goreportcard.com/report/github.com/RedHatInsights/insights-operator-controller) [![Build Status](https://travis-ci.org/RedHatInsights/insights-operator-controller.svg?branch=master)](https://travis-ci.org/RedHatInsights/insights-operator-controller)
+[![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-operator-controller)](https://goreportcard.com/report/github.com/RedHatInsights/insights-operator-controller) [![Build Status](https://travis-ci.org/RedHatInsights/insights-operator-controller.svg?branch=master)](https://travis-ci.org/RedHatInsights/insights-operator-controller) [![codecov](https://codecov.io/gh/RedHatInsights/insights-operator-controller/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/insights-operator-controller)
 
 ## Description
 
