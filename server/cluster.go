@@ -19,11 +19,13 @@ limitations under the License.
 package server
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/utils"
 	"log"
 	"net/http"
-	"strconv"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
+	"github.com/redhatinsighs/insights-operator-controller/storage"
+	"github.com/redhatinsighs/insights-operator-controller/utils"
 )
 
 // GetClusters - read list of all clusters from database and return it to a client.
@@ -111,33 +113,67 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 
 // SearchCluster - search for a cluster specified by its ID or name.
 func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
-	idParam, foundID := request.URL.Query()["id"]
-	nameParam, foundName := request.URL.Query()["name"]
+	var (
+		req     SearchClusterRequest
+		cluster storage.Cluster
+		err     error
+	)
+
+	err = utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
+	if err != nil {
+		log.Println(err)
+		utils.SendError(writer, err.Error())
+		return
+	}
 
 	// either cluster id or its name needs to be specified
-	if foundID {
-		id, err := strconv.ParseInt(idParam[0], 10, 0)
-		if err != nil {
-			log.Println("Error reading and decoding cluster ID from query", err)
-			utils.SendError(writer, "Error reading and decoding cluster ID from query\n")
-		} else {
-			cluster, err := s.Storage.GetCluster(int(id))
-			if err != nil {
-				log.Println("Unable to read cluster from database", err)
-				utils.SendError(writer, err.Error())
-			} else {
-				utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
-			}
-		}
-	} else if foundName {
-		cluster, err := s.Storage.GetClusterByName(nameParam[0])
-		if err != nil {
-			log.Println("Unable to read cluster from database", err)
-			utils.SendError(writer, err.Error())
-		} else {
-			utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
-		}
+	if req.ID != 0 {
+		cluster, err = s.Storage.GetCluster(req.ID)
 	} else {
-		utils.SendError(writer, "Either cluster ID or name needs to be specified")
+		cluster, err = s.Storage.GetClusterByName(req.Name)
 	}
+	if err != nil {
+		log.Println("Unable to read cluster from database", err)
+		utils.SendError(writer, err.Error())
+		return
+	}
+
+	utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
+}
+
+// SearchClusterRequest defines type safe SearchCluster request
+type SearchClusterRequest struct {
+	utils.Pagination
+	ID   int    `schema:"id"`
+	Name string `schema:"name"`
+}
+
+// SearchClusterTemplate defines validation rules and messages for SearchCluster
+var SearchClusterTemplate = utils.MergeMaps(map[string]interface{}{
+	// all acceptable fields are listed
+	// case sensitive
+	"id":   "int~Error reading and decoding cluster ID from query",
+	"name": "",
+	"":     "oneOfIdOrName~Either cluster ID or name needs to be specified",
+}, utils.PaginationTemplate)
+
+// oneOfIDOrNameValidation validates that id or name is filled
+func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
+	// Tag oneOfIdOrName
+	v, ok := context.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	// the int validation is done next by validator, we are just checking if its filled
+	if id, ok := v["id"].(string); ok && len(id) != 0 {
+		return true
+	}
+	if name, ok := v["name"].(string); ok && len(name) != 0 {
+		return true
+	}
+	return false
+}
+
+func init() {
+	govalidator.CustomTypeTagMap.Set("oneOfIdOrName", govalidator.CustomTypeValidator(oneOfIDOrNameValidation))
 }
