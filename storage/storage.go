@@ -950,6 +950,23 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 	return nil
 }
 
+// NewTriggerType inserts a trigger_type object in the database
+func (storage Storage) NewTriggerType(ttype string, description string) error {
+	statement, err := storage.connections.Prepare("INSERT INTO trigger_type(type, description) VALUES ($1, $2)")
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(ttype, description)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	return nil
+}
+
 // AckTrigger sets a timestamp to the selected trigger + updates the 'active' flag.
 func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
 	t := time.Now()

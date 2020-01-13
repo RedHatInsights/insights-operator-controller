@@ -1,0 +1,5 @@
+[benchmark]
+cluster_no=100
+operator_configuration_no=100
+trigger_no=100
+conf_profile_no=100
