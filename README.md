@@ -68,7 +68,9 @@ Data storage used by the service is configurable via the command line parameters
 * SQLite local database: `controller.db` for the local deployment and `test.db` for functional tests
 * PostgreSQL database: for local deployment and to be able to deploy the application to developer development
 
-
+## ER Diagram
+[Insights operator database](https://drive.google.com/file/d/13dSJggeqBZT1khwSWdTPW4oGFZ8USM-V/view?usp=sharing)
+![ER diagram](doc/db_er.png)
 
 ### SQLite
 
