@@ -17,7 +17,7 @@ limitations under the License.
 package server
 
 import (
-	"github.com/RedHatInsighs/insights-operator-controller/utils"
+	"github.com/RedHatInsights/insights-operator-controller/utils"
 	"io/ioutil"
 	"net/http"
 	"strconv"

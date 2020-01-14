@@ -22,8 +22,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/RedHatInsighs/insights-operator-controller/storage"
-	"github.com/RedHatInsighs/insights-operator-controller/utils"
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-controller/utils"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 )

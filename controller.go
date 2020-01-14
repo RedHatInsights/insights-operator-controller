@@ -18,9 +18,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/RedHatInsighs/insights-operator-controller/logging"
-	"github.com/RedHatInsighs/insights-operator-controller/server"
-	"github.com/RedHatInsighs/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-controller/logging"
+	"github.com/RedHatInsights/insights-operator-controller/server"
+	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
