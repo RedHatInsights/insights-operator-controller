@@ -1,4 +1,4 @@
-module github.com/redhatinsighs/insights-operator-controller
+module github.com/RedHatInsighs/insights-operator-controller
 
 go 1.13
 

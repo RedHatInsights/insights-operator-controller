@@ -18,7 +18,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/utils"
+	"github.com/RedHatInsighs/insights-operator-controller/utils"
 	"net/http"
 )
 

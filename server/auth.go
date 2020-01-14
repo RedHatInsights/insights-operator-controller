@@ -21,7 +21,7 @@ package server
 import (
 	"context"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/redhatinsighs/insights-operator-controller/utils"
+	"github.com/RedHatInsighs/insights-operator-controller/utils"
 	"net/http"
 	"os"
 	"strings"
