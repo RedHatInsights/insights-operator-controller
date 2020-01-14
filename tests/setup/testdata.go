@@ -5,8 +5,8 @@ package testdata
 import (
 	"fmt"
 
+	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/brianvoe/gofakeit"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
 	"github.com/spf13/viper"
 )
 
