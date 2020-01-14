@@ -20,8 +20,8 @@ package server
 
 import (
 	"context"
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/RedHatInsighs/insights-operator-controller/utils"
+	jwt "github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
 	"strings"

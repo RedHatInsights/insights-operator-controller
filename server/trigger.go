@@ -17,8 +17,8 @@ limitations under the License.
 package server
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/RedHatInsighs/insights-operator-controller/utils"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
