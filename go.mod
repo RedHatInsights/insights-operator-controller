@@ -6,6 +6,7 @@ require (
 	github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/bitly/go-simplejson v0.5.0 // indirect
+	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fzipp/gocyclo v0.0.0-20150627053110-6acd4345c835 // indirect
 	github.com/gorilla/mux v1.7.3
