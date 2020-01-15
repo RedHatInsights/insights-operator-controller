@@ -17,20 +17,27 @@ limitations under the License.
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"           // PostgreSQL database driver
-	_ "github.com/mattn/go-sqlite3" // SQLite database driver
 	"log"
 	"time"
+
+	sq "github.com/Masterminds/squirrel"
+	_ "github.com/lib/pq"           // PostgreSQL database driver
+	_ "github.com/mattn/go-sqlite3" // SQLite database driver
 )
 
 // Storage represents an interface to any relational database based on SQL language
 type Storage struct {
 	connections *sql.DB
 	driver      string
+	placeholder sq.PlaceholderFormat
 }
+
+// Column is typed reference to a sql column, which is further used by particular storage objects
+type Column string
 
 func enableForeignKeys(connections *sql.DB) {
 	log.Println("Enabling foreign_keys pragma for sqlite")
@@ -53,12 +60,27 @@ func New(driverName string, dataSourceName string) Storage {
 	if err != nil {
 		log.Fatal("Can not connect to data storage", err)
 	}
+	s := Storage{connections: connections, driver: driverName}
 
-	if driverName == "sqlite3" {
+	switch driverName {
+	case "sqlite3":
 		enableForeignKeys(connections)
+		s.placeholder = sq.Question
+	case "postgres":
+		s.placeholder = sq.Dollar
 	}
+	return s
+}
 
-	return Storage{connections, driverName}
+// Placeholder returns current query argument placeholder
+// (?, or $).It depends on driver used. In squirrel format
+func (storage Storage) Placeholder() sq.PlaceholderFormat {
+	return storage.placeholder
+}
+
+// Connections is sql.DB connection
+func (storage Storage) Connections() *sql.DB {
+	return storage.connections
 }
 
 // Close method closes the connection to database. Needs to be called at the end of application lifecycle.
@@ -992,3 +1014,47 @@ func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
 	}
 	return nil
 }
+
+// QueryOne is generating Sql query using squirell sql builder, querying it with db store and mapping result to destination object with provided mapper
+func (storage Storage) QueryOne(ctx context.Context, selectCols []Column, selectBuilder sq.SelectBuilder, mapper func(Column, interface{}) (interface{}, error), res interface{}) error {
+	q, args, err := selectBuilder.ToSql()
+	if err != nil {
+		return err
+	}
+	rowScanner := storage.connections.QueryRowContext(ctx, q, args...)
+	if rowScanner == nil {
+		return ErrUnknown
+	}
+
+	resMap, err := storage.Map(selectCols, mapper, res)
+	if err != nil {
+		return err
+	}
+	err = rowScanner.Scan(resMap...)
+	if err == sql.ErrNoRows {
+		return ErrNoSuchObj
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Map creates a list of destination struct fields using columns to select
+func (storage Storage) Map(cols []Column, mapper func(Column, interface{}) (interface{}, error), r interface{}) ([]interface{}, error) {
+	var mappedCols []interface{}
+	for _, c := range cols {
+		mc, err := mapper(c, r)
+		if err != nil {
+			return nil, err
+		}
+		mappedCols = append(mappedCols, mc)
+	}
+	return mappedCols, nil
+}
+
+// ErrNoSuchObj is indicating no result returned from db
+var ErrNoSuchObj = fmt.Errorf("no such object")
+
+// ErrUnknown indicates db query failed without details (QueryRow returning Row wasn't populated)
+var ErrUnknown = fmt.Errorf("unknown error during querying db")

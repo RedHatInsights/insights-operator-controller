@@ -115,24 +115,19 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 // SearchCluster - search for a cluster specified by its ID or name.
 func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
 	var (
-		req     SearchClusterRequest
-		cluster storage.Cluster
-		err     error
+		req     storage.SearchClusterRequest
+		cluster *storage.Cluster
 	)
 
-	err = utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
+	err := utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
 	if err != nil {
 		log.Println(err)
 		responses.SendError(writer, err.Error())
 		return
 	}
-
 	// either cluster id or its name needs to be specified
-	if req.ID != 0 {
-		cluster, err = s.Storage.GetCluster(req.ID)
-	} else {
-		cluster, err = s.Storage.GetClusterByName(req.Name)
-	}
+	cluster, err = s.ClusterQuery.QueryOne(request.Context(), req)
+
 	if err != nil {
 		log.Println("Unable to read cluster from database", err)
 		responses.SendError(writer, err.Error())
@@ -140,13 +135,6 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	}
 
 	responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
-}
-
-// SearchClusterRequest defines type safe SearchCluster request
-type SearchClusterRequest struct {
-	utils.Pagination
-	ID   int    `schema:"id"`
-	Name string `schema:"name"`
 }
 
 // SearchClusterTemplate defines validation rules and messages for SearchCluster
