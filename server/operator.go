@@ -17,7 +17,7 @@ limitations under the License.
 package server
 
 import (
-	"github.com/RedHatInsights/insights-operator-controller/utils"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -28,14 +28,14 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
-		utils.SendError(writer, "Cluster ID needs to be specified")
+		responses.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
 	configuration, err := s.Storage.GetClusterActiveConfiguration(cluster)
 	if err != nil {
 		log.Println("Cannot read cluster configuration", err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 		return
 	}
 	sendConfiguration(writer, configuration)
@@ -48,7 +48,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check parameters provided by client
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		utils.SendError(writer, "Cluster name needs to be specified")
+		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -56,45 +56,45 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	err := s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		utils.SendInternalServerError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	}
-	utils.SendCreated(writer, utils.BuildOkResponse())
+	responses.SendCreated(writer, responses.BuildOkResponse())
 }
 
 // GetActiveTriggersForCluster - return list of triggers for single cluster
 func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		utils.SendError(writer, "Cluster name needs to be specified")
+		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggers, err := s.Storage.ListActiveClusterTriggers(cluster)
 	if err != nil {
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 		return
 	}
-	utils.SendResponse(writer, utils.BuildOkResponseWithData("triggers", triggers))
+	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 }
 
 // AckTriggerForCluster - ack single cluster's trigger
 func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) {
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		utils.SendError(writer, "Cluster name needs to be specified")
+		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	triggerID, found := mux.Vars(request)["trigger"]
 	if !found {
-		utils.SendError(writer, "Trigger ID needs to be specified")
+		responses.SendError(writer, "Trigger ID needs to be specified")
 		return
 	}
 
 	err := s.Storage.AckTrigger(cluster, triggerID)
 	if err != nil {
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 		return
 	}
-	utils.SendResponse(writer, utils.BuildOkResponse())
+	responses.SendResponse(writer, responses.BuildOkResponse())
 }

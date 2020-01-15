@@ -24,6 +24,7 @@ import (
 
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-controller/utils"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 )
@@ -33,9 +34,9 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		utils.SendInternalServerError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		utils.SendResponse(writer, utils.BuildOkResponseWithData("clusters", clusters))
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -45,7 +46,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		utils.SendError(writer, "Cluster name needs to be specified")
+		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -54,15 +55,15 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	err := s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		utils.SendInternalServerError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	}
 
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 	} else {
-		utils.SendCreated(writer, utils.BuildOkResponseWithData("clusters", clusters))
+		responses.SendCreated(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -72,14 +73,14 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
-		utils.SendError(writer, "Error reading cluster ID from request")
+		responses.SendError(writer, "Error reading cluster ID from request")
 	} else {
 		cluster, err := s.Storage.GetCluster(int(id))
 		if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			utils.SendError(writer, err.Error())
+			responses.SendError(writer, err.Error())
 		} else {
-			utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
+			responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
 		}
 	}
 }
@@ -91,7 +92,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	// check parameter provided by client
 	if !foundID {
 		log.Println("Cluster ID is not provided")
-		utils.SendError(writer, "Cluster ID needs to be specified")
+		responses.SendError(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -99,15 +100,15 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	err := s.Storage.DeleteCluster(clusterID)
 	if err != nil {
 		log.Println("Cannot delete cluster", err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 	}
 
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 	} else {
-		utils.SendAccepted(writer, utils.BuildOkResponseWithData("clusters", clusters))
+		responses.SendAccepted(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -122,7 +123,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	err = utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
 	if err != nil {
 		log.Println(err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 		return
 	}
 
@@ -134,11 +135,11 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	}
 	if err != nil {
 		log.Println("Unable to read cluster from database", err)
-		utils.SendError(writer, err.Error())
+		responses.SendError(writer, err.Error())
 		return
 	}
 
-	utils.SendResponse(writer, utils.BuildOkResponseWithData("cluster", cluster))
+	responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
 }
 
 // SearchClusterRequest defines type safe SearchCluster request
