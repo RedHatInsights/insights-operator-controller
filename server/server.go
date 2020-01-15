@@ -38,6 +38,8 @@ type Server struct {
 	UseHTTPS bool
 	Storage  storage.Storage
 	Splunk   logging.Client
+
+	ClusterQuery *storage.ClusterQuery
 }
 
 // APIPrefix is appended before all REST API endpoint addresses
@@ -114,6 +116,7 @@ func (s Server) Initialize() {
 	log.Println("Environment: ", Environment)
 	log.Println("API Prefix: ", APIPrefix)
 	log.Println("Initializing HTTP server at", s.Address)
+	s.ClusterQuery = storage.NewClusterQuery(s.Storage)
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(s.LogRequest)
 	if Environment == "production" {

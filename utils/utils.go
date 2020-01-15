@@ -20,6 +20,7 @@ package utils
 
 import (
 	"os"
+	"reflect"
 )
 
 // GetEnv return value of environment variable if it exists, or fallback otherwise
@@ -28,4 +29,9 @@ func GetEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+// ZeroValue checks if value is a Zero value.
+func ZeroValue(x interface{}) bool {
+	return x == nil || reflect.DeepEqual(x, reflect.Zero(reflect.TypeOf(x)).Interface())
 }

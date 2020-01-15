@@ -3,6 +3,7 @@ module github.com/RedHatInsights/insights-operator-controller
 go 1.13
 
 require (
+	github.com/Masterminds/squirrel v1.1.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/bitly/go-simplejson v0.5.0 // indirect
