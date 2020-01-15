@@ -20,7 +20,7 @@ package server
 
 import (
 	"context"
-	"github.com/RedHatInsights/insights-operator-controller/utils"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 	jwt "github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
@@ -47,13 +47,13 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 		tokenHeader := r.Header.Get("Authorization") //Grab the token from the header
 
 		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
-			utils.SendForbidden(w, "Missing auth token")
+			responses.SendForbidden(w, "Missing auth token")
 			return
 		}
 
 		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
 		if len(splitted) != 2 {
-			utils.SendForbidden(w, "Invalid/Malformed auth token")
+			responses.SendForbidden(w, "Invalid/Malformed auth token")
 			return
 		}
 
@@ -65,12 +65,12 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 		})
 
 		if err != nil { //Malformed token, returns with http code 403 as usual
-			utils.SendForbidden(w, "Malformed authentication token")
+			responses.SendForbidden(w, "Malformed authentication token")
 			return
 		}
 
 		if !token.Valid { //Token is invalid, maybe not signed on this server
-			utils.SendForbidden(w, "Token is not valid.")
+			responses.SendForbidden(w, "Token is not valid.")
 			return
 		}
 
