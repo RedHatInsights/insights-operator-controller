@@ -20,6 +20,8 @@ package utils
 
 import "net/url"
 
+import "strings"
+
 // mergeMapsT merges multiple maps of various types, trying to convert them
 // srcs can be;
 // map[string]interface{} (for example body dedoded from json)
@@ -68,6 +70,16 @@ func stringsMap(m map[string]interface{}) map[string][]string {
 		}
 	}
 	return sm
+}
+
+// LowerCaseKeys returns new map with keys changed to lowercase
+func LowerCaseKeys(m map[string]interface{}) map[string]interface{} {
+	nm := map[string]interface{}{}
+
+	for k, v := range m {
+		nm[strings.ToLower(k)] = v
+	}
+	return nm
 }
 
 // interMap converts map from [string][]string to [string]interface{}

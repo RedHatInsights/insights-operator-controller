@@ -28,7 +28,7 @@ var decoder = schema.NewDecoder()
 // DecodeValidRequest validates input maps (From Query.URL, or decoded Json Body) against template and returns typed structure
 // srcs can be list of either map[string]interface{} or map[string][]string
 func DecodeValidRequest(dst interface{}, temp map[string]interface{}, srcs ...interface{}) error {
-	input := mergeMapsT(srcs...)
+	input := LowerCaseKeys(mergeMapsT(srcs...))
 	sm := stringsMap(input)
 	// add invalid key to force non keyed validator to run
 	input[""] = ""
