@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	tests "github.com/redhatinsighs/insights-operator-controller/tests/rest"
-	testdata "github.com/redhatinsighs/insights-operator-controller/tests/setup"
+	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"
+	testdata "github.com/RedHatInsights/insights-operator-controller/tests/setup"
 	"github.com/verdverm/frisby"
 )
 

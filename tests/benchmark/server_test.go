@@ -3,7 +3,7 @@ package testsbenchmark
 import (
 	"testing"
 
-	tests "github.com/redhatinsighs/insights-operator-controller/tests/rest"
+	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"
 	"github.com/verdverm/frisby"
 )
 

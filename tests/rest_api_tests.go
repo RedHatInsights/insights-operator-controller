@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/redhatinsighs/insights-operator-controller/server"
-	tests "github.com/redhatinsighs/insights-operator-controller/tests/rest"
+	"github.com/RedHatInsights/insights-operator-controller/server"
+	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"
 	"github.com/verdverm/frisby"
 )
 

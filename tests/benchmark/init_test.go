@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	testdata "github.com/redhatinsighs/insights-operator-controller/tests/setup"
+	testdata "github.com/RedHatInsights/insights-operator-controller/tests/setup"
 )
 
 const dbDriverEnv string = "DBDRIVER"

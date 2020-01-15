@@ -1,0 +1,11 @@
+FROM postgres:12
+
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD postgres
+
+EXPOSE 5432
+
+RUN echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf
+
+#ENTRYPOINT [ "tail","-f","/dev/null"]
+

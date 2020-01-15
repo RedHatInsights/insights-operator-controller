@@ -17,13 +17,13 @@ limitations under the License.
 package server
 
 import (
+	"github.com/RedHatInsights/insights-operator-controller/logging"
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-controller/utils"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/redhatinsighs/insights-operator-controller/logging"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"github.com/redhatinsighs/insights-operator-controller/utils"
 	"io"
 	"log"
 	"net/http"

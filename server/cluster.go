@@ -22,10 +22,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-controller/utils"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
-	"github.com/redhatinsighs/insights-operator-controller/storage"
-	"github.com/redhatinsighs/insights-operator-controller/utils"
 )
 
 // GetClusters - read list of all clusters from database and return it to a client.
