@@ -63,16 +63,14 @@ var clusterColsDef Cols = Cols{
 // mapCol defines mapping from type safe column to a struct field in result Cluster.
 // Used by db row.Scan
 func mapCol(col ClusterCol, r *Cluster) (interface{}, error) {
-	var sc interface{}
 	switch col {
 	case clusterColsDef.ID:
-		sc = &r.ID
+		return &r.ID, nil
 	case clusterColsDef.Name:
-		sc = &r.Name
+		return &r.Name, nil
 	default:
 		return nil, fmt.Errorf("unknown col %s", col)
 	}
-	return sc, nil
 }
 
 // Map creates a list of destination struct fields using columns to select

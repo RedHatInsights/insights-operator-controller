@@ -19,17 +19,8 @@ limitations under the License.
 package utils
 
 import (
-	"os"
 	"reflect"
 )
-
-// GetEnv return value of environment variable if it exists, or fallback otherwise
-func GetEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
 
 // ZeroValue checks if value is a Zero value.
 func ZeroValue(x interface{}) bool {

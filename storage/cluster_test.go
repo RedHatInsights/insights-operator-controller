@@ -34,7 +34,7 @@ func TestMap(t *testing.T) {
 
 	mappedCluster, err := cqb.Map([]ClusterCol{clusterColsDef.ID, clusterColsDef.Name}, c)
 	if err != nil {
-		t.Errorf("test should suceed, failed with: %s", err)
+		t.Errorf("test should succeed, failed with: %s", err)
 	}
 
 	expCol := []struct {

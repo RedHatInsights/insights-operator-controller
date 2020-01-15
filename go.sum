@@ -6,6 +6,10 @@ github.com/Masterminds/squirrel v1.1.0 h1:baP1qLdoQCeTw3ifCdOq2dkYc6vGcmRdaociKL
 github.com/Masterminds/squirrel v1.1.0/go.mod h1:yaPeOnPG5ZRwL9oKdTsO/prlkPbXWZlRVMQ/gGlzIuA=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
+github.com/RedHatInsights/insights-operator-controller v0.0.0-20200115110628-ea862f20f19d h1:eeqJk2b75sOdI4AvD5BM5q+DMH5BBL2INegziUJ0R9g=
+github.com/RedHatInsights/insights-operator-controller v0.0.0-20200115110628-ea862f20f19d/go.mod h1:MioVsJzal5Wq71CAbOjpuPEDfhltXHe156jtpQBVm5w=
+github.com/RedHatInsights/insights-operator-utils v0.0.0-20200115122427-0ae75ac105e6 h1:KYHI5/x+93+2z7TGHj5KrtCaLb+qWDak2pT2gFp9Aog=
+github.com/RedHatInsights/insights-operator-utils v0.0.0-20200115122427-0ae75ac105e6/go.mod h1:c6ReBK57bYPBl3DCb03lo3Jwr+ORT/9XUdlTwzhKQP8=
 github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af h1:aTyc5cOSaXiCh1n/mf/COjrWCV9f2yXUuPIeIEs14xU=
 github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af/go.mod h1:RsO+aYhoc9OyzUJwKHWWXXsjLN/85QaaEHx/PWa2+/I=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc h1:cAKDfWh5VpdgMhJosfJnn5/FoN2SRZ4p7fJNX58YPaU=
