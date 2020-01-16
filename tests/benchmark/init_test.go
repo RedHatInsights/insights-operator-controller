@@ -1,6 +1,3 @@
-/*sDebug := storage.New(os.Getenv(dbDriverEnv), os.Getenv(storageSpecificationEnv))
-clust, _ := sDebug.GetCluster(10)*/
-
 package testsbenchmark
 
 import (
