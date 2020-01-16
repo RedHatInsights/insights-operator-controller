@@ -9,7 +9,7 @@ then
 	exit 1
 fi
 
-echo starting benchmark testing
+echo 'starting benchmark testing'
 
 if [[ $DBDRIVER == 'sqlite3' ]]
 then
@@ -32,7 +32,7 @@ then
 	./local_storage/drop_test_database_postgres.sh
 	./local_storage/create_test_database_postgres.sh
 
-	cho 'performing tests, please wait'
+	echo 'performing tests, please wait'
 	go test -json -bench=. ./tests/benchmark > benchmark_test_out.json
 	echo 'benchmark tests completed!'
 fi
