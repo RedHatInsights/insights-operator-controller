@@ -109,6 +109,12 @@ The following two scripts can be used to drop existing database(s):
 * `drop_database_postgres.sh` to drop database named `controller`
 * `drop_test_database_postgres.sh` to drop database named `test_db`
 
+---
+
+You can also run PostgreSQL containerized with the prepared Dockerfile `local_storage/Dockerfile.postgres`
+* there is a simple shortcut script `local_storage/dockerize_postgres.sh` which stops the container if it exists, then builds and runs a detached image.
+* to automatically fill the database with test data, set an environment variable `MOCK_DATA=true` and [pass it to docker run](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file)
+* the environment variables from the [original postgres image](https://hub.docker.com/_/postgres), such as `PGDATA` also work
 
 ### RDS AWS PostgreSQL
 
@@ -121,7 +127,7 @@ Set the name of the database as `postgres`. (Not the DB instance identifier.)
 
 When database instance status becomes available, set environment variables `$RDS_MASTERUSER`, `$RDS_MASTERPASSWORD` and `$RDS_ENDPOINT` with values 
 `master username`, `master password`, and `endpoint` including `port`, of your database instance.
-Run 'create_RDS_database_postgres.sh` to create database.
+Run `create_RDS_database_postgres.sh` to create database.
 
 To drop previously created database, run `drop_RDS_database_postgres.sh`.
 
