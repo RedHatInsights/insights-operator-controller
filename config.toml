@@ -1,6 +1,8 @@
 [service]
 use_https=false
 address=":8080"
+tls_cert="certs/cert.pem"
+tls_key="certs/key.pem"
 
 [splunk]
 enabled=false
