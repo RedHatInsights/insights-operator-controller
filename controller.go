@@ -76,12 +76,16 @@ func main() {
 	serviceCfg := viper.Sub("service")
 	useHTTPS := serviceCfg.GetBool("use_https")
 	address := serviceCfg.GetString("address")
+	tlsCert := serviceCfg.GetString("tls_cert")
+	tlsKey := serviceCfg.GetString("tls_key")
 
 	s := server.Server{
 		Address:  address,
 		UseHTTPS: useHTTPS,
 		Storage:  storage,
 		Splunk:   splunk,
+		TLSCert:  tlsCert,
+		TLSKey:   tlsKey,
 	}
 
 	s.Initialize()

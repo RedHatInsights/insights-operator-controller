@@ -17,6 +17,8 @@ limitations under the License.
 package server
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/env"
@@ -25,6 +27,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -38,6 +41,8 @@ type Server struct {
 	UseHTTPS bool
 	Storage  storage.Storage
 	Splunk   logging.Client
+	TLSCert  string
+	TLSKey   string
 
 	ClusterQuery *storage.ClusterQuery
 }
@@ -58,6 +63,27 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Help:    "Response time",
 	Buckets: prometheus.LinearBuckets(0, 20, 20),
 }, []string{"url"})
+
+func (s Server) createTLSServer(router http.Handler) *http.Server {
+	caCert, err := ioutil.ReadFile(s.TLSCert)
+	if err != nil {
+		log.Fatal(err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+	tlsConfig := &tls.Config{
+		ClientCAs:  caCertPool,
+		ClientAuth: tls.RequireAndVerifyClientCert,
+	}
+	tlsConfig.BuildNameToCertificate()
+	server := &http.Server{
+		Addr:      s.Address,
+		TLSConfig: tlsConfig,
+		Handler:   router,
+	}
+
+	return server
+}
 
 func countEndpoint(request *http.Request, start time.Time) {
 	url := request.URL.String()
@@ -187,7 +213,8 @@ func (s Server) Initialize() {
 	var err error
 
 	if s.UseHTTPS {
-		err = http.ListenAndServeTLS(s.Address, "server.crt", "server.key", router)
+		server := s.createTLSServer(router)
+		err = server.ListenAndServeTLS(s.TLSCert, s.TLSKey)
 	} else {
 		err = http.ListenAndServe(s.Address, router)
 	}

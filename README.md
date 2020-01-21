@@ -47,10 +47,17 @@ Change the following lines in `config.toml`:
 ```
 use_https=true
 address=":4443"
+tls_cert="certs/cert.pem"
+tls_key="certs/key.pem"
 ```
 
 Please note that the service (when run locally) use the self-signed certificate.
 You'd need to use `certs.pem` file on client side (curl, web browser etc.)
+
+ - `use_https` is boolean flag that defines if connection should be secured
+ - `address` is address of controller server
+ - `tls_cert` is path to certificate, can be used only if `use_https == true`
+ - `tls_key` is path to key of certificate, can be used only if `use_https == true`
 
 
 ### Configuration file
