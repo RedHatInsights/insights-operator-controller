@@ -42,8 +42,7 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 
 // NewCluster - create a record with new cluster in a database. The updated list of all clusters is returned to client.
 func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
-	clusterNamee := mux.Vars(request)
-	clusterName, foundName := clusterNamee["name"]
+	clusterName, foundName := mux.Vars(request)["name"]
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
