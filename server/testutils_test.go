@@ -20,31 +20,54 @@ package server_test
 
 import (
 	"bytes"
-	"encoding/json"
-	"flag"
+	//"encoding/json"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/server"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 const (
-	expectedBody = `{"color_s":"blue","extra_data_m":{"param1":1,"param2":false}}`
-	contentType  = "Content-Type"
-	appJSON      = "application/json; charset=utf-8"
-	emptyStr     = ""
-	sqliteDB     = "test.db"
+	contentType = "Content-Type"
+	appJSON     = "application/json; charset=utf-8"
+	emptyStr    = ""
+	sqliteDB    = "test.db"
 )
 
-// MockedHTTPServer prepares new instance of testing HTTP server
-func MockedHTTPServer(handler func(responseWriter http.ResponseWriter, request *http.Request)) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(handler))
+type handlerFunction func(writer http.ResponseWriter, request *http.Request)
+
+type requestData map[string]string
+
+type testCase struct {
+	testName         string
+	fName            handlerFunction
+	expectedHeader   int
+	requestMethod    string
+	checkContentType bool
+	requestData      requestData
+}
+
+func testRequest(t *testing.T, test testCase) {
+	t.Run(test.testName, func(t *testing.T) {
+
+		req, _ := http.NewRequest(test.requestMethod, "", nil)
+
+		req = mux.SetURLVars(req, test.requestData)
+
+		rr := httptest.NewRecorder()
+
+		test.fName(rr, req) // call the handlerFunction
+
+		CheckResponse(t, rr, test.expectedHeader, test.checkContentType)
+	})
 }
 
 // MockedIOCServer returns an insights-operator-controller Server with disabled Splunk
@@ -67,14 +90,13 @@ func MockedIOCServer(t *testing.T) *server.Server {
 }
 
 func MockedSQLite(t *testing.T) storage.Storage {
-	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
-	storageSpecification := flag.String("storage", sqliteDB, "storage specification")
-	flag.Parse()
+	dbDriver := "sqlite3"
+	storageSpecification := sqliteDB
 
 	rmsqlite := exec.Command("rm", "-f", sqliteDB)
 	rmsqlite.Run()
 
-	db := storage.New(*dbDriver, *storageSpecification)
+	db := storage.New(dbDriver, storageSpecification)
 
 	// run schema_sqlite.sql
 	cmd := exec.Command("sqlite3", sqliteDB)
@@ -101,42 +123,38 @@ func MockedSQLite(t *testing.T) storage.Storage {
 }
 
 // CheckResponse ...
-func CheckResponse(url string, expectedStatusCode int, checkPayload bool, t *testing.T) {
-	res, err := http.Get(url)
-	if err != nil {
-		t.Fatal(err)
+func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCode int, checkContentType bool) {
+	if statusCode := rr.Code; statusCode != expectedStatusCode {
+		t.Errorf("Expected status code %v, got %v", expectedStatusCode, statusCode)
 	}
 
-	if res.StatusCode != expectedStatusCode {
-		t.Errorf("Expected status code %v, got %v", expectedStatusCode, res.StatusCode)
-	}
-
-	if checkPayload {
-		cType := res.Header.Get(contentType)
+	if checkContentType {
+		cType := rr.Header().Get(contentType)
 		if cType != appJSON {
 			t.Errorf("Unexpected content type. Expected %v, got %v", appJSON, cType)
 		}
-
+	}
+	/*
 		body, err := ioutil.ReadAll(res.Body)
 		defer res.Body.Close()
 
-		/*
+
 			var expected map[string]interface{}
 			err = json.NewDecoder(strings.NewReader(expectedBody)).Decode(&expected)
 			if err != nil {
 				t.Fatal(err)
 			}
-		*/
+
 
 		var response map[string]interface{}
 		err = json.Unmarshal(body, &response)
 		if err != nil {
 			t.Fatal(err)
 		}
-		/*
+
 			if equal := reflect.DeepEqual(response, expected); !equal {
 				t.Errorf("Expected response %v.", expected)
 			}
-		*/
-	}
+		}
+	*/
 }

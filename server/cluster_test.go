@@ -17,74 +17,57 @@ limitations under the License.
 package server_test
 
 import (
-	"fmt"
-	"github.com/RedHatInsights/insights-operator-controller/server"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-	//"github.com/RedHatInsights/insights-operator-controller/utils"
 )
 
-type handlerFunction func(writer http.ResponseWriter, request *http.Request)
+func TestNonErrorsCluster(t *testing.T) {
+	serv := MockedIOCServer(t)
 
-var nonErrorTT = []struct {
-	testName         string
-	fName            interface{}
-	expectedHeader   int
-	requestMethod    string
-	checkContentType bool
-}{
-	{"GetClusters", server.GetClusters, http.StatusOK, "GET", true},
-	{"NewCluster", server.NewCluster, http.StatusCreated, "POST", false},
-	{"GetClusterByID", server.GetClusterByID, http.StatusAccepted, "GET", true},
-	{"DeleteCluster", server.DeleteCluster, http.StatusAccepted, "DELETE", false},
-	{"SearchCluster", server.SearchCluster, http.StatusOK, "GET", true},
-}
+	nonErrorTT := []testCase{
+		{"GetClusters OK", serv.GetClusters, http.StatusOK, "GET", true, requestData{}},
+		{"NewCluster OK", serv.NewCluster, http.StatusCreated, "POST", false, requestData{"name": "test"}},
+		{"GetClusterByID OK", serv.GetClusterByID, http.StatusOK, "GET", true, requestData{"id": "1"}},
+		{"DeleteCluster OK", serv.DeleteCluster, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}},
+	}
 
-func TestNonErrors(t *testing.T) {
 	for _, tt := range nonErrorTT {
-		t.Run(tt.testName, func(t *testing.T) {
-			serv := MockedIOCServer(t)
-			req, err := http.NewRequest(tt.requestMethod, "", nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-			rr := httptest.NewRecorder()
-
-			fName := tt.fName
-			serv.fName(rr, req) // eh, obviously doesn't work...
-		})
+		testRequest(t, tt)
 	}
 }
 
-func TestGetClusters(t *testing.T) {
-	/*
-		server := MockedIOCServer(t)
+func TestDatabaseErrorsCluster(t *testing.T) {
+	serv := MockedIOCServer(t)
+	dbErrorTT := []testCase{
+		{"GetClusters DB error", serv.GetClusters, http.StatusInternalServerError, "GET", true, requestData{}},
+		{"NewCluster DB error", serv.NewCluster, http.StatusInternalServerError, "POST", false, requestData{"name": "test"}},
+		{"GetClusterByID DB error", serv.GetClusterByID, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}},
+		{"DeleteCluster DB error", serv.DeleteCluster, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}},
+		{"SearchCluster DB error", serv.SearchCluster, http.StatusInternalServerError, "GET", true, requestData{"name": "test"}},
+	}
 
-		req, err := http.NewRequest("GET", "", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	// close DB
+	serv.Storage.Close()
 
-		rr := httptest.NewRecorder()
-
-		server.GetClusters(rr, req)
-
-	*/
-	fmt.Println("hm")
+	for _, tt := range dbErrorTT {
+		testRequest(t, tt)
+	}
 }
 
-/*
-func TestNewCluster(t *testing.T) {
+func TestParameterErrorsCluster(t *testing.T) {
+	serv := MockedIOCServer(t)
+	dbErrorTT := []testCase{
+		{"NewCluster no param", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{}},
+		{"NewCluster empty name key", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{"name": ""}},
+		{"GetClusterByID no param", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{}},
+		{"GetClusterByID non-str id", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{"id": "test"}},
+		{"DeleteCluster no param", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{}},
+		{"DeleteCluster by name", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"name": "test"}},
+		{"DeleteCluster by non-int id", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"id": "test"}},
+		{"SearchCluster wrong format", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{"name": "test"}},
+	}
 
+	for _, tt := range dbErrorTT {
+		testRequest(t, tt)
+	}
 }
-func TestGetClusterByID(t *testing.T) {
-
-}
-func TestDeleteCluster(t *testing.T) {
-
-}
-func TestSearchCluster(t *testing.T) {
-
-}
-*/
