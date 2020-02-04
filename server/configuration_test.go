@@ -21,16 +21,35 @@ import (
 	"testing"
 )
 
-func TestNonErrorsConfiguration(t *testing.T) {
-	serv := MockedIOCServer(t)
+// TestNonErrorsConfigurationWithoutData tests OK behaviour with empty DB (schema only)
+func TestNonErrorsConfigurationWithoutData(t *testing.T) {
+	serv := MockedIOCServer(t, false)
 
 	nonErrorTT := []testCase{
-		{"GetConfiguration OK", serv.GetConfiguration, http.StatusOK, "GET", true, requestData{"id": "1"}},
-		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusCreated, "DELETE", false, requestData{"name": "test"}},
-		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}},
-		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusAccepted, "GET", false, requestData{"id": "1"}},
-		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}},
-		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}},
+		{"GetConfiguration Not Found", serv.GetConfiguration, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}},
+		{"DeleteConfiguration Not Found", serv.DeleteConfiguration, http.StatusNotFound, "DELETE", false, requestData{"id": "1"}, requestData{}},
+		{"GetAllConfigurations Empty OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}},
+		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}},
+		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
+	}
+
+	for _, tt := range nonErrorTT {
+		testRequest(t, tt)
+	}
+}
+
+// TestNonErrorsConfigurationWithData tests OK behaviour with mock data
+func TestNonErrorsConfigurationWithData(t *testing.T) {
+	serv := MockedIOCServer(t, true)
+
+	nonErrorTT := []testCase{
+		{"GetConfiguration OK", serv.GetConfiguration, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}},
+		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}},
+		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}},
+		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}, requestData{}},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -39,39 +58,7 @@ func TestNonErrorsConfiguration(t *testing.T) {
 }
 
 /*
-func TestParameterErrorConfiguration(t *testing.T) {
-	serv := MockedIOCServer(t)
-
-	nonErrorTT := []testCase{
-		{"GetConfiguration OK", serv.GetConfiguration, http.StatusOK, "GET", true, requestData{}},
-		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusCreated, "POST", false, requestData{"name": "test"}},
-		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{"id": "1"}},
-		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}},
-		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}},
-		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}},
-	}
-
-	for _, tt := range nonErrorTT {
-		testRequest(t, tt)
-	}
-}
-*/
-
-/*
-func TestSendConfiguration(t *testing.T) {
-	payload := "enabled"
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sendConfiguration(w, payload)
-	}))
-	defer testServer.Close()
-	res, err := http.Get(testServer.URL)
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bodyStr := string(bodyBytes)
-	if bodyStr != payload {
-		t.Fatal("SendConfiguration doesn't send correct data. Got %v, expected %v", bodyString, payload)
-	}
-}
+	{"NewClusterConfiguration OK", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"username": "test", "reason": "unknown", "description": "testing"}},
+	{"EnableClusterConfiguration OK", serv.EnableClusterConfiguration, http.StatusAccepted, "PUT", false, requestData{}, requestData{}},
+	{"DisableClusterConfiguration OK", serv.DisableClusterConfiguration, http.StatusAccepted, "PUT", false, requestData{}, requestData{}},
 */

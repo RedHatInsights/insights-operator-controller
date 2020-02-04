@@ -15,3 +15,11 @@ limitations under the License.
 */
 
 package server_test
+
+/*
+ListConfigurationProfiles
+GetConfigurationProfile
+NewConfigurationProfile
+DeleteConfigurationProfile
+ChangeConfigurationProfile
+*/

@@ -24,7 +24,7 @@ import (
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/server"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
-	//"io/ioutil"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -39,6 +39,7 @@ const (
 	contentType = "Content-Type"
 	appJSON     = "application/json; charset=utf-8"
 	emptyStr    = ""
+	dbDriver    = "sqlite3"
 	sqliteDB    = "test.db"
 )
 
@@ -52,7 +53,8 @@ type testCase struct {
 	expectedHeader   int
 	requestMethod    string
 	checkContentType bool
-	requestData      requestData
+	reqData          requestData
+	urlData          requestData
 }
 
 func testRequest(t *testing.T, test testCase) {
@@ -60,22 +62,56 @@ func testRequest(t *testing.T, test testCase) {
 
 		req, _ := http.NewRequest(test.requestMethod, "", nil)
 
-		req = mux.SetURLVars(req, test.requestData)
+		// set URL vars
+		q := req.URL.Query()
+		for key, value := range test.urlData {
+			q.Add(key, value)
+		}
+		// encode the parameters to be URL-safe
+		req.URL.RawQuery = q.Encode()
 
+		// set mux vars
+		req = mux.SetURLVars(req, test.reqData)
+
+		// new RequestRecorder which satisfies ResponseWriter interface
 		rr := httptest.NewRecorder()
 
-		test.fName(rr, req) // call the handlerFunction
+		// call the handlerFunction
+		test.fName(rr, req)
 
 		CheckResponse(t, rr, test.expectedHeader, test.checkContentType)
 	})
 }
 
+func runSQLiteScript(t *testing.T, path string) {
+	script, err := os.Open(path)
+	if err != nil {
+		t.Fatalf("Unable to open %v", path)
+	}
+	defer script.Close()
+
+	// sqlite3 test.db
+	cmd := exec.Command(dbDriver, sqliteDB)
+
+	var out, stderr bytes.Buffer
+	// stdin for the command `sqlite3 dbname` since we can't use <
+	cmd.Stdin = script
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+
+	if err != nil {
+		log.Fatalf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err)
+	}
+}
+
 // MockedIOCServer returns an insights-operator-controller Server with disabled Splunk
 // and a SQLite db for testing purposes
-func MockedIOCServer(t *testing.T) *server.Server {
+func MockedIOCServer(t *testing.T, mockData bool) *server.Server {
 	splunk := logging.NewClient(false, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr)
 
-	db := MockedSQLite(t)
+	db := MockedSQLite(t, mockData)
 
 	s := server.Server{
 		Address:  emptyStr, // not necessary since handlers are called directly
@@ -86,11 +122,13 @@ func MockedIOCServer(t *testing.T) *server.Server {
 		TLSKey:   emptyStr,
 	}
 
+	s.ClusterQuery = storage.NewClusterQuery(s.Storage)
+
 	return &s
 }
 
-func MockedSQLite(t *testing.T) storage.Storage {
-	dbDriver := "sqlite3"
+func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
+	dbDriver := dbDriver
 	storageSpecification := sqliteDB
 
 	rmsqlite := exec.Command("rm", "-f", sqliteDB)
@@ -98,25 +136,10 @@ func MockedSQLite(t *testing.T) storage.Storage {
 
 	db := storage.New(dbDriver, storageSpecification)
 
-	// run schema_sqlite.sql
-	cmd := exec.Command("sqlite3", sqliteDB)
+	runSQLiteScript(t, "../local_storage/schema_sqlite.sql")
 
-	schema, err := os.Open("../local_storage/schema_sqlite.sql")
-	if err != nil {
-		t.Fatalf("Unable to open schema_sqlite")
-	}
-	defer schema.Close()
-
-	var out, stderr bytes.Buffer
-	// stdin for the command `sqlite3 dbname` since we can't use <
-	cmd.Stdin = schema
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err = cmd.Run()
-
-	if err != nil {
-		log.Fatalf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err)
+	if mockData {
+		runSQLiteScript(t, "../local_storage/test_data_sqlite.sql")
 	}
 
 	return db
@@ -134,27 +157,10 @@ func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCo
 			t.Errorf("Unexpected content type. Expected %v, got %v", appJSON, cType)
 		}
 	}
-	/*
-		body, err := ioutil.ReadAll(res.Body)
-		defer res.Body.Close()
 
+	result := rr.Result()
+	body, _ := ioutil.ReadAll(result.Body)
+	defer result.Body.Close()
 
-			var expected map[string]interface{}
-			err = json.NewDecoder(strings.NewReader(expectedBody)).Decode(&expected)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-
-		var response map[string]interface{}
-		err = json.Unmarshal(body, &response)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-			if equal := reflect.DeepEqual(response, expected); !equal {
-				t.Errorf("Expected response %v.", expected)
-			}
-		}
-	*/
+	t.Log(string(body))
 }

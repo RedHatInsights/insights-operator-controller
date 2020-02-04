@@ -15,3 +15,10 @@ limitations under the License.
 */
 
 package server_test
+
+/*
+ReadConfigurationForOperator
+RegisterCluster
+GetActiveTriggersForCluster
+AckTriggerForCluster
+*/
