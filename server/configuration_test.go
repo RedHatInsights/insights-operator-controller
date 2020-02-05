@@ -24,14 +24,15 @@ import (
 // TestNonErrorsConfigurationWithoutData tests OK behaviour with empty DB (schema only)
 func TestNonErrorsConfigurationWithoutData(t *testing.T) {
 	serv := MockedIOCServer(t, false)
+	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
 		{"GetConfiguration Not Found", serv.GetConfiguration, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}},
 		{"DeleteConfiguration Not Found", serv.DeleteConfiguration, http.StatusNotFound, "DELETE", false, requestData{"id": "1"}, requestData{}},
-		{"GetAllConfigurations Empty OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}},
-		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}},
-		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
-		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}},
+		{"GetClusterConfiguration Not Found", serv.GetClusterConfiguration, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}},
+		{"EnableConfiguration Not Found", serv.EnableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DisableConfiguration Not Found", serv.DisableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -42,17 +43,71 @@ func TestNonErrorsConfigurationWithoutData(t *testing.T) {
 // TestNonErrorsConfigurationWithData tests OK behaviour with mock data
 func TestNonErrorsConfigurationWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
+	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
 		{"GetConfiguration OK", serv.GetConfiguration, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}},
 		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}},
 		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}},
-		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}, requestData{}},
-		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusAccepted, "PUT", false, requestData{"id": "1"}, requestData{}},
-		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}, requestData{}},
+		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}},
+		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}},
+		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}},
+		{"EnableClusterConfiguration OK", serv.EnableClusterConfiguration, http.StatusAccepted, "PUT", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}},
+		{"DisableClusterConfiguration OK", serv.DisableClusterConfiguration, http.StatusAccepted, "PUT", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}},
+		{"NewClusterConfiguration OK", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"username": "test", "reason": "unknown", "description": "testing"}},
 	}
 
 	for _, tt := range nonErrorTT {
+		testRequest(t, tt)
+	}
+}
+
+func TestDatabaseErrorConfiguration(t *testing.T) {
+	serv := MockedIOCServer(t, true)
+
+	dbErrorTT := []testCase{
+		{"GetConfiguration OK", serv.GetConfiguration, http.StatusInternalServerError, "GET", false, requestData{"id": "1"}, requestData{}},
+		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusInternalServerError, "GET", false, requestData{}, requestData{}},
+		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusInternalServerError, "GET", false, requestData{"cluster": "1"}, requestData{}},
+		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}},
+		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}, requestData{}},
+		{"EnableClusterConfiguration OK", serv.EnableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}},
+		{"DisableClusterConfiguration OK", serv.DisableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}},
+		{"NewClusterConfiguration OK", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"username": "test", "reason": "unknown", "description": "testing"}},
+	}
+
+	// close storage
+	serv.Storage.Close()
+
+	for _, tt := range dbErrorTT {
+		testRequest(t, tt)
+	}
+}
+
+func TestParameterErrorsConfiguration(t *testing.T) {
+	serv := MockedIOCServer(t, true)
+	defer serv.Storage.Close()
+
+	paramErrorTT := []testCase{
+		{"GetConfiguration no id", serv.GetConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
+		{"DeleteConfiguration ", serv.DeleteConfiguration, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}},
+		{"GetClusterConfiguration ", serv.GetClusterConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
+		{"EnableConfiguration ", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}},
+		{"DisableConfiguration ", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}},
+		{"EnableClusterConfiguration no cluster", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{}, requestData{"username": "tester", "reason": "test"}},
+		{"EnableClusterConfiguration no reason", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester"}},
+		{"EnableClusterConfiguration no username", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"reason": "test"}},
+		{"DisableClusterConfiguration no cluster", serv.DisableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{}, requestData{"username": "tester", "reason": "test"}},
+		{"DisableClusterConfiguration no reason", serv.DisableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester"}},
+		{"DisableClusterConfiguration no username", serv.DisableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"reason": "test"}},
+		{"NewClusterConfiguration no cluster", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{}, requestData{"username": "test", "reason": "unknown", "description": "testing"}},
+		{"NewClusterConfiguration no username", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"reason": "unknown", "description": "testing"}},
+		{"NewClusterConfiguration no reason", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"username": "test", "description": "testing"}},
+		{"NewClusterConfiguration no description", serv.NewClusterConfiguration, http.StatusAccepted, "POST", false, requestData{"cluster": "1"}, requestData{"username": "test", "reason": "unknown"}},
+	}
+
+	for _, tt := range paramErrorTT {
 		testRequest(t, tt)
 	}
 }

@@ -15,3 +15,22 @@ limitations under the License.
 */
 
 package server_test
+
+const (
+	localhost = "127.0.0.1:8080"
+)
+
+/*
+func TestInitialize(t *testing.T) {
+	serv := MockedIOCServer(t, true)
+	serv.Address = localhost
+
+    // Initialize ends with a running HttpServe server, so it's better to be tested with REST API TESTS
+	serv.Initialize()
+
+	_, err := http.Get(localhost)
+	if err != nil {
+		t.Fatal("Cannot connect to server")
+	}
+}
+*/

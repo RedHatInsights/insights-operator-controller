@@ -24,11 +24,13 @@ import (
 // TestNonErrorsClusterWithoutData tests OK behaviour with empty DB (schema only)
 func TestNonErrorsClusterWithoutData(t *testing.T) {
 	serv := MockedIOCServer(t, false)
+	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
 		{"GetClusters OK", serv.GetClusters, http.StatusOK, "GET", true, requestData{}, requestData{}},
 		{"GetClusterByID OK", serv.GetClusterByID, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"SearchCluster OK", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"name": "test"}},
+		{"SearchCluster by id OK", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"id": "1"}},
+		{"SearchCluster by name OK", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"name": "test"}},
 		{"DeleteCluster OK", serv.DeleteCluster, http.StatusNotFound, "DELETE", false, requestData{"id": "2"}, requestData{}},
 		{"NewCluster OK", serv.NewCluster, http.StatusCreated, "POST", false, requestData{"name": "test"}, requestData{}},
 	}
@@ -41,13 +43,14 @@ func TestNonErrorsClusterWithoutData(t *testing.T) {
 // TestNonErrorsConfigurationWithData tests OK behaviour with mock data
 func TestNonErrorsClusterWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
+	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
 		{"GetClusters OK", serv.GetClusters, http.StatusOK, "GET", true, requestData{}, requestData{}},
 		{"NewCluster OK", serv.NewCluster, http.StatusCreated, "POST", false, requestData{"name": "test"}, requestData{}},
 		{"GetClusterByID OK", serv.GetClusterByID, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}},
 		{"SearchCluster OK", serv.SearchCluster, http.StatusOK, "GET", true, requestData{}, requestData{"name": "test"}},
-		{"DeleteCluster OK", serv.DeleteCluster, http.StatusAccepted, "DELETE", false, requestData{"id": "1"}, requestData{}},
+		{"DeleteCluster OK", serv.DeleteCluster, http.StatusOK, "DELETE", false, requestData{"id": "1"}, requestData{}},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -56,7 +59,7 @@ func TestNonErrorsClusterWithData(t *testing.T) {
 }
 
 // TestDatabaseErrorsCluster tests unexpected behaviour by closing DB connection (consistency check)
-func TestDatabaseErrorsCluster(t *testing.T) {
+func TestDatabaseErrorCluster(t *testing.T) {
 	serv := MockedIOCServer(t, false)
 
 	dbErrorTT := []testCase{
@@ -64,7 +67,7 @@ func TestDatabaseErrorsCluster(t *testing.T) {
 		{"NewCluster DB error", serv.NewCluster, http.StatusInternalServerError, "POST", false, requestData{"name": "test"}, requestData{}},
 		{"GetClusterByID DB error", serv.GetClusterByID, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}},
 		{"DeleteCluster DB error", serv.DeleteCluster, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}, requestData{}},
-		{"SearchCluster DB error", serv.SearchCluster, http.StatusInternalServerError, "GET", true, requestData{"name": "test"}, requestData{}},
+		{"SearchCluster DB error", serv.SearchCluster, http.StatusInternalServerError, "GET", true, requestData{}, requestData{"name": "test"}},
 	}
 
 	// close DB
@@ -79,8 +82,9 @@ func TestDatabaseErrorsCluster(t *testing.T) {
 // since StatusBadRequest is the default error code, it's harder to say if they're correct
 func TestParameterErrorsCluster(t *testing.T) {
 	serv := MockedIOCServer(t, true)
+	defer serv.Storage.Close()
 
-	dbErrorTT := []testCase{
+	paramErrorTT := []testCase{
 		{"NewCluster no param", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{}, requestData{}},
 		{"NewCluster empty name key", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{"name": ""}, requestData{}},
 		{"GetClusterByID no param", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
@@ -88,10 +92,11 @@ func TestParameterErrorsCluster(t *testing.T) {
 		{"DeleteCluster no param", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{}, requestData{}},
 		{"DeleteCluster by name", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"name": "test"}, requestData{}},
 		{"DeleteCluster by non-int id", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"id": "test"}, requestData{}},
-		{"SearchCluster wrong format", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
+		{"SearchCluster no params", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
+		{"SearchCluster wrong data type", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{"name": ""}, requestData{}},
 	}
 
-	for _, tt := range dbErrorTT {
+	for _, tt := range paramErrorTT {
 		testRequest(t, tt)
 	}
 }

@@ -60,7 +60,7 @@ type testCase struct {
 func testRequest(t *testing.T, test testCase) {
 	t.Run(test.testName, func(t *testing.T) {
 
-		req, _ := http.NewRequest(test.requestMethod, "", nil)
+		req, _ := http.NewRequest(test.requestMethod, "", bytes.NewBufferString("Test Body"))
 
 		// set URL vars
 		q := req.URL.Query()
