@@ -30,7 +30,7 @@ func TestNonErrorsTriggerWithoutData(t *testing.T) {
 		{"GetAllTriggers OK", serv.GetAllTriggers, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
 		{"GetTrigger Not Found", serv.GetTrigger, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeleteTrigger Not Found", serv.DeleteTrigger, http.StatusNotFound, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
-		{"ActivateTrigger OK", serv.ActivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ActivateTrigger Not Found", serv.ActivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeactivateTrigger Not Found", serv.DeactivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
 		{"GetClusterTriggers Not Found", serv.GetClusterTriggers, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
 		{"RegisterClusterTrigger Not Found", serv.RegisterClusterTrigger, http.StatusNotFound, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},

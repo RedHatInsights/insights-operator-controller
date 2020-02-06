@@ -67,15 +67,15 @@ func TestDatabaseErrorConfiguration(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
 	dbErrorTT := []testCase{
-		{"GetConfiguration OK", serv.GetConfiguration, http.StatusInternalServerError, "GET", false, requestData{"id": "1"}, requestData{}, ""},
-		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusInternalServerError, "GET", false, requestData{}, requestData{}, ""},
-		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusInternalServerError, "GET", false, requestData{"cluster": "1"}, requestData{}, ""},
-		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
-		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
-		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
-		{"EnableClusterConfiguration OK", serv.EnableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}, ""},
-		{"DisableClusterConfiguration OK", serv.DisableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}, ""},
-		{"NewClusterConfiguration OK", serv.NewClusterConfiguration, http.StatusInternalServerError, "POST", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "test", "reason": "unknown", "description": "testing"}, "Test config"},
+		{"GetConfiguration DB error", serv.GetConfiguration, http.StatusInternalServerError, "GET", false, requestData{"id": "1"}, requestData{}, ""},
+		{"GetAllConfigurations DB error", serv.GetAllConfigurations, http.StatusInternalServerError, "GET", false, requestData{}, requestData{}, ""},
+		{"GetClusterConfiguration DB error", serv.GetClusterConfiguration, http.StatusInternalServerError, "GET", false, requestData{"cluster": "1"}, requestData{}, ""},
+		{"EnableConfiguration DB error", serv.EnableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
+		{"DisableConfiguration DB error", serv.DisableConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteConfiguration DB error", serv.DeleteConfiguration, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
+		{"EnableClusterConfiguration DB error", serv.EnableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}, ""},
+		{"DisableClusterConfiguration DB error", serv.DisableClusterConfiguration, http.StatusInternalServerError, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester", "reason": "test"}, ""},
+		{"NewClusterConfiguration DB error", serv.NewClusterConfiguration, http.StatusInternalServerError, "POST", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "test", "reason": "unknown", "description": "testing"}, "Test config"},
 	}
 
 	// close storage
@@ -93,10 +93,10 @@ func TestParameterErrorsConfiguration(t *testing.T) {
 
 	paramErrorTT := []testCase{
 		{"GetConfiguration no id", serv.GetConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
-		{"DeleteConfiguration ", serv.DeleteConfiguration, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
-		{"GetClusterConfiguration ", serv.GetClusterConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
-		{"EnableConfiguration ", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
-		{"DisableConfiguration ", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"DeleteConfiguration no id", serv.DeleteConfiguration, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
+		{"GetClusterConfiguration no id", serv.GetClusterConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"EnableConfiguration no id", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"DisableConfiguration no id", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
 		{"EnableClusterConfiguration no cluster", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{}, requestData{"username": "tester", "reason": "test"}, ""},
 		{"EnableClusterConfiguration no reason", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester"}, ""},
 		{"EnableClusterConfiguration no username", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"reason": "test"}, ""},

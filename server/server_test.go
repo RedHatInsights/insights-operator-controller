@@ -22,10 +22,6 @@ import (
 	"testing"
 )
 
-const (
-	localhost = "127.0.0.1:8080"
-)
-
 // TestAddDefaultHeaders tests middleware adding headers
 func TestAddDefaultHeaders(t *testing.T) {
 	expectedHeaders := map[string]string{

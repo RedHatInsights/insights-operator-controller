@@ -45,11 +45,11 @@ func TestNonErrorsProfileWithData(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"GetConfigurationProfile OK", serv.GetConfigurationProfile, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
-		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteConfigurationProfile OK", serv.DeleteConfigurationProfile, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
 		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
-		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile OK", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
 	}
 
 	for _, tt := range nonErrorTT {

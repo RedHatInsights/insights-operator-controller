@@ -28,10 +28,10 @@ func TestNonErrorsClusterWithoutData(t *testing.T) {
 
 	nonErrorTT := []testCase{
 		{"GetClusters OK", serv.GetClusters, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
-		{"GetClusterByID OK", serv.GetClusterByID, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
-		{"SearchCluster by id OK", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"id": "1"}, ""},
-		{"SearchCluster by name OK", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"name": "test"}, ""},
-		{"DeleteCluster OK", serv.DeleteCluster, http.StatusNotFound, "DELETE", false, requestData{"id": "2"}, requestData{}, ""},
+		{"GetClusterByID Not found", serv.GetClusterByID, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"SearchCluster Not found", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"id": "1"}, ""},
+		{"SearchCluster Not found", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"name": "test"}, ""},
+		{"DeleteCluster Not found", serv.DeleteCluster, http.StatusNotFound, "DELETE", false, requestData{"id": "2"}, requestData{}, ""},
 		{"NewCluster OK", serv.NewCluster, http.StatusCreated, "POST", false, requestData{"name": "test"}, requestData{}, ""},
 	}
 
