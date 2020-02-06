@@ -87,10 +87,10 @@ func TestParameterErrorsProfile(t *testing.T) {
 		{"ChangeConfigurationProfile no id", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
 		{"ChangeConfigurationProfile no description", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester"}, "Test config"},
 		{"ChangeConfigurationProfile no username", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"description": "test"}, "Test config"},
-		{"ChangeConfigurationProfile no config in body", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, ""},
+		{"ChangeConfigurationProfile no config in body", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, ""},
 		{"NewConfigurationProfile no description", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"username": "tester"}, "Test config"},
 		{"NewConfigurationProfile no username", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"description": "test"}, "Test config"},
-		{"NewConfigurationProfile no config in body", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, ""},
+		{"NewConfigurationProfile no config in body", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, ""},
 	}
 
 	for _, tt := range paramErrorTT {
