@@ -55,12 +55,13 @@ type testCase struct {
 	checkContentType bool
 	reqData          requestData
 	urlData          requestData
+	reqBody          string
 }
 
 func testRequest(t *testing.T, test testCase) {
 	t.Run(test.testName, func(t *testing.T) {
 
-		req, _ := http.NewRequest(test.requestMethod, "", bytes.NewBufferString("Test Body"))
+		req, _ := http.NewRequest(test.requestMethod, "", bytes.NewBufferString(test.reqBody))
 
 		// set URL vars
 		q := req.URL.Query()
@@ -143,6 +144,10 @@ func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
 	}
 
 	return db
+}
+
+func mockedHTTPServer(handler func(responseWriter http.ResponseWriter, request *http.Request)) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
 // CheckResponse ...

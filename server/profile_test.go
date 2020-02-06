@@ -27,11 +27,11 @@ func TestNonErrorsProfileWithoutData(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}},
-		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusNotFound, "DELETE", true, requestData{"id": "1"}, requestData{}},
-		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}},
-		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}},
+		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
+		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusNotFound, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -44,11 +44,11 @@ func TestNonErrorsProfileWithData(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}},
-		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}},
-		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}},
-		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}},
+		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
+		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -60,11 +60,11 @@ func TestDatabaseErrorProfile(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
 	dbErrorTT := []testCase{
-		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusInternalServerError, "GET", true, requestData{}, requestData{}},
-		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusInternalServerError, "DELETE", true, requestData{"id": "1"}, requestData{}},
-		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}},
-		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusInternalServerError, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}},
+		{"GetConfigurationProfile Not Found", serv.GetConfigurationProfile, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusInternalServerError, "GET", true, requestData{}, requestData{}, ""},
+		{"DeleteConfigurationProfile Not Found", serv.DeleteConfigurationProfile, http.StatusInternalServerError, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ChangeConfigurationProfile Not Found", serv.ChangeConfigurationProfile, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusInternalServerError, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
 	}
 
 	serv.Storage.Close()
@@ -79,13 +79,15 @@ func TestParameterErrorsProfile(t *testing.T) {
 	defer serv.Storage.Close()
 
 	paramErrorTT := []testCase{
-		{"GetConfigurationProfile no id", serv.GetConfigurationProfile, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
-		{"DeleteConfigurationProfile no id", serv.DeleteConfigurationProfile, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}},
-		{"ChangeConfigurationProfile no id", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{}, requestData{"username": "tester", "description": "test"}},
-		{"ChangeConfigurationProfile no description", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester"}},
-		{"ChangeConfigurationProfile no username", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"description": "test"}},
-		{"NewConfigurationProfile no description", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"username": "tester"}},
-		{"NewConfigurationProfile no username", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"description": "test"}},
+		{"GetConfigurationProfile no id", serv.GetConfigurationProfile, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"DeleteConfigurationProfile no id", serv.DeleteConfigurationProfile, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
+		{"ChangeConfigurationProfile no id", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile no description", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester"}, "Test config"},
+		{"ChangeConfigurationProfile no username", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile no config in body", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, ""},
+		{"NewConfigurationProfile no description", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"username": "tester"}, "Test config"},
+		{"NewConfigurationProfile no username", serv.NewConfigurationProfile, http.StatusBadRequest, "POST", true, requestData{}, requestData{"description": "test"}, "Test config"},
+		{"NewConfigurationProfile no config in body", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, ""},
 	}
 
 	for _, tt := range paramErrorTT {

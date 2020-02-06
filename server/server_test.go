@@ -16,6 +16,12 @@ limitations under the License.
 
 package server_test
 
+import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
 const (
 	localhost = "127.0.0.1:8080"
 )
@@ -34,3 +40,33 @@ func TestInitialize(t *testing.T) {
 	}
 }
 */
+func TestAddDefaultHeaders(t *testing.T) {
+	expectedHeaders := map[string]string{
+		"Access-Control-Allow-Methods":     "POST, GET, OPTIONS, PUT, DELETE",
+		"Access-Control-Allow-Headers":     "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token",
+		"Access-Control-Allow-Credentials": "true",
+		"Access-Control-Allow-Origin":      "local",
+	}
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		headers := w.Header()
+		for k, v := range expectedHeaders {
+			if header := headers.Get(k); header != v {
+				t.Errorf("Unexpected header value of %v. Expected %v, got %v", k, v, header)
+			}
+		}
+	})
+
+	serv := MockedIOCServer(t, false)
+	defer serv.Storage.Close()
+
+	// Add header to test addition of Access-Control-Allow-Origin
+	req, _ := http.NewRequest("GET", "/health-check", nil)
+	req.Header.Set("Origin", "local")
+
+	rr := httptest.NewRecorder()
+
+	// call the handler with the middleware
+	handl := serv.LogRequest(serv.AddDefaultHeaders(handler))
+	handl.ServeHTTP(rr, req)
+}

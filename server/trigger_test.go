@@ -27,13 +27,13 @@ func TestNonErrorsTriggerWithoutData(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"GetAllTriggers OK", serv.GetAllTriggers, http.StatusOK, "GET", true, requestData{}, requestData{}},
-		{"GetTrigger Not Found", serv.GetTrigger, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"DeleteTrigger Not Found", serv.DeleteTrigger, http.StatusNotFound, "DELETE", true, requestData{"id": "1"}, requestData{}},
-		{"ActivateTrigger OK", serv.ActivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"DeactivateTrigger Not Found", serv.DeactivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"GetClusterTriggers Not Found", serv.GetClusterTriggers, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}},
-		{"RegisterClusterTrigger Not Found", serv.RegisterClusterTrigger, http.StatusNotFound, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}},
+		{"GetAllTriggers OK", serv.GetAllTriggers, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
+		{"GetTrigger Not Found", serv.GetTrigger, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteTrigger Not Found", serv.DeleteTrigger, http.StatusNotFound, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ActivateTrigger OK", serv.ActivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeactivateTrigger Not Found", serv.DeactivateTrigger, http.StatusNotFound, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"GetClusterTriggers Not Found", serv.GetClusterTriggers, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"RegisterClusterTrigger Not Found", serv.RegisterClusterTrigger, http.StatusNotFound, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -46,13 +46,13 @@ func TestNonErrorsTriggerWithData(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"GetAllTriggers OK", serv.GetAllTriggers, http.StatusOK, "GET", true, requestData{}, requestData{}},
-		{"GetTrigger OK", serv.GetTrigger, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"ActivateTrigger OK", serv.ActivateTrigger, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"DeactivateTrigger OK", serv.DeactivateTrigger, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"GetClusterTriggers OK", serv.GetClusterTriggers, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}},
-		{"RegisterClusterTrigger OK", serv.RegisterClusterTrigger, http.StatusOK, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}},
-		{"DeleteTrigger OK", serv.DeleteTrigger, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}},
+		{"GetAllTriggers OK", serv.GetAllTriggers, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
+		{"GetTrigger OK", serv.GetTrigger, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ActivateTrigger OK", serv.ActivateTrigger, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeactivateTrigger OK", serv.DeactivateTrigger, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"GetClusterTriggers OK", serv.GetClusterTriggers, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"RegisterClusterTrigger OK", serv.RegisterClusterTrigger, http.StatusOK, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},
+		{"DeleteTrigger OK", serv.DeleteTrigger, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -64,13 +64,13 @@ func TestDatabaseErrorTrigger(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
 	dbErrorTT := []testCase{
-		{"GetAllTriggers DB error", serv.GetAllTriggers, http.StatusInternalServerError, "GET", true, requestData{}, requestData{}},
-		{"GetTrigger DB error", serv.GetTrigger, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}},
-		{"DeleteTrigger DB error", serv.DeleteTrigger, http.StatusInternalServerError, "DELETE", true, requestData{"id": "1"}, requestData{}},
-		{"ActivateTrigger DB error", serv.ActivateTrigger, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"DeactivateTrigger DB error", serv.DeactivateTrigger, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{}},
-		{"GetClusterTriggers DB error", serv.GetClusterTriggers, http.StatusInternalServerError, "GET", true, requestData{"cluster": "1"}, requestData{}},
-		{"RegisterClusterTrigger DB error", serv.RegisterClusterTrigger, http.StatusInternalServerError, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}},
+		{"GetAllTriggers DB error", serv.GetAllTriggers, http.StatusInternalServerError, "GET", true, requestData{}, requestData{}, ""},
+		{"GetTrigger DB error", serv.GetTrigger, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteTrigger DB error", serv.DeleteTrigger, http.StatusInternalServerError, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
+		{"ActivateTrigger DB error", serv.ActivateTrigger, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"DeactivateTrigger DB error", serv.DeactivateTrigger, http.StatusInternalServerError, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
+		{"GetClusterTriggers DB error", serv.GetClusterTriggers, http.StatusInternalServerError, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"RegisterClusterTrigger DB error", serv.RegisterClusterTrigger, http.StatusInternalServerError, "POST", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},
 	}
 
 	serv.Storage.Close()
@@ -85,16 +85,16 @@ func TestParameterErrorsTrigger(t *testing.T) {
 	defer serv.Storage.Close()
 
 	paramErrorTT := []testCase{
-		{"GetTrigger no id", serv.GetTrigger, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
-		{"DeleteTrigger no id", serv.DeleteTrigger, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}},
-		{"ActivateTrigger no id", serv.ActivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}},
-		{"DeactivateTrigger no id", serv.DeactivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}},
-		{"GetClusterTriggers no id", serv.GetClusterTriggers, http.StatusBadRequest, "GET", true, requestData{}, requestData{}},
-		{"RegisterClusterTrigger no trigger", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1"}, requestData{"username": "tester", "reason": "test", "link": "link"}},
-		{"RegisterClusterTrigger no cluster", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}},
-		{"RegisterClusterTrigger no link", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test"}},
-		{"RegisterClusterTrigger no reason", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"username": "tester", "link": "link"}},
-		{"RegisterClusterTrigger no username", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"reason": "test", "link": "link"}},
+		{"GetTrigger no id", serv.GetTrigger, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"DeleteTrigger no id", serv.DeleteTrigger, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
+		{"ActivateTrigger no id", serv.ActivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"DeactivateTrigger no id", serv.DeactivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"GetClusterTriggers no id", serv.GetClusterTriggers, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"RegisterClusterTrigger no trigger", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},
+		{"RegisterClusterTrigger no cluster", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"trigger": "must-gather"}, requestData{"username": "tester", "reason": "test", "link": "link"}, ""},
+		{"RegisterClusterTrigger no link", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"username": "tester", "reason": "test"}, ""},
+		{"RegisterClusterTrigger no reason", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"username": "tester", "link": "link"}, ""},
+		{"RegisterClusterTrigger no username", serv.RegisterClusterTrigger, http.StatusBadRequest, "POST", true, requestData{"cluster": "1", "trigger": "must-gather"}, requestData{"reason": "test", "link": "link"}, ""},
 	}
 
 	for _, tt := range paramErrorTT {
