@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# check if file is locked (db is used by another process)
+if fuser test.db &> /dev/null; then
+	echo Database is locked, please kill or close the process using the file:
+	fuser test.db
+	exit 1
+fi
+
 if [ -z "$CONTROLLER_ENV" ]; then
     export CONTROLLER_ENV=test
 fi
