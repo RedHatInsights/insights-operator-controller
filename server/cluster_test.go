@@ -40,7 +40,7 @@ func TestNonErrorsClusterWithoutData(t *testing.T) {
 	}
 }
 
-// TestNonErrorsConfigurationWithData tests OK behaviour with mock data
+// TestNonErrorsClusterWithData tests OK behaviour with mock data
 func TestNonErrorsClusterWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()

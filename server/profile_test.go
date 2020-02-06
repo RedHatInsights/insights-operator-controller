@@ -39,6 +39,7 @@ func TestNonErrorsProfileWithoutData(t *testing.T) {
 	}
 }
 
+// TestNonErrorsProfileWithData tests OK behaviour with mock data
 func TestNonErrorsProfileWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()
@@ -56,6 +57,7 @@ func TestNonErrorsProfileWithData(t *testing.T) {
 	}
 }
 
+// TestDatabaseErrorProfile tests unexpected behaviour by closing DB connection (consistency check)
 func TestDatabaseErrorProfile(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
@@ -74,6 +76,7 @@ func TestDatabaseErrorProfile(t *testing.T) {
 	}
 }
 
+// TestParameterErrorsProfile tests wrong request paramaters
 func TestParameterErrorsProfile(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()

@@ -20,10 +20,10 @@ package server_test
 
 import (
 	"bytes"
-	//"encoding/json"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/server"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -31,8 +31,6 @@ import (
 	"os"
 	"os/exec"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -40,7 +38,7 @@ const (
 	appJSON     = "application/json; charset=utf-8"
 	emptyStr    = ""
 	dbDriver    = "sqlite3"
-	sqliteDB    = "test.db"
+	sqliteDB    = "test.db" // :memory: not used to avoid Raw SQL in Go (schema and data are in .sql files)
 )
 
 type handlerFunction func(writer http.ResponseWriter, request *http.Request)
@@ -58,6 +56,7 @@ type testCase struct {
 	reqBody          string
 }
 
+// testRequest tests a single testCase
 func testRequest(t *testing.T, test testCase) {
 	t.Run(test.testName, func(t *testing.T) {
 
@@ -84,6 +83,7 @@ func testRequest(t *testing.T, test testCase) {
 	})
 }
 
+// runSQLiteScript runs the script in `path` against the above defined DB
 func runSQLiteScript(t *testing.T, path string) {
 	script, err := os.Open(path)
 	if err != nil {
@@ -95,7 +95,7 @@ func runSQLiteScript(t *testing.T, path string) {
 	cmd := exec.Command(dbDriver, sqliteDB)
 
 	var out, stderr bytes.Buffer
-	// stdin for the command `sqlite3 dbname` since we can't use <
+	// stdin for the command `sqlite3 dbname` since we can't use < or |
 	cmd.Stdin = script
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
@@ -128,6 +128,7 @@ func MockedIOCServer(t *testing.T, mockData bool) *server.Server {
 	return &s
 }
 
+// MockedSQLite deletes the test db, (re)creates it and returns a Storage linked to it
 func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
 	dbDriver := dbDriver
 	storageSpecification := sqliteDB
@@ -146,11 +147,8 @@ func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
 	return db
 }
 
-func mockedHTTPServer(handler func(responseWriter http.ResponseWriter, request *http.Request)) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(handler))
-}
-
-// CheckResponse ...
+// CheckResponse checks the response's status code, content type and logs the request body
+// because of the endpoints' unexpected and incosistent behaviour.
 func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCode int, checkContentType bool) {
 	if statusCode := rr.Code; statusCode != expectedStatusCode {
 		t.Errorf("Expected status code %v, got %v", expectedStatusCode, statusCode)
@@ -166,6 +164,5 @@ func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCo
 	result := rr.Result()
 	body, _ := ioutil.ReadAll(result.Body)
 	defer result.Body.Close()
-
 	t.Log(string(body))
 }

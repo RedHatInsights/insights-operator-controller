@@ -38,6 +38,7 @@ func TestNonErrorsOperatorWithoutData(t *testing.T) {
 	}
 }
 
+// TestNonErrorsOperatorWithData tests OK behaviour with mock data
 func TestNonErrorsOperatorWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()
@@ -54,6 +55,7 @@ func TestNonErrorsOperatorWithData(t *testing.T) {
 	}
 }
 
+// TestDatabaseErrorOperator tests unexpected behaviour by closing DB connection (consistency check)
 func TestDatabaseErrorOperator(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
@@ -71,6 +73,7 @@ func TestDatabaseErrorOperator(t *testing.T) {
 	}
 }
 
+// TestParameterErrorsOperator tests wrong request paramaters
 func TestParameterErrorsOperator(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()

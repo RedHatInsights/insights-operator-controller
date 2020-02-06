@@ -62,6 +62,7 @@ func TestNonErrorsConfigurationWithData(t *testing.T) {
 	}
 }
 
+// TestDatabaseErrorConfiguration tests unexpected behaviour by closing DB connection (consistency check)
 func TestDatabaseErrorConfiguration(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
@@ -85,6 +86,7 @@ func TestDatabaseErrorConfiguration(t *testing.T) {
 	}
 }
 
+// TestParameterErrorsConfiguration tests wrong request parameters
 func TestParameterErrorsConfiguration(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()
@@ -112,5 +114,3 @@ func TestParameterErrorsConfiguration(t *testing.T) {
 		testRequest(t, tt)
 	}
 }
-
-//func TestNewClusterConfiguration

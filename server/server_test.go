@@ -26,20 +26,7 @@ const (
 	localhost = "127.0.0.1:8080"
 )
 
-/*
-func TestInitialize(t *testing.T) {
-	serv := MockedIOCServer(t, true)
-	serv.Address = localhost
-
-    // Initialize ends with a running HttpServe server, so it's better to be tested with REST API TESTS
-	serv.Initialize()
-
-	_, err := http.Get(localhost)
-	if err != nil {
-		t.Fatal("Cannot connect to server")
-	}
-}
-*/
+// TestAddDefaultHeaders tests middleware adding headers
 func TestAddDefaultHeaders(t *testing.T) {
 	expectedHeaders := map[string]string{
 		"Access-Control-Allow-Methods":     "POST, GET, OPTIONS, PUT, DELETE",
@@ -67,6 +54,7 @@ func TestAddDefaultHeaders(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// call the handler with the middleware
+	// test call LogRequest too
 	handl := serv.LogRequest(serv.AddDefaultHeaders(handler))
 	handl.ServeHTTP(rr, req)
 }

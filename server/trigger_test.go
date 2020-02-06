@@ -41,6 +41,7 @@ func TestNonErrorsTriggerWithoutData(t *testing.T) {
 	}
 }
 
+// TestNonErrorsTriggerWithData tests OK behaviour with mock data
 func TestNonErrorsTriggerWithData(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()
@@ -60,6 +61,7 @@ func TestNonErrorsTriggerWithData(t *testing.T) {
 	}
 }
 
+// TestDatabaseErrorTrigger tests unexpected behaviour by closing DB connection (consistency check)
 func TestDatabaseErrorTrigger(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 
@@ -80,6 +82,7 @@ func TestDatabaseErrorTrigger(t *testing.T) {
 	}
 }
 
+// TestParameterErrorsTrigger tests wrong request parameters
 func TestParameterErrorsTrigger(t *testing.T) {
 	serv := MockedIOCServer(t, true)
 	defer serv.Storage.Close()
