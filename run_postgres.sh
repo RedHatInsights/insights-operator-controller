@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 go build
 
 if [ $? -eq 0 ]

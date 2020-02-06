@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [[ -z "$RDS_MASTERUSER" ]]; then
   echo '$RDS_MASTERUSER not set !'

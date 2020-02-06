@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 if [ -z "$CONTROLLER_ENV" ]; then
     export CONTROLLER_ENV=test

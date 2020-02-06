@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 SUPERUSER=postgres
 SU_PASSWORD=postgres

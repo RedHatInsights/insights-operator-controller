@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 modules="storage server logging"
 
 pushd ..
