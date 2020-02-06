@@ -62,7 +62,7 @@ func createCluster(f *frisby.Frisby, clusterID string, clusterName string) {
 func deleteCluster(f *frisby.Frisby, clusterID string) {
 	f.Delete(API_URL + "client/cluster/" + clusterID)
 	f.Send()
-	f.ExpectStatus(202)
+	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 

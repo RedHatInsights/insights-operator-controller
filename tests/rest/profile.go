@@ -166,7 +166,7 @@ func checkChangeConfigurationProfile() {
 	f.Req.Body = strings.NewReader(`{"no_op":"Z", "watch":[]}`)
 
 	f.Send()
-	f.ExpectStatus(202)
+	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
@@ -197,7 +197,7 @@ func checkChangeNonExistingConfigurationProfile() {
 	f.Req.Body = strings.NewReader(`{"no_op":"Z", "watch":[]}`)
 
 	f.Send()
-	f.ExpectStatus(202)
+	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
