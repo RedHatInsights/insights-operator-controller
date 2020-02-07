@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// ItemNotFoundError shows that item with provided ItemID wasn't found in storage
 type ItemNotFoundError struct {
 	ItemID interface{}
 }
