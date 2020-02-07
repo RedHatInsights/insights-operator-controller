@@ -108,7 +108,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 		log.Println("Unable to get list of clusters", err)
 		responses.SendError(writer, err.Error())
 	} else {
-		responses.SendAccepted(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 

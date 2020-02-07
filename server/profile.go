@@ -128,6 +128,6 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	if err != nil {
 		responses.SendError(writer, err.Error())
 	} else {
-		responses.SendAccepted(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
