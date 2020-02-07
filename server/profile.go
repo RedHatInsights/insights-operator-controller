@@ -65,6 +65,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
+
 	if err != nil || len(configuration) == 0 {
 		responses.SendError(writer, "Configuration needs to be provided in the request body")
 		return

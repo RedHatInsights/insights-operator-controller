@@ -164,6 +164,9 @@ func (c *ClusterQuery) mapCol(storageCol Column, cluster interface{}) (interface
 
 // QueryOne will query DB with generated command and return one row as Cluster
 func (c *ClusterQuery) QueryOne(ctx context.Context, req SearchClusterRequest) (*Cluster, error) {
+	if c == nil {
+		panic("ClusterQuery must not be nil. Make sure the Server has a pointer reference to ClusterQuery by calling NewClusterQuery().")
+	}
 	qb := c.Query().
 		Equals(c.Cols.ID, req.ID).
 		Equals(c.Cols.Name, req.Name).
