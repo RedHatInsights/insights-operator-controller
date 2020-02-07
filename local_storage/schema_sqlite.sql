@@ -51,7 +51,9 @@ create table trigger (
     CONSTRAINT fk_type
         foreign key (type)
         references trigger_type(ID)
+        on delete cascade
     CONSTRAINT fk_cluster
         foreign key(cluster)
         references cluster(ID)
+        on delete cascade
 );
