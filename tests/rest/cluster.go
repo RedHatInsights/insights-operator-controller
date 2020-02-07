@@ -62,7 +62,6 @@ func createCluster(f *frisby.Frisby, clusterID string, clusterName string) {
 func deleteCluster(f *frisby.Frisby, clusterID string) {
 	f.Delete(API_URL + "client/cluster/" + clusterID)
 	f.Send()
-	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
@@ -151,6 +150,7 @@ func checkDeleteCluster() {
 	compareClusters(f, clusters, expected)
 
 	deleteCluster(f, "5")
+	f.ExpectStatus(200)
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
@@ -177,6 +177,7 @@ func checkDeleteAnotherCluster() {
 	compareClusters(f, clusters, expected)
 
 	deleteCluster(f, "4")
+	f.ExpectStatus(200)
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
@@ -201,6 +202,7 @@ func checkDeleteNonexistentCluster() {
 	compareClusters(f, clusters, expected)
 
 	deleteCluster(f, "40")
+	f.ExpectStatus(404)
 
 	clusters = readListOfClusters(f)
 	expected = []Cluster{
@@ -225,9 +227,13 @@ func checkDeleteAllClusters() {
 	compareClusters(f, clusters, expected)
 
 	deleteCluster(f, "0")
+	f.ExpectStatus(200)
 	deleteCluster(f, "1")
+	f.ExpectStatus(200)
 	deleteCluster(f, "2")
+	f.ExpectStatus(200)
 	deleteCluster(f, "3")
+	f.ExpectStatus(200)
 
 	clusters = readListOfClusters(f)
 

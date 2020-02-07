@@ -17,10 +17,13 @@ limitations under the License.
 package server
 
 import (
-	"github.com/RedHatInsights/insights-operator-utils/responses"
-	"github.com/gorilla/mux"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
+	"github.com/gorilla/mux"
 )
 
 // ReadConfigurationForOperator - read configuration for the operator.
@@ -33,12 +36,19 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	}
 
 	configuration, err := s.Storage.GetClusterActiveConfiguration(cluster)
-	if err != nil {
+	if itemNotFoundError, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(
+			http.StatusNotFound,
+			writer,
+			fmt.Sprintf("unable to read any active configuration for the cluster %v",
+				itemNotFoundError.ItemID),
+		)
+	} else if err != nil {
 		log.Println("Cannot read cluster configuration", err)
-		responses.SendError(writer, err.Error())
-		return
+		responses.SendInternalServerError(writer, err.Error())
+	} else {
+		sendConfiguration(writer, configuration)
 	}
-	sendConfiguration(writer, configuration)
 }
 
 // RegisterCluster - register new cluster.
@@ -71,7 +81,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 
 	triggers, err := s.Storage.ListActiveClusterTriggers(cluster)
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
@@ -92,9 +102,11 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	}
 
 	err := s.Storage.AckTrigger(cluster, triggerID)
-	if err != nil {
-		responses.SendError(writer, err.Error())
-		return
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponse())
 	}
-	responses.SendResponse(writer, responses.BuildOkResponse())
 }

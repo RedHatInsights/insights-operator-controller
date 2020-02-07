@@ -17,16 +17,19 @@ limitations under the License.
 package server
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 // GetAllTriggers - return list of all triggers
 func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request) {
 	triggers, err := s.Storage.ListAllTriggers()
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
@@ -41,11 +44,13 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	trigger, err := s.Storage.GetTriggerByID(id)
-	if err != nil {
-		responses.SendError(writer, err.Error())
-		return
+	if err == storage.ErrNoSuchObj {
+		responses.Send(http.StatusNotFound, writer, fmt.Sprintf("No such trigger for ID %v", id))
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("trigger", trigger))
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("trigger", trigger))
 }
 
 // DeleteTrigger - delete single trigger
@@ -57,12 +62,17 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 	}
 
 	s.Splunk.LogAction("DeleteTrigger", "tester", id)
-	err := s.Storage.DeleteTriggerByID(id)
+	wasDeleted, err := s.Storage.DeleteTriggerByID(id)
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponse())
+
+	if wasDeleted {
+		responses.SendResponse(writer, responses.BuildOkResponse())
+		return
+	}
+	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // ActivateTrigger - active single trigger
@@ -74,12 +84,17 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	}
 
 	s.Splunk.LogAction("ActivateTrigger", "tester", id)
-	err := s.Storage.ChangeStateOfTriggerByID(id, 1)
+	wasChanged, err := s.Storage.ChangeStateOfTriggerByID(id, 1)
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponse())
+
+	if wasChanged {
+		responses.SendResponse(writer, responses.BuildOkResponse())
+		return
+	}
+	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // DeactivateTrigger - deactivate single trigger
@@ -91,12 +106,17 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	}
 
 	s.Splunk.LogAction("DeactivateTrigger", "tester", id)
-	err := s.Storage.ChangeStateOfTriggerByID(id, 0)
+	wasChanged, err := s.Storage.ChangeStateOfTriggerByID(id, 0)
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponse())
+
+	if wasChanged {
+		responses.SendResponse(writer, responses.BuildOkResponse())
+		return
+	}
+	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // GetClusterTriggers - return list of triggers for single cluster
@@ -109,7 +129,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 
 	triggers, err := s.Storage.ListClusterTriggers(cluster)
 	if err != nil {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
@@ -149,9 +169,11 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 
 	s.Splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
 	err := s.Storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
-	if err != nil {
-		responses.SendError(writer, err.Error())
-		return
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponse())
 	}
-	responses.SendResponse(writer, responses.BuildOkResponse())
 }

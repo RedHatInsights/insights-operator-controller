@@ -226,7 +226,9 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 			log.Println("error", err)
 		}
 	} else {
-		return cluster, errors.New("Unknown cluster ID provided")
+		return cluster, &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 	return cluster, err
 }
@@ -259,7 +261,7 @@ func (storage Storage) CreateNewCluster(id string, name string) error {
 }
 
 // DeleteCluster deletes cluster with specified ID from the database.
-func (storage Storage) DeleteCluster(id string) error {
+func (storage Storage) DeleteCluster(id int64) error {
 	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE id = $1")
 	if err != nil {
 		log.Print(err)
@@ -267,8 +269,16 @@ func (storage Storage) DeleteCluster(id string) error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(id)
-	return err
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: id,
+		}
+	}
+	return nil
 }
 
 // GetClusterByName selects a cluster specified by its name. Also see GetCluster.
@@ -295,7 +305,9 @@ func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 			log.Println("error", err)
 		}
 	} else {
-		return cluster, errors.New("Unknown cluster ID provided")
+		return cluster, &ItemNotFoundError{
+			ItemID: name,
+		}
 	}
 	return cluster, err
 }
@@ -357,7 +369,9 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 			log.Println("error", err)
 		}
 	} else {
-		return profile, errors.New("Unknown configuration profile ID provided")
+		return profile, &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 	return profile, err
 }
@@ -397,10 +411,15 @@ func (storage Storage) ChangeConfigurationProfile(id int, username string, descr
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(configuration, t, username, description, id)
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, configuration, t, username, description, id)
 	if err != nil {
 		log.Print(err)
 		return profiles, err
+	}
+	if rowsAffected == 0 {
+		return profiles, &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 
 	return storage.ListConfigurationProfiles()
@@ -417,10 +436,15 @@ func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfil
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(id)
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
 	if err != nil {
 		log.Print(err)
 		return profiles, err
+	}
+	if rowsAffected == 0 {
+		return profiles, &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 
 	return storage.ListConfigurationProfiles()
@@ -505,7 +529,9 @@ SELECT configuration_profile.configuration
 		}
 		return configuration, err
 	}
-	return configuration, errors.New("unable to read any active configuration")
+	return configuration, &ItemNotFoundError{
+		ItemID: id,
+	}
 }
 
 // GetClusterActiveConfiguration reads one active configuration for the selected cluster.
@@ -533,7 +559,9 @@ SELECT configuration_profile.configuration
 		}
 		return configuration, err
 	}
-	return configuration, errors.New("unable to read any active configuration")
+	return configuration, &ItemNotFoundError{
+		ItemID: cluster,
+	}
 }
 
 // GetConfigurationIDForCluster reads the ID for the specified cluster name.
@@ -756,9 +784,14 @@ func (storage Storage) EnableOrDisableClusterConfigurationByID(id string, active
 
 	t := time.Now()
 
-	_, err = statement.Exec(active, t, id)
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, active, t, id)
 	if err != nil {
 		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 	return nil
 }
@@ -772,9 +805,14 @@ func (storage Storage) DeleteClusterConfigurationByID(id string) error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(id)
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
 	if err != nil {
 		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 	return nil
 }
@@ -822,36 +860,62 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 	if len(triggers) >= 1 {
 		return triggers[0], nil
 	}
-	return Trigger{}, fmt.Errorf("No such trigger for ID=%s", id)
+	return Trigger{}, ErrNoSuchObj
 }
 
-// DeleteTriggerByID deletes trigger specified by its ID.
-func (storage Storage) DeleteTriggerByID(id string) error {
+func execStatementAndGetRowsAffected(statement *sql.Stmt, args ...interface{}) (int64, error) {
+	res, err := statement.Exec(args...)
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rowsAffected, nil
+}
+
+// DeleteTriggerByID deletes trigger specified by its ID
+// and returns true if trigger existed and was deleted
+func (storage Storage) DeleteTriggerByID(id string) (bool, error) {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
 		log.Print(err)
-		return err
+		return false, err
 	}
 
 	defer statement.Close()
 
-	_, err = statement.Exec(id)
-	return err
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
+	if err != nil {
+		log.Print(err)
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
 }
 
 // ChangeStateOfTriggerByID change the state ('active', 'inactive') of trigger specified by its ID.
-func (storage Storage) ChangeStateOfTriggerByID(id string, active int) error {
+// returns true if at least one row was actually updated
+func (storage Storage) ChangeStateOfTriggerByID(id string, active int) (bool, error) {
 	statement, err := storage.connections.Prepare(`
-UPDATE trigger SET active= $1 WHERE trigger.id = $2`)
+UPDATE trigger SET active = $1 WHERE trigger.id = $2`)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	defer statement.Close()
 
-	_, err = statement.Exec(active, id)
-	return err
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, active, id)
+	if err != nil {
+		log.Print(err)
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
 }
 
 // ListAllTriggers selects all triggers from the database.
@@ -990,6 +1054,7 @@ func (storage Storage) NewTriggerType(ttype string, description string) error {
 }
 
 // AckTrigger sets a timestamp to the selected trigger + updates the 'active' flag.
+// and returns error if trigger wasn't found
 func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
 	t := time.Now()
 
@@ -1008,9 +1073,14 @@ func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(t, clusterID, triggerID)
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, t, clusterID, triggerID)
 	if err != nil {
 		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: fmt.Sprintf("%v/%v", clusterName, triggerID),
+		}
 	}
 	return nil
 }

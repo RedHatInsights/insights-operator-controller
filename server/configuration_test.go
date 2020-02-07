@@ -30,7 +30,7 @@ func TestNonErrorsConfigurationWithoutData(t *testing.T) {
 		{"GetConfiguration Not Found", serv.GetConfiguration, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeleteConfiguration Not Found", serv.DeleteConfiguration, http.StatusNotFound, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
 		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
-		{"GetClusterConfiguration Not Found", serv.GetClusterConfiguration, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"GetClusterConfiguration Empty", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
 		{"EnableConfiguration Not Found", serv.EnableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
 		{"DisableConfiguration Not Found", serv.DisableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
 	}

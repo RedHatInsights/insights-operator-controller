@@ -28,7 +28,7 @@ func TestNonErrorsOperatorWithoutData(t *testing.T) {
 
 	nonErrorTT := []testCase{
 		{"ReadConfigurationForOperator Not Found", serv.ReadConfigurationForOperator, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
-		{"GetActiveTriggersForCluster Not Found", serv.GetActiveTriggersForCluster, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"GetActiveTriggersForCluster Empty", serv.GetActiveTriggersForCluster, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
 		{"AckTriggerForCluster Not Found", serv.AckTriggerForCluster, http.StatusNotFound, "GET", true, requestData{"cluster": "1", "trigger": "1"}, requestData{}, ""},
 		{"RegisterCluster OK", serv.RegisterCluster, http.StatusCreated, "PUT", true, requestData{"cluster": "1"}, requestData{}, ""},
 	}
