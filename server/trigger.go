@@ -62,17 +62,18 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 	}
 
 	s.Splunk.LogAction("DeleteTrigger", "tester", id)
-	wasDeleted, err := s.Storage.DeleteTriggerByID(id)
-	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
-		return
-	}
-
-	if wasDeleted {
+	err := s.Storage.DeleteTriggerByID(id)
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(
+			http.StatusNotFound,
+			writer,
+			responses.BuildOkResponse(),
+		)
+	} else if err != nil {
+		responses.Send(http.StatusInternalServerError, writer, err.Error())
+	} else {
 		responses.SendResponse(writer, responses.BuildOkResponse())
-		return
 	}
-	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // ActivateTrigger - active single trigger
@@ -84,17 +85,14 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	}
 
 	s.Splunk.LogAction("ActivateTrigger", "tester", id)
-	wasChanged, err := s.Storage.ChangeStateOfTriggerByID(id, 1)
-	if err != nil {
+	err := s.Storage.ChangeStateOfTriggerByID(id, 1)
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
-		return
-	}
-
-	if wasChanged {
+	} else {
 		responses.SendResponse(writer, responses.BuildOkResponse())
-		return
 	}
-	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // DeactivateTrigger - deactivate single trigger
@@ -106,17 +104,14 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	}
 
 	s.Splunk.LogAction("DeactivateTrigger", "tester", id)
-	wasChanged, err := s.Storage.ChangeStateOfTriggerByID(id, 0)
-	if err != nil {
+	err := s.Storage.ChangeStateOfTriggerByID(id, 0)
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
-		return
-	}
-
-	if wasChanged {
+	} else {
 		responses.SendResponse(writer, responses.BuildOkResponse())
-		return
 	}
-	responses.Send(http.StatusNotFound, writer, responses.BuildOkResponse())
 }
 
 // GetClusterTriggers - return list of triggers for single cluster

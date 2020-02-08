@@ -878,13 +878,13 @@ func execStatementAndGetRowsAffected(statement *sql.Stmt, args ...interface{}) (
 }
 
 // DeleteTriggerByID deletes trigger specified by its ID
-// and returns true if trigger existed and was deleted
-func (storage Storage) DeleteTriggerByID(id string) (bool, error) {
+// returns ItemNotFoundError if trigger didn't exist
+func (storage Storage) DeleteTriggerByID(id string) error {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
 		log.Print(err)
-		return false, err
+		return err
 	}
 
 	defer statement.Close()
@@ -892,19 +892,24 @@ DELETE FROM trigger WHERE trigger.id = $1`)
 	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
 	if err != nil {
 		log.Print(err)
-		return false, err
+		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 
-	return rowsAffected > 0, nil
+	return nil
 }
 
 // ChangeStateOfTriggerByID change the state ('active', 'inactive') of trigger specified by its ID.
-// returns true if at least one row was actually updated
-func (storage Storage) ChangeStateOfTriggerByID(id string, active int) (bool, error) {
+// returns ItemNotFoundError if there weren't rows with such id
+func (storage Storage) ChangeStateOfTriggerByID(id string, active int) error {
 	statement, err := storage.connections.Prepare(`
 UPDATE trigger SET active = $1 WHERE trigger.id = $2`)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	defer statement.Close()
@@ -912,10 +917,15 @@ UPDATE trigger SET active = $1 WHERE trigger.id = $2`)
 	rowsAffected, err := execStatementAndGetRowsAffected(statement, active, id)
 	if err != nil {
 		log.Print(err)
-		return false, err
+		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: id,
+		}
 	}
 
-	return rowsAffected > 0, nil
+	return nil
 }
 
 // ListAllTriggers selects all triggers from the database.
