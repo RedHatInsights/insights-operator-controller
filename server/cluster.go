@@ -102,19 +102,10 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 
 // DeleteCluster - delete a cluster
 func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
-	clusterIDStr, foundID := mux.Vars(request)["id"]
-
-	// check parameter provided by client
-	if !foundID {
-		log.Println("Cluster ID is not provided")
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
-		return
-	}
-
-	clusterID, err := strconv.ParseInt(clusterIDStr, 10, 64)
+	clusterID, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		log.Println("Cluster ID is not an integer")
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be an integer")
+		log.Println("Cluster ID is not provided or not an integer")
+		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified and to be an integer")
 		return
 	}
 
