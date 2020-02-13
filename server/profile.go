@@ -17,10 +17,12 @@ limitations under the License.
 package server
 
 import (
-	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 )
 
 // ListConfigurationProfiles - read list of configuration profiles.
@@ -29,7 +31,7 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 	if err == nil {
 		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	}
 }
 
@@ -42,10 +44,12 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 
 	profile, err := s.Storage.GetConfigurationProfile(int(id))
-	if err == nil {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profile", profile))
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendError(writer, err.Error())
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("profile", profile))
 	}
 }
 
@@ -65,6 +69,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
+
 	if err != nil || len(configuration) == 0 {
 		responses.SendError(writer, "Configuration needs to be provided in the request body")
 		return
@@ -89,8 +94,10 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 
 	s.Splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
 	profiles, err := s.Storage.DeleteConfigurationProfile(int(id))
-	if err != nil {
-		responses.SendError(writer, err.Error())
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
@@ -125,8 +132,10 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 
 	s.Splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
 	profiles, err := s.Storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
-	if err != nil {
-		responses.SendError(writer, err.Error())
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}

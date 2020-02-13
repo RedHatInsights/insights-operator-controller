@@ -19,8 +19,11 @@ limitations under the License.
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-controller/utils"
@@ -46,7 +49,14 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		responses.SendError(writer, "Cluster name needs to be specified")
+		// query parameter 'name' can't be found in request,
+		// which might be caused by issue in Gorilla mux (not on client side)
+		responses.Send(http.StatusBadRequest, writer, "Cluster name needs to be specified")
+		return
+	}
+
+	if len(strings.TrimSpace(clusterName)) == 0 {
+		responses.Send(http.StatusBadRequest, writer, "Cluster name shouldn't be empty")
 		return
 	}
 
@@ -61,7 +71,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	clusters, err := s.Storage.ListOfClusters()
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendCreated(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
@@ -71,14 +81,19 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request) {
 	// try to retrieve cluster ID from query
 	id, err := retrieveIDRequestParameter(request)
-	if err != nil {
+	if _, ok := err.(*strconv.NumError); ok {
+		log.Println("Bad cluster ID", err)
+		responses.Send(http.StatusBadRequest, writer, "Bad cluster ID")
+	} else if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
-		responses.SendError(writer, "Error reading cluster ID from request")
+		responses.Send(http.StatusBadRequest, writer, "Error reading cluster ID from request")
 	} else {
 		cluster, err := s.Storage.GetCluster(int(id))
-		if err != nil {
+		if _, ok := err.(*storage.ItemNotFoundError); ok {
+			responses.Send(http.StatusNotFound, writer, err.Error())
+		} else if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			responses.SendError(writer, err.Error())
+			responses.SendInternalServerError(writer, err.Error())
 		} else {
 			responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
 		}
@@ -87,28 +102,28 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 
 // DeleteCluster - delete a cluster
 func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
-	clusterID, foundID := mux.Vars(request)["id"]
-
-	// check parameter provided by client
-	if !foundID {
-		log.Println("Cluster ID is not provided")
-		responses.SendError(writer, "Cluster ID needs to be specified")
+	clusterID, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		log.Println("Cluster ID is not provided or not an integer")
+		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified and to be an integer")
 		return
 	}
 
-	s.Splunk.LogAction("DeleteCluster", "tester", clusterID)
-	err := s.Storage.DeleteCluster(clusterID)
-	if err != nil {
+	s.Splunk.LogAction("DeleteCluster", "tester", fmt.Sprint(clusterID))
+	err = s.Storage.DeleteCluster(clusterID)
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		log.Println("Cannot delete cluster", err)
-		responses.SendError(writer, err.Error())
-	}
-
-	clusters, err := s.Storage.ListOfClusters()
-	if err != nil {
-		log.Println("Unable to get list of clusters", err)
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		clusters, err := s.Storage.ListOfClusters()
+		if err != nil {
+			log.Println("Unable to get list of clusters", err)
+			responses.SendInternalServerError(writer, err.Error())
+		} else {
+			responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		}
 	}
 }
 
@@ -122,15 +137,20 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	err := utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
 	if err != nil {
 		log.Println(err)
-		responses.SendError(writer, err.Error())
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 	// either cluster id or its name needs to be specified
 	cluster, err = s.ClusterQuery.QueryOne(request.Context(), req)
 
+	if err == storage.ErrNoSuchObj {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+		return
+	}
+
 	if err != nil {
 		log.Println("Unable to read cluster from database", err)
-		responses.SendError(writer, err.Error())
+		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
 

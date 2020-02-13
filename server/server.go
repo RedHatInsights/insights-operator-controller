@@ -19,6 +19,7 @@ package server
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/env"
@@ -96,7 +97,10 @@ func countEndpoint(request *http.Request, start time.Time) {
 }
 
 func retrieveIDRequestParameter(request *http.Request) (int64, error) {
-	idVar := mux.Vars(request)["id"]
+	idVar, found := mux.Vars(request)["id"]
+	if !found {
+		return 0, errors.New("id not found")
+	}
 	return strconv.ParseInt(idVar, 10, 0)
 }
 

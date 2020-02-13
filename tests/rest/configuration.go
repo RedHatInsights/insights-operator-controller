@@ -192,7 +192,7 @@ func checkEnableNonExistingConfiguration() {
 
 	f.Put(API_URL + "client/configuration/42/enable")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	configurations = readConfigurations(f)
 	checkNumberOfConfigurations(f, configurations, 6)
@@ -228,7 +228,7 @@ func checkDisableNonExistingConfiguration() {
 
 	f.Put(API_URL + "client/configuration/42/enable")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	configurations = readConfigurations(f)
 	checkNumberOfConfigurations(f, configurations, 6)
@@ -298,7 +298,7 @@ func checkDeleteNonExistingConfiguration() {
 
 	f.Delete(API_URL + "client/configuration/42")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	configurations = readConfigurations(f)
 	checkNumberOfConfigurations(f, configurations, 5)
@@ -328,7 +328,7 @@ func checkDescribeNonExistingConfiguration() {
 	f := frisby.Create("Check describing (reading) non existing configuration")
 	f.Get(API_URL + "client/configuration/42")
 	f.Send()
-	f.ExpectStatus(400)
+	f.ExpectStatus(404)
 	f.PrintReport()
 }
 

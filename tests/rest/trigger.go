@@ -256,7 +256,7 @@ func checkActivateNonExistingTrigger() {
 
 	f.Post(API_URL + "client/trigger/42/activate")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	triggers = readTriggers(f)
 	checkNumberOfTriggers(f, triggers, 4)
@@ -288,7 +288,7 @@ func checkDeactivateNonExistingTrigger() {
 
 	f.Post(API_URL + "client/trigger/42/deactivate")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	triggers = readTriggers(f)
 	checkNumberOfTriggers(f, triggers, 4)
@@ -350,7 +350,7 @@ func checkDeleteNonExistingTrigger() {
 
 	f.Delete(API_URL + "client/trigger/42")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 
 	triggers = readTriggers(f)
 	checkNumberOfTriggers(f, triggers, 3)
@@ -457,7 +457,7 @@ func checkCreateNewTriggerForWrongCluster() {
 	f := frisby.Create("Check create new trigger for wrong cluster")
 	f.Post(API_URL + "client/cluster/00000000-0000-ffff-0000-000000000001/trigger/must-gather?username=tester&reason=r&link=l")
 	f.Send()
-	f.ExpectStatus(400)
+	f.ExpectStatus(404)
 
 	triggers := readTriggers(f)
 	checkNumberOfTriggers(f, triggers, 4)

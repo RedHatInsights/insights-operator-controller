@@ -44,7 +44,7 @@ func checkNonExistingConfiguration() {
 	// configuration can't exists
 	f.Get(API_URL + "/operator/configuration/00000000-0000-0000-0000-000000000006")
 	f.Send()
-	f.ExpectStatus(400)
+	f.ExpectStatus(404)
 	f.PrintReport()
 }
 
