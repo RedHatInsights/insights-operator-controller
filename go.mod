@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/Masterminds/squirrel v1.2.0
-	github.com/RedHatInsights/insights-operator-utils v0.0.0-20200128100540-06c122fd8a86
+	github.com/RedHatInsights/insights-operator-utils v0.0.0-20200212101518-5819e1fc31a9
 	github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/bitly/go-simplejson v0.5.0 // indirect

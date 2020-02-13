@@ -14,6 +14,8 @@ github.com/RedHatInsights/insights-operator-utils v0.0.0-20200115122427-0ae75ac1
 github.com/RedHatInsights/insights-operator-utils v0.0.0-20200115122427-0ae75ac105e6/go.mod h1:c6ReBK57bYPBl3DCb03lo3Jwr+ORT/9XUdlTwzhKQP8=
 github.com/RedHatInsights/insights-operator-utils v0.0.0-20200128100540-06c122fd8a86 h1:iypZgR01YTg1vYzALrZdZ17R2zGi6NNQJG+9BWxoZGc=
 github.com/RedHatInsights/insights-operator-utils v0.0.0-20200128100540-06c122fd8a86/go.mod h1:c6ReBK57bYPBl3DCb03lo3Jwr+ORT/9XUdlTwzhKQP8=
+github.com/RedHatInsights/insights-operator-utils v0.0.0-20200212101518-5819e1fc31a9 h1:LK+3X6wSHRHzBV/jir+4GqsIG77hYxE5yj5ai7u8RVg=
+github.com/RedHatInsights/insights-operator-utils v0.0.0-20200212101518-5819e1fc31a9/go.mod h1:c6ReBK57bYPBl3DCb03lo3Jwr+ORT/9XUdlTwzhKQP8=
 github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af h1:aTyc5cOSaXiCh1n/mf/COjrWCV9f2yXUuPIeIEs14xU=
 github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af/go.mod h1:RsO+aYhoc9OyzUJwKHWWXXsjLN/85QaaEHx/PWa2+/I=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc h1:cAKDfWh5VpdgMhJosfJnn5/FoN2SRZ4p7fJNX58YPaU=
