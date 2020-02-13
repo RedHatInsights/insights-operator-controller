@@ -30,7 +30,7 @@ func TestNonErrorsConfigurationWithoutData(t *testing.T) {
 		{"GetConfiguration Not Found", serv.GetConfiguration, http.StatusNotFound, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeleteConfiguration Not Found", serv.DeleteConfiguration, http.StatusNotFound, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
 		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
-		{"GetClusterConfiguration Empty", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"GetClusterConfiguration Not Found", serv.GetClusterConfiguration, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
 		{"EnableConfiguration Not Found", serv.EnableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
 		{"DisableConfiguration Not Found", serv.DisableConfiguration, http.StatusNotFound, "PUT", false, requestData{"id": "1"}, requestData{}, ""},
 	}
@@ -93,10 +93,14 @@ func TestParameterErrorsConfiguration(t *testing.T) {
 
 	paramErrorTT := []testCase{
 		{"GetConfiguration no id", serv.GetConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"GetConfiguration non-int id", serv.GetConfiguration, http.StatusBadRequest, "GET", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeleteConfiguration no id", serv.DeleteConfiguration, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
+		{"DeleteConfiguration non-int id", serv.DeleteConfiguration, http.StatusBadRequest, "DELETE", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"GetClusterConfiguration no id", serv.GetClusterConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
 		{"EnableConfiguration no id", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
 		{"DisableConfiguration no id", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"EnableConfiguration non-int id", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{}, ""},
+		{"DisableConfiguration non-int id", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"EnableClusterConfiguration no cluster", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{}, requestData{"username": "tester", "reason": "test"}, ""},
 		{"EnableClusterConfiguration no reason", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester"}, ""},
 		{"EnableClusterConfiguration no username", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"reason": "test"}, ""},
