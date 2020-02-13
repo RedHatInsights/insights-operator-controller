@@ -91,7 +91,7 @@ func TestParameterErrorsTrigger(t *testing.T) {
 		{"GetTrigger no id", serv.GetTrigger, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
 		{"GetTrigger non-int id", serv.GetTrigger, http.StatusBadRequest, "GET", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeleteTrigger no id", serv.DeleteTrigger, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
-		{"DeleteTrigger non-int id", serv.DeleteTrigger, http.StatusBadRequest, "DELETE", true, requestData{"id": "test"}, requestData{}, ""},
+		{"DeleteTrigger non-int id", serv.DeleteTrigger, http.StatusBadRequest, "DELETE", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"ActivateTrigger no id", serv.ActivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
 		{"ActivateTrigger non-int id", serv.ActivateTrigger, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeactivateTrigger no id", serv.DeactivateTrigger, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},

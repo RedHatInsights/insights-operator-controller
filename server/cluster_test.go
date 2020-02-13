@@ -87,7 +87,7 @@ func TestParameterErrorsCluster(t *testing.T) {
 		{"NewCluster no param", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{}, requestData{}, ""},
 		{"NewCluster empty name key", serv.NewCluster, http.StatusBadRequest, "POST", false, requestData{"name": ""}, requestData{}, ""},
 		{"GetClusterByID no param", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
-		{"GetClusterByID non-str id", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{"id": "test"}, requestData{}, ""},
+		{"GetClusterByID non-int id", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeleteCluster no param", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{}, requestData{}, ""},
 		{"DeleteCluster by name", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"name": "test"}, requestData{}, ""},
 		{"DeleteCluster by non-int id", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"id": "non-int"}, requestData{}, ""},

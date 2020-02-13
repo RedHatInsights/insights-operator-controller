@@ -99,6 +99,8 @@ func TestParameterErrorsConfiguration(t *testing.T) {
 		{"GetClusterConfiguration no id", serv.GetClusterConfiguration, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
 		{"EnableConfiguration no id", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
 		{"DisableConfiguration no id", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{}, requestData{}, ""},
+		{"EnableConfiguration non-int id", serv.EnableConfiguration, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{}, ""},
+		{"DisableConfiguration non-int id", serv.DisableConfiguration, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"EnableClusterConfiguration no cluster", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{}, requestData{"username": "tester", "reason": "test"}, ""},
 		{"EnableClusterConfiguration no reason", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"username": "tester"}, ""},
 		{"EnableClusterConfiguration no username", serv.EnableClusterConfiguration, http.StatusBadRequest, "PUT", false, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{"reason": "test"}, ""},
