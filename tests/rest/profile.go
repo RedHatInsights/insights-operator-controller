@@ -155,7 +155,7 @@ func checkGetNonexistentConfigurationProfile() {
 	f := frisby.Create("Check getting configuration profile that does not exist")
 	f.Get(API_URL + "/client/profile/1234")
 	f.Send()
-	f.ExpectStatus(400)
+	f.ExpectStatus(404)
 
 	f.PrintReport()
 }
@@ -192,12 +192,12 @@ func checkListOfConfigurationProfilesWithUpdatedItem() {
 }
 
 func checkChangeNonExistingConfigurationProfile() {
-	f := frisby.Create("Check changing configuration profile")
+	f := frisby.Create("Check changing non existing configuration profile")
 	f.Put(API_URL + "client/profile/35?username=foo&description=bar")
 	f.Req.Body = strings.NewReader(`{"no_op":"Z", "watch":[]}`)
 
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
@@ -211,11 +211,11 @@ func checkDeleteConfigurationProfile() {
 }
 
 func checkDeleteNonexistingConfigurationProfile() {
-	f := frisby.Create("Check deletion of configuration profile")
+	f := frisby.Create("Check deletion of non existing configuration profile")
 	f.Delete(API_URL + "client/profile/35?")
 
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
