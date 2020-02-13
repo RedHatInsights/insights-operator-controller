@@ -4,7 +4,10 @@ SUPERUSER=postgres
 SU_PASSWORD=postgres
 
 DATABASE=controller
-DB_SERVER=local socket  # default value; for readability sake
+
+# when host is not specified, the default behaviour is to automatically connect
+# to the correct Unix-like socket (directory was specified when PostgreSQL was built)
+DB_SERVER=
 
 USER=tester
 USER_PASSWORD=tester
