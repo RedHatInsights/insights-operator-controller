@@ -37,9 +37,9 @@ func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request
 
 // GetTrigger - return single trigger by id
 func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.SendError(writer, "Trigger ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -55,14 +55,14 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 
 // DeleteTrigger - delete single trigger
 func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.SendError(writer, "Trigger ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
-	s.Splunk.LogAction("DeleteTrigger", "tester", id)
-	err := s.Storage.DeleteTriggerByID(id)
+	s.Splunk.LogAction("DeleteTrigger", "tester", fmt.Sprint(id))
+	err = s.Storage.DeleteTriggerByID(id)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(
 			http.StatusNotFound,
@@ -78,14 +78,14 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 
 // ActivateTrigger - active single trigger
 func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.SendError(writer, "Trigger ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
-	s.Splunk.LogAction("ActivateTrigger", "tester", id)
-	err := s.Storage.ChangeStateOfTriggerByID(id, 1)
+	s.Splunk.LogAction("ActivateTrigger", "tester", fmt.Sprint(id))
+	err = s.Storage.ChangeStateOfTriggerByID(id, 1)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -97,14 +97,14 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 
 // DeactivateTrigger - deactivate single trigger
 func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.SendError(writer, "Trigger ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
-	s.Splunk.LogAction("DeactivateTrigger", "tester", id)
-	err := s.Storage.ChangeStateOfTriggerByID(id, 0)
+	s.Splunk.LogAction("DeactivateTrigger", "tester", fmt.Sprint(id))
+	err = s.Storage.ChangeStateOfTriggerByID(id, 0)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -123,11 +123,13 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	}
 
 	triggers, err := s.Storage.ListClusterTriggers(cluster)
-	if err != nil {
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
-		return
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 }
 
 // RegisterClusterTrigger - register new trigger for cluster

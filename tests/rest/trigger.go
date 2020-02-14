@@ -366,7 +366,7 @@ func checkDeleteNonExistingTrigger() {
 }
 
 func checkGetTriggersForCluster0() {
-	f := frisby.Create("Check get trigger for a cluster")
+	f := frisby.Create("Check get trigger for a cluster 0")
 	f.Get(API_URL + "client/cluster/00000000-0000-0000-0000-000000000000/trigger")
 	f.Send()
 	f.ExpectStatus(200)
@@ -389,7 +389,7 @@ func checkGetTriggersForCluster0() {
 }
 
 func checkGetTriggersForCluster1() {
-	f := frisby.Create("Check get trigger for a cluster")
+	f := frisby.Create("Check get trigger for a cluster 1")
 	f.Get(API_URL + "client/cluster/00000000-0000-0000-0000-000000000001/trigger")
 	f.Send()
 	f.ExpectStatus(200)
@@ -413,10 +413,10 @@ func checkGetTriggersForCluster1() {
 }
 
 func checkGetTriggersForClusterX() {
-	f := frisby.Create("Check get trigger for a cluster")
+	f := frisby.Create("Check get trigger for a cluster x")
 	f.Get(API_URL + "client/cluster/00000000-ffff-0000-0000-000000000001/trigger")
 	f.Send()
-	f.ExpectStatus(200)
+	f.ExpectStatus(404)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
 	triggers := TriggerResponse{}

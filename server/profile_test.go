@@ -49,7 +49,7 @@ func TestNonErrorsProfileWithData(t *testing.T) {
 		{"ListConfigurationProfiles OK", serv.ListConfigurationProfiles, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
 		{"DeleteConfigurationProfile OK", serv.DeleteConfigurationProfile, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
 		{"NewConfigurationProfile OK", serv.NewConfigurationProfile, http.StatusCreated, "POST", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
-		{"ChangeConfigurationProfile OK", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile OK", serv.ChangeConfigurationProfile, http.StatusOK, "PUT", true, requestData{"id": "4"}, requestData{"username": "tester", "description": "test"}, "Test config"},
 	}
 
 	for _, tt := range nonErrorTT {

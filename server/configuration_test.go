@@ -48,7 +48,7 @@ func TestNonErrorsConfigurationWithData(t *testing.T) {
 	nonErrorTT := []testCase{
 		{"GetConfiguration OK", serv.GetConfiguration, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"GetAllConfigurations OK", serv.GetAllConfigurations, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
-		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"GetClusterConfiguration OK", serv.GetClusterConfiguration, http.StatusOK, "GET", true, requestData{"cluster": "00000000-0000-0000-0000-000000000001"}, requestData{}, ""},
 		{"EnableConfiguration OK", serv.EnableConfiguration, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DisableConfiguration OK", serv.DisableConfiguration, http.StatusOK, "PUT", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeleteConfiguration OK", serv.DeleteConfiguration, http.StatusOK, "DELETE", true, requestData{"id": "1"}, requestData{}, ""},
