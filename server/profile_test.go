@@ -83,8 +83,11 @@ func TestParameterErrorsProfile(t *testing.T) {
 
 	paramErrorTT := []testCase{
 		{"GetConfigurationProfile no id", serv.GetConfigurationProfile, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
+		{"GetConfigurationProfile non-int id", serv.GetConfigurationProfile, http.StatusBadRequest, "GET", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeleteConfigurationProfile no id", serv.DeleteConfigurationProfile, http.StatusBadRequest, "DELETE", true, requestData{}, requestData{}, ""},
+		{"DeleteConfigurationProfile non-int id", serv.DeleteConfigurationProfile, http.StatusBadRequest, "DELETE", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"ChangeConfigurationProfile no id", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{}, requestData{"username": "tester", "description": "test"}, "Test config"},
+		{"ChangeConfigurationProfile non-int id", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "non-int"}, requestData{"username": "tester", "description": "test"}, "Test config"},
 		{"ChangeConfigurationProfile no description", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester"}, "Test config"},
 		{"ChangeConfigurationProfile no username", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"description": "test"}, "Test config"},
 		{"ChangeConfigurationProfile no config in body", serv.ChangeConfigurationProfile, http.StatusBadRequest, "PUT", true, requestData{"id": "1"}, requestData{"username": "tester", "description": "test"}, ""},

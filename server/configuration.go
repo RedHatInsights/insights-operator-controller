@@ -17,6 +17,7 @@ limitations under the License.
 package server
 
 import (
+	"fmt"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
@@ -32,9 +33,9 @@ func sendConfiguration(writer http.ResponseWriter, configuration string) {
 
 // GetConfiguration - return single configuration by id
 func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Configuration ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -50,14 +51,14 @@ func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Reque
 
 // DeleteConfiguration - remove single configuration by id
 func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Request) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Configuration ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
-	s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", id)
-	err := s.Storage.DeleteClusterConfigurationByID(id)
+	s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", fmt.Sprint(id))
+	err = s.Storage.DeleteClusterConfigurationByID(id)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -86,27 +87,29 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 	}
 
 	configuration, err := s.Storage.ListClusterConfiguration(cluster)
-	if err != nil {
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
-		return
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 }
 
 // EnableOrDisableConfiguration - enable or disable single configuration
 func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, active string) {
-	id, found := mux.Vars(request)["id"]
-	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Configuration ID needs to be specified")
+	id, err := retrieveIDRequestParameter(request)
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
 	if active == "0" {
-		s.Splunk.LogAction("DisableClusterConfiguration", "tester", id)
+		s.Splunk.LogAction("DisableClusterConfiguration", "tester", fmt.Sprint(id))
 	} else {
-		s.Splunk.LogAction("EnableClusterConfiguration", "tester", id)
+		s.Splunk.LogAction("EnableClusterConfiguration", "tester", fmt.Sprint(id))
 	}
-	err := s.Storage.EnableOrDisableClusterConfigurationByID(id, active)
+	err = s.Storage.EnableOrDisableClusterConfigurationByID(id, active)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {

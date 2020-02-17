@@ -248,7 +248,7 @@ func (storage Storage) RegisterNewCluster(name string) error {
 
 // CreateNewCluster creates a new cluster with specified ID and name.
 // It differs from RegisterNewCluster, because ID is specified explicitly here.
-func (storage Storage) CreateNewCluster(id string, name string) error {
+func (storage Storage) CreateNewCluster(id int64, name string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO cluster(id, name) VALUES ($1, $2)")
 	if err != nil {
 		log.Print(err)
@@ -492,6 +492,10 @@ ORDER BY operator_configuration.id`)
 
 // ListClusterConfiguration selects cluster configuration from the database for the specified cluster.
 func (storage Storage) ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error) {
+	if _, err := storage.GetClusterByName(cluster); err != nil {
+		return nil, err
+	}
+
 	rows, err := storage.connections.Query(`
 SELECT operator_configuration.id, cluster.name, configuration, changed_at, changed_by, active, reason
   FROM operator_configuration JOIN cluster
@@ -507,7 +511,7 @@ SELECT operator_configuration.id, cluster.name, configuration, changed_at, chang
 }
 
 // GetClusterConfigurationByID reads cluster configuration for the specified configuration ID.
-func (storage Storage) GetClusterConfigurationByID(id string) (string, error) {
+func (storage Storage) GetClusterConfigurationByID(id int64) (string, error) {
 	var configuration string
 
 	row, err := storage.connections.Query(`
@@ -775,7 +779,7 @@ func (storage Storage) DisableClusterConfiguration(cluster string, username stri
 
 // EnableOrDisableClusterConfigurationByID enables or disables the specified cluster configuration (set or reset the 'active' flag).
 // Please see also EnableClusterConfiguration and DisableClusterConfiguration
-func (storage Storage) EnableOrDisableClusterConfigurationByID(id string, active string) error {
+func (storage Storage) EnableOrDisableClusterConfigurationByID(id int64, active string) error {
 	statement, err := storage.connections.Prepare("UPDATE operator_configuration SET active = $1, changed_at = $2 WHERE id = $3")
 	if err != nil {
 		return err
@@ -798,7 +802,7 @@ func (storage Storage) EnableOrDisableClusterConfigurationByID(id string, active
 
 // DeleteClusterConfigurationByID deletes cluster configuration specified by its ID.
 // TODO: copy & paste, needs to be refactored later
-func (storage Storage) DeleteClusterConfigurationByID(id string) error {
+func (storage Storage) DeleteClusterConfigurationByID(id int64) error {
 	statement, err := storage.connections.Prepare("DELETE FROM operator_configuration WHERE id = $1")
 	if err != nil {
 		return err
@@ -839,7 +843,7 @@ func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 }
 
 // GetTriggerByID selects all informations about the trigger specified by its ID.
-func (storage Storage) GetTriggerByID(id string) (Trigger, error) {
+func (storage Storage) GetTriggerByID(id int64) (Trigger, error) {
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
@@ -879,7 +883,7 @@ func execStatementAndGetRowsAffected(statement *sql.Stmt, args ...interface{}) (
 
 // DeleteTriggerByID deletes trigger specified by its ID
 // returns ItemNotFoundError if trigger didn't exist
-func (storage Storage) DeleteTriggerByID(id string) error {
+func (storage Storage) DeleteTriggerByID(id int64) error {
 	statement, err := storage.connections.Prepare(`
 DELETE FROM trigger WHERE trigger.id = $1`)
 	if err != nil {
@@ -905,7 +909,7 @@ DELETE FROM trigger WHERE trigger.id = $1`)
 
 // ChangeStateOfTriggerByID change the state ('active', 'inactive') of trigger specified by its ID.
 // returns ItemNotFoundError if there weren't rows with such id
-func (storage Storage) ChangeStateOfTriggerByID(id string, active int) error {
+func (storage Storage) ChangeStateOfTriggerByID(id int64, active int) error {
 	statement, err := storage.connections.Prepare(`
 UPDATE trigger SET active = $1 WHERE trigger.id = $2`)
 	if err != nil {
@@ -951,6 +955,11 @@ ORDER BY trigger.id`)
 func (storage Storage) ListClusterTriggers(clusterName string) ([]Trigger, error) {
 	triggers := []Trigger{}
 
+	// check that cluster exist
+	if _, err := storage.GetClusterByName(clusterName); err != nil {
+		return triggers, err
+	}
+
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
        trigger.reason, trigger.link, trigger.triggered_at, trigger.triggered_by,
@@ -970,6 +979,11 @@ SELECT trigger.id, trigger_type.type, cluster.name,
 // ListActiveClusterTriggers selects all active triggers assigned to the specified cluster.
 func (storage Storage) ListActiveClusterTriggers(clusterName string) ([]Trigger, error) {
 	triggers := []Trigger{}
+
+	// check that cluster exist
+	if _, err := storage.GetClusterByName(clusterName); err != nil {
+		return triggers, err
+	}
 
 	rows, err := storage.connections.Query(`
 SELECT trigger.id, trigger_type.type, cluster.name,
@@ -1065,7 +1079,7 @@ func (storage Storage) NewTriggerType(ttype string, description string) error {
 
 // AckTrigger sets a timestamp to the selected trigger + updates the 'active' flag.
 // and returns error if trigger wasn't found
-func (storage Storage) AckTrigger(clusterName string, triggerID string) error {
+func (storage Storage) AckTrigger(clusterName string, triggerID int64) error {
 	t := time.Now()
 
 	// retrieve cluster ID

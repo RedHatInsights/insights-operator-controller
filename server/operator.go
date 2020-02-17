@@ -80,11 +80,13 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	}
 
 	triggers, err := s.Storage.ListActiveClusterTriggers(cluster)
-	if err != nil {
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
-		return
+	} else {
+		responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 }
 
 // AckTriggerForCluster - ack single cluster's trigger
@@ -95,13 +97,13 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	triggerID, found := mux.Vars(request)["trigger"]
-	if !found {
-		responses.SendError(writer, "Trigger ID needs to be specified")
+	triggerID, err := retrievePositiveIntRequestParameter(request, "trigger")
+	if err != nil {
+		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
-	err := s.Storage.AckTrigger(cluster, triggerID)
+	err = s.Storage.AckTrigger(cluster, triggerID)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {

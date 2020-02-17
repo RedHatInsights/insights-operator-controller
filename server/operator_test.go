@@ -28,7 +28,7 @@ func TestNonErrorsOperatorWithoutData(t *testing.T) {
 
 	nonErrorTT := []testCase{
 		{"ReadConfigurationForOperator Not Found", serv.ReadConfigurationForOperator, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
-		{"GetActiveTriggersForCluster Empty", serv.GetActiveTriggersForCluster, http.StatusOK, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
+		{"GetActiveTriggersForCluster Not Found", serv.GetActiveTriggersForCluster, http.StatusNotFound, "GET", true, requestData{"cluster": "1"}, requestData{}, ""},
 		{"AckTriggerForCluster Not Found", serv.AckTriggerForCluster, http.StatusNotFound, "GET", true, requestData{"cluster": "1", "trigger": "1"}, requestData{}, ""},
 		{"RegisterCluster OK", serv.RegisterCluster, http.StatusCreated, "PUT", true, requestData{"cluster": "1"}, requestData{}, ""},
 	}
@@ -46,6 +46,7 @@ func TestNonErrorsOperatorWithData(t *testing.T) {
 	nonErrorTT := []testCase{
 		{"ReadConfigurationForOperator OK", serv.ReadConfigurationForOperator, http.StatusOK, "GET", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{}, ""},
 		{"GetActiveTriggersForCluster OK", serv.GetActiveTriggersForCluster, http.StatusOK, "GET", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000"}, requestData{}, ""},
+		{"GetActiveTriggersForCluster No triggers OK", serv.GetActiveTriggersForCluster, http.StatusOK, "GET", true, requestData{"cluster": "00000000-0000-0000-0000-000000000004"}, requestData{}, ""},
 		{"AckTriggerForCluster OK", serv.AckTriggerForCluster, http.StatusOK, "GET", true, requestData{"cluster": "00000000-0000-0000-0000-000000000000", "trigger": "1"}, requestData{}, ""},
 		{"RegisterCluster OK", serv.RegisterCluster, http.StatusCreated, "PUT", true, requestData{"cluster": "1"}, requestData{}, ""},
 	}

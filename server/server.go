@@ -19,7 +19,7 @@ package server
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
+	"fmt"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/env"
@@ -96,12 +96,25 @@ func countEndpoint(request *http.Request, start time.Time) {
 	apiResponses.With(prometheus.Labels{"url": url}).Observe(float64(duration.Microseconds()))
 }
 
-func retrieveIDRequestParameter(request *http.Request) (int64, error) {
-	idVar, found := mux.Vars(request)["id"]
+// retrievePositiveIntRequestParameter gets param with paramName converts to int and checks
+// if it's positive
+func retrievePositiveIntRequestParameter(request *http.Request, paramName string) (int64, error) {
+	strValue, found := mux.Vars(request)[paramName]
 	if !found {
-		return 0, errors.New("id not found")
+		return 0, fmt.Errorf("'%v' param not found", paramName)
 	}
-	return strconv.ParseInt(idVar, 10, 0)
+	intValue, err := strconv.ParseInt(strValue, 10, 0)
+	if err != nil {
+		return 0, err
+	}
+	if intValue < 0 {
+		return 0, fmt.Errorf("'%v' param cannot be negative", paramName)
+	}
+	return intValue, nil
+}
+
+func retrieveIDRequestParameter(request *http.Request) (int64, error) {
+	return retrievePositiveIntRequestParameter(request, "id")
 }
 
 func (s Server) mainEndpoint(writer http.ResponseWriter, request *http.Request) {
