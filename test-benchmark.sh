@@ -2,7 +2,8 @@
 
 export DBDRIVER=$1
 
-echo $DBDRIVER
+echo "$DBDRIVER"
+
 if [[ $DBDRIVER != 'sqlite3' ]] && [[ $DBDRIVER != 'postgres' ]]
 then
 	echo 'usage test-benchmark.sh sqlite3|postgres'

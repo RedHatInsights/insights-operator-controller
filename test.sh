@@ -21,9 +21,7 @@ else
     exit 1
 fi
 
-go build -o rest-api-tests tests/rest_api_tests.go
-
-if [ $? -eq 0 ]
+if go build -o rest-api-tests tests/rest_api_tests.go
 then
     echo "REST API tests build ok"
 else
@@ -38,8 +36,11 @@ echo "Done"
 
 echo "Starting service"
 ./insights-operator-controller --storage test.db &
+
+# shellcheck disable=SC2116
 PID=$(echo $!)
 
+# shellcheck disable=SC2181
 if [ $? -eq 0 ]
 then
     echo "Service started, PID=$PID"
@@ -50,8 +51,7 @@ then
     EXIT_VALUE=$?
     echo -e "------------------------------------------------------------------------------------------------"
 
-    kill $PID
-    if [ $? -eq 0 ]
+    if kill "$PID"
     then
         echo "Service killed, PID=$PID"
     else

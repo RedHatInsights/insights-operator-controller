@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-go build
-
-if [ $? -eq 0 ]
+if go build
 then
     echo "Build ok"
     ./insights-operator-controller --dbdriver=postgres --storage=postgres://postgres:postgres@localhost/controller?sslmode=disable
