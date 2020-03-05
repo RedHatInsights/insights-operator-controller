@@ -11,9 +11,7 @@ if [ -z "$CONTROLLER_ENV" ]; then
     export CONTROLLER_ENV=test
 fi
 
-go build -race
-
-if [ $? -eq 0 ]
+if go build -race
 then
     echo "Service build ok"
 else
