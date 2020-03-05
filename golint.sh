@@ -13,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cd "$(dirname $0)"
+cd "$(dirname "$0")" || exit
 
 go get golang.org/x/lint/golint
 
-if golint `go list ./...` |
+# shellcheck disable=SC2046
+if golint $(go list ./...) |
     grep -v ALL_CAPS |
     grep .; then
   exit 1
