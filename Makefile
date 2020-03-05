@@ -26,7 +26,18 @@ cyclo: ## Run gocyclo
 	@echo "Running gocyclo"
 	./gocyclo.sh
 
-style: fmt vet lint cyclo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
+ineffassign: ## Run ineffassign checker
+	@echo "Running ineffassign checker"
+	./ineffassign.sh
+
+goerrcheck: ## Run error checks linter
+	@echo "Running error checks linter"
+	./goerrcheck.sh
+
+shellcheck: ## Run shellcheck
+	shellcheck *.sh
+
+style: fmt vet lint cyclo ineffassign shellcheck ## Run all the formatting related commands (fmt, vet, lint, cyclo)
 
 run: clean build ## Build the project and executes the binary
 	./insights-operator-controller 

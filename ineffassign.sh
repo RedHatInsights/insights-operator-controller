@@ -13,6 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cd "$(dirname "$0")" || exit
-# shellcheck disable=SC2046
-go vet $(go list ./...)
+go get github.com/gordonklaus/ineffassign
+ineffassign .
