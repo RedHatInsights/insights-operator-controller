@@ -45,6 +45,10 @@ run: clean build ## Build the project and executes the binary
 test: clean build ## Run the unit tests
 	@go test -coverprofile coverage.out $(shell go list ./... | grep -v tests)
 
+license:
+	GO111MODULE=off go get -u github.com/google/addlicense && \
+		addlicense -c "Red Hat, Inc" -l "apache" -v ./
+
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'
 	@echo ''
