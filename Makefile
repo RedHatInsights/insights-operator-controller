@@ -37,7 +37,11 @@ goerrcheck: ## Run error checks linter
 shellcheck: ## Run shellcheck
 	shellcheck *.sh
 
-style: fmt vet lint cyclo ineffassign shellcheck ## Run all the formatting related commands (fmt, vet, lint, cyclo)
+abcgo: ## Run ABC metrics checker
+	@echo "Run ABC metrics checker"
+	./abcgo.sh
+
+style: fmt vet lint cyclo ineffassign shellcheck abcgo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
 
 run: clean build ## Build the project and executes the binary
 	./insights-operator-controller 
