@@ -519,6 +519,19 @@
                     }
                 }
             }
+        },
+        "/metrics": {
+            "get": {
+                "summary": "Read all metrics exposed by this service",
+                "description": "",
+                "parameters": [],
+                "operationId": "getMetrics",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
         }
     },
     "externalDocs": {
