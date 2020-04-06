@@ -1,0 +1,29 @@
+{
+    "openapi": "3.0.0",
+    "servers": [
+        {
+            "url": ""
+        }
+    ],
+    "info": {
+        "description": "A service to be used to store Insights operator configuration and to offer the configuration to selected operator",
+        "version": "1.0.0",
+        "title": "Insights operator controller service",
+        "termsOfService": "https://github.com/RedHatInsights/insights-operator-controller/blob/master/CONTRIBUTING.md",
+        "contact": {
+            "email": "ptisnovs@redhat.com",
+            "name": "Pavel Tisnovsky",
+            "url": "https://github.com/RedHatInsights/insights-operator-controller/"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "tags": [],
+    "externalDocs": {
+        "description": "Please see https://github.com/RedHatInsights/insights-operator-controller/blob/master/README.md",
+        "url": "https://godoc.org/github.com/RedHatInsights/insights-operator-controller"
+    },
+    "security": []
+}
