@@ -319,6 +319,206 @@
                     }
                 }
             }
+        },
+        "/client/trigger": {
+            "get": {
+                "summary": "Return list of all triggers",
+                "description": "",
+                "parameters": [],
+                "operationId": "getAllTriggers",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}": {
+            "get": {
+                "summary": "Return single trigger by its id",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "getTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete single trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deleteTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/{cluster}/trigger": {
+            "get": {
+                "summary": "Return list of triggers for single cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "getClusterTriggers",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/{cluster}/trigger/{trigger}": {
+            "post": {
+                "summary": "Register new trigger for cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "registerClusterTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}/activate": {
+            "post": {
+                "summary": "Activate filter",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "activateTriggerByPost",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Activate filter",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "activateTriggerByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}/deactivate": {
+            "post": {
+                "summary": "Deactivate trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deactivateTriggerByPost",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Deactivate trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deactivateTriggerByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
         }
     },
     "externalDocs": {
