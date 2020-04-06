@@ -127,6 +127,95 @@
                     }
                 }
             }
+        },
+        "/profile": {
+            "get": {
+                "summary": "Read list of configuration profiles",
+                "description": "",
+                "parameters": [],
+                "operationId": "listConfigurationProfiles",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates new configuration profile",
+                "description": "",
+                "parameters": [],
+                "operationId": "newConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/profile/{id}": {
+            "get": {
+                "summary": "Read profile specified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "getConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete configuration profile",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "deleteConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Change configuration profile",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "changeConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
         }
     },
     "externalDocs": {
