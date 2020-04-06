@@ -532,6 +532,127 @@
                     }
                 }
             }
+        },
+        "/operator/register/{cluster}": {
+            "get": {
+                "summary": "Register new cluster",
+                "description": "",
+                "parameters": [],
+                "operationId": "registerCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/configuration/{cluster}": {
+            "get": {
+                "summary": "Read configuration for operator",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "readConfigurationForOperator",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/triggers/{cluster}": {
+            "get": {
+                "summary": "Get all active triggers for a given cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "getActiveTriggersForCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/trigger/{cluster}/ack/{trigger}": {
+            "get": {
+                "summary": "Ack single cluster's trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "ackTriggerForClusterByGet",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Ack single cluster's trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "ackTriggerForClusterByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
         }
     },
     "externalDocs": {
