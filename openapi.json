@@ -128,7 +128,7 @@
                 }
             }
         },
-        "/profile": {
+        "/client/profile": {
             "get": {
                 "summary": "Read list of configuration profiles",
                 "description": "",
@@ -152,7 +152,7 @@
                 }
             }
         },
-        "/profile/{id}": {
+        "/client/profile/{id}": {
             "get": {
                 "summary": "Read profile specified by its ID",
                 "description": "",
@@ -210,6 +210,109 @@
                     }
                 ],
                 "operationId": "changeConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration": {
+            "get": {
+                "summary": "Return list of all configurations",
+                "description": "",
+                "parameters": [],
+                "operationId": "getAllConfigurations",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}": {
+            "get": {
+                "summary": "Return single configuration by id",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "getConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Remove single configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "deleteConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}/enable": {
+            "put": {
+                "summary": "Enable configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "enableConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}/disable": {
+            "put": {
+                "summary": "Disable configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "od",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "disableConfiguration",
                 "responses": {
                     "default": {
                         "description": "Default response"
