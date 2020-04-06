@@ -1,0 +1,663 @@
+{
+    "openapi": "3.0.0",
+    "servers": [
+        {
+            "url": ""
+        }
+    ],
+    "info": {
+        "description": "A service to be used to store Insights operator configuration and to offer the configuration to selected operator",
+        "version": "1.0.0",
+        "title": "Insights operator controller service",
+        "termsOfService": "https://github.com/RedHatInsights/insights-operator-controller/blob/master/CONTRIBUTING.md",
+        "contact": {
+            "email": "ptisnovs@redhat.com",
+            "name": "Pavel Tisnovsky",
+            "url": "https://github.com/RedHatInsights/insights-operator-controller/"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "tags": [],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Returns valid HTTP 200 ok status when the service is ready",
+                "description": "",
+                "parameters": [],
+                "operationId": "main",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster": {
+            "x-temp": {
+                "summary": "Read list of all clusters from database and return it to a client",
+                "description": "",
+                "parameters": [],
+                "operationId": "getClusters",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Read list of all clusters from database and return it to a client",
+                "description": "",
+                "parameters": [],
+                "operationId": "getClusters",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/{name}": {
+            "get": {
+                "summary": "Read cluster specified by its ID and return it to a client",
+                "description": "",
+                "parameters": [],
+                "operationId": "getClusterById",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a record with new cluster in a database. The updated list of all clusters is returned to client",
+                "description": "",
+                "parameters": [],
+                "operationId": "newCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a cluster specified by its ID",
+                "description": "",
+                "parameters": [],
+                "operationId": "deleteCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/search": {
+            "get": {
+                "summary": "Search for a cluster specified by its ID or name",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID",
+                        "allowEmptyValue": true
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster name",
+                        "allowEmptyValue": true
+                    }
+                ],
+                "operationId": "searchCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/profile": {
+            "get": {
+                "summary": "Read list of configuration profiles",
+                "description": "",
+                "parameters": [],
+                "operationId": "listConfigurationProfiles",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates new configuration profile",
+                "description": "",
+                "parameters": [],
+                "operationId": "newConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/profile/{id}": {
+            "get": {
+                "summary": "Read profile specified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "getConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete configuration profile",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "deleteConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Change configuration profile",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Profile ID"
+                    }
+                ],
+                "operationId": "changeConfigurationProfile",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration": {
+            "get": {
+                "summary": "Return list of all configurations",
+                "description": "",
+                "parameters": [],
+                "operationId": "getAllConfigurations",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}": {
+            "get": {
+                "summary": "Return single configuration by id",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "getConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Remove single configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "deleteConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}/enable": {
+            "put": {
+                "summary": "Enable configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "enableConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/configuration/{id}/disable": {
+            "put": {
+                "summary": "Disable configuration identified by its ID",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "od",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Configuration ID"
+                    }
+                ],
+                "operationId": "disableConfiguration",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger": {
+            "get": {
+                "summary": "Return list of all triggers",
+                "description": "",
+                "parameters": [],
+                "operationId": "getAllTriggers",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}": {
+            "get": {
+                "summary": "Return single trigger by its id",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "getTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete single trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deleteTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/{cluster}/trigger": {
+            "get": {
+                "summary": "Return list of triggers for single cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "getClusterTriggers",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/cluster/{cluster}/trigger/{trigger}": {
+            "post": {
+                "summary": "Register new trigger for cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "registerClusterTrigger",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}/activate": {
+            "post": {
+                "summary": "Activate filter",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "activateTriggerByPost",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Activate filter",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "activateTriggerByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/client/trigger/{id}/deactivate": {
+            "post": {
+                "summary": "Deactivate trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deactivateTriggerByPost",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Deactivate trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "deactivateTriggerByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/metrics": {
+            "get": {
+                "summary": "Read all metrics exposed by this service",
+                "description": "",
+                "parameters": [],
+                "operationId": "getMetrics",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/register/{cluster}": {
+            "get": {
+                "summary": "Register new cluster",
+                "description": "",
+                "parameters": [],
+                "operationId": "registerCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/configuration/{cluster}": {
+            "get": {
+                "summary": "Read configuration for operator",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "readConfigurationForOperator",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/triggers/{cluster}": {
+            "get": {
+                "summary": "Get all active triggers for a given cluster",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    }
+                ],
+                "operationId": "getActiveTriggersForCluster",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        },
+        "/operator/trigger/{cluster}/ack/{trigger}": {
+            "get": {
+                "summary": "Ack single cluster's trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "ackTriggerForClusterByGet",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Ack single cluster's trigger",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "cluster",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cluster ID"
+                    },
+                    {
+                        "name": "trigger",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Trigger ID"
+                    }
+                ],
+                "operationId": "ackTriggerForClusterByPut",
+                "responses": {
+                    "default": {
+                        "description": "Default response"
+                    }
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Please see https://github.com/RedHatInsights/insights-operator-controller/blob/master/README.md",
+        "url": "https://godoc.org/github.com/RedHatInsights/insights-operator-controller"
+    },
+    "security": []
+}
