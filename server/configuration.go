@@ -18,6 +18,8 @@ package server
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
