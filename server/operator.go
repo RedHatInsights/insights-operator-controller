@@ -62,8 +62,13 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	s.Splunk.LogAction("RegisterCluster", "tester", clusterName)
-	err := s.Storage.RegisterNewCluster(clusterName)
+	// try to record the action RegisterCluster into Splunk
+	err := s.Splunk.LogAction("RegisterCluster", "tester", clusterName)
+	if err != nil {
+		log.Println("(not critical) Log into splunk failed", err)
+	}
+
+	err = s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
 		responses.SendInternalServerError(writer, err.Error())
