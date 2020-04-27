@@ -113,7 +113,12 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	s.Splunk.LogAction("DeleteCluster", "tester", fmt.Sprint(clusterID))
+	// try to record the action DeleteCluster into Splunk
+	err = s.Splunk.LogAction("DeleteCluster", "tester", fmt.Sprint(clusterID))
+	if err != nil {
+		log.Println("Unable to write log into Splunk", err)
+	}
+
 	err = s.Storage.DeleteCluster(clusterID)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
