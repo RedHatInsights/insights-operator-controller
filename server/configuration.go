@@ -57,7 +57,12 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", fmt.Sprint(id))
+	// try to record the action DeleteConfiguration into Splunk
+	err = s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", fmt.Sprint(id))
+	if err != nil {
+		log.Println("Unable to write log into Splunk", err)
+	}
+
 	err = s.Storage.DeleteClusterConfigurationByID(id)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
