@@ -209,7 +209,12 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 		return
 	}
 
-	s.Splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
+	// try to write information about EnableClusterConfiguration operation into Splunk
+	err := s.Splunk.LogAction("EnableClusterConfiguration", username[0], cluster)
+	if err != nil {
+		log.Println("Unable to write log into Splunk", err)
+	}
+
 	configurations, err := s.Storage.EnableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
