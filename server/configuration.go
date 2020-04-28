@@ -112,9 +112,15 @@ func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request
 	}
 
 	if active == "0" {
-		s.Splunk.LogAction("DisableClusterConfiguration", "tester", fmt.Sprint(id))
+		err = s.Splunk.LogAction("DisableClusterConfiguration", "tester", fmt.Sprint(id))
+		if err != nil {
+			log.Println("Unable to write log into Splunk", err)
+		}
 	} else {
-		s.Splunk.LogAction("EnableClusterConfiguration", "tester", fmt.Sprint(id))
+		err = s.Splunk.LogAction("EnableClusterConfiguration", "tester", fmt.Sprint(id))
+		if err != nil {
+			log.Println("Unable to write log into Splunk", err)
+		}
 	}
 	err = s.Storage.EnableOrDisableClusterConfigurationByID(id, active)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
