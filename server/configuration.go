@@ -59,7 +59,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	// try to record the action DeleteConfiguration into Splunk
+	// try to record the action DeleteConfigurationById into Splunk
 	err = s.Splunk.LogAction("DeleteClusterConfigurationById", "tester", fmt.Sprint(id))
 	if err != nil {
 		log.Println("Unable to write log into Splunk", err)
