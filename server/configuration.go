@@ -239,7 +239,12 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 		return
 	}
 
-	s.Splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
+	// try to write information about DisableClusterConfiguration operation into Splunk
+	err := s.Splunk.LogAction("DisableClusterConfiguration", username[0], cluster)
+	if err != nil {
+		log.Println("Unable to write log into Splunk", err)
+	}
+
 	configurations, err := s.Storage.DisableClusterConfiguration(cluster, username[0], reason[0])
 	if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
