@@ -392,7 +392,7 @@ func checkGetTriggersForCluster0() {
 		f.AddError(err.Error())
 	} else {
 		// try to unmarshall response body and check if it's correct
-		err = json.Unmarshal(text, &response)
+		err = json.Unmarshal(text, &triggers)
 		if err != nil {
 			f.AddError(err.Error())
 		}
