@@ -439,6 +439,8 @@ func checkGetTriggersForCluster1() {
 	f.PrintReport()
 }
 
+// checkGetTriggersForClusterX tries to read list of triggers for non-existing cluster,
+// check the response and compare list if expected values
 func checkGetTriggersForClusterX() {
 	f := frisby.Create("Check get trigger for a cluster x")
 	f.Get(API_URL + "client/cluster/00000000-ffff-0000-0000-000000000001/trigger")
@@ -447,11 +449,18 @@ func checkGetTriggersForClusterX() {
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
 	triggers := TriggerResponse{}
+
+	// try to read payload from response
 	text, err := f.Resp.Content()
 	if err != nil {
+		// it is not possible to retrieve the payload from response
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &triggers)
+		// try to unmarshall response body and check if it's correct
+		err = json.Unmarshal(text, &triggers)
+		if err != nil {
+			f.AddError(err.Error())
+		}
 	}
 
 	expected := []Trigger{}
