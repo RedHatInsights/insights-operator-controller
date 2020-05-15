@@ -69,6 +69,8 @@ func compareTriggers(f *frisby.Frisby, triggers []Trigger, expected []Trigger) {
 	}
 }
 
+// readTriggers tries to read list of triggers via REST API call and check
+// whether it is possible to unmarshal response
 func readTriggers(f *frisby.Frisby) []Trigger {
 	f.Get(API_URL + "client/trigger")
 	f.Send()
@@ -78,9 +80,14 @@ func readTriggers(f *frisby.Frisby) []Trigger {
 	response := TriggerResponse{}
 	text, err := f.Resp.Content()
 	if err != nil {
+		// it is not possible to retrieve the payload from response
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &response)
+		// try to unmarshall response body and check if it's correct
+		err = json.Unmarshal(text, &response)
+		if err != nil {
+			f.AddError(err.Error())
+		}
 	}
 	return response.Triggers
 }
