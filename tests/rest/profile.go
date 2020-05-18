@@ -99,19 +99,29 @@ func readConfigurationProfileFromResponse(f *frisby.Frisby) ConfigurationProfile
 		// try to unmarshall response body and check if it's correct
 		err = json.Unmarshal(text, &response)
 		if err != nil {
+			// any error needs to be recorded
 			f.AddError(err.Error())
 		}
 	}
 	return response.Profile
 }
 
+// readConfigurationProfilesFromResponse tries to read list of configuration profiles from the HTTP server response
 func readConfigurationProfilesFromResponse(f *frisby.Frisby) []ConfigurationProfile {
+	// default return value from this function
 	response := ConfigurationProfilesResponse{}
+
+	// try to read payload from response
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &response)
+		// try to unmarshall response body and check if it's correct
+		err = json.Unmarshal(text, &response)
+		if err != nil {
+			// any error needs to be recorded
+			f.AddError(err.Error())
+		}
 	}
 	return response.Profiles
 }
