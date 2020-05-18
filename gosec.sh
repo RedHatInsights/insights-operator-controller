@@ -22,7 +22,7 @@ cd "$(dirname "$0")" || exit
 
 echo -e "${BLUE}Security issues detection${NC}"
 
-go get github.com/securego/gosec/cmd/gosec
+GO111MODULE=off go get github.com/securego/gosec/cmd/gosec 2> /dev/null
 
 if ! gosec ./...
 then
