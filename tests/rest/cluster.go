@@ -37,18 +37,28 @@ type ClusterResponse struct {
 	Clusters []Cluster `json:"clusters"`
 }
 
+// readListOfClusters tries to read list of clusters from the HTTP server response
 func readListOfClusters(f *frisby.Frisby) []Cluster {
+	// try to get response from REST API server
 	f.Get(API_URL + "/client/cluster")
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
+	// default return value from this function
 	response := ClusterResponse{}
+
+	// try to read payload from response
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &response)
+		// try to unmarshall response body and check if it's correct
+		err = json.Unmarshal(text, &response)
+		if err != nil {
+			// any error needs to be recorded
+			f.AddError(err.Error())
+		}
 	}
 	return response.Clusters
 }
