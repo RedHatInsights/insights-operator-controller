@@ -61,18 +61,27 @@ func compareConfigurations(f *frisby.Frisby, configurations []ClusterConfigurati
 	}
 }
 
+// readConfigurations tries to read list of configurations from the HTTP server response
 func readConfigurations(f *frisby.Frisby) []ClusterConfiguration {
 	f.Get(API_URL + "client/configuration")
 	f.Send()
 	f.ExpectStatus(200)
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 
+	// default return value from this function
 	response := ClusterConfigurationsResponse{}
+
+	// try to read payload from response
 	text, err := f.Resp.Content()
 	if err != nil {
 		f.AddError(err.Error())
 	} else {
-		json.Unmarshal(text, &response)
+		// try to unmarshall response body and check if it's correct
+		err = json.Unmarshal(text, &response)
+		if err != nil {
+			// any error needs to be recorded
+			f.AddError(err.Error())
+		}
 	}
 	return response.Configuration
 }
