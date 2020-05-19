@@ -184,7 +184,13 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	s.Splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
+
+	// try to write information about NewClusterConfiguration operation into Splunk
+	err = s.Splunk.LogAction("NewClusterConfiguration", "tester", string(configuration))
+	if err != nil {
+		log.Println("Unable to write log into Splunk", err)
+	}
+
 	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
