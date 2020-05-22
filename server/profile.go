@@ -134,7 +134,11 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 		return
 	}
 
-	s.Splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
+	// try to record the action ChangeConfigurationProfile into Splunk
+	err = s.Splunk.LogAction("ChangeConfigurationProfile", username[0], string(configuration))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	profiles, err := s.Storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
