@@ -111,7 +111,11 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	s.Splunk.LogAction("DeactivateTrigger", "tester", fmt.Sprint(id))
+	// try to record the action DeactivateTrigger into Splunk
+	err = s.Splunk.LogAction("DeactivateTrigger", "tester", fmt.Sprint(id))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	err = s.Storage.ChangeStateOfTriggerByID(id, 0)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
