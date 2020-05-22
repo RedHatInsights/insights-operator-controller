@@ -96,7 +96,11 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 		return
 	}
 
-	s.Splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
+	// try to record the action DeleteConfigurationProfile into Splunk
+	err = s.Splunk.LogAction("DeleteConfigurationProfile", "tester", strconv.Itoa(int(id)))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	profiles, err := s.Storage.DeleteConfigurationProfile(int(id))
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
