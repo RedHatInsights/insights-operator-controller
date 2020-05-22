@@ -75,7 +75,11 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	s.Splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
+	// try to record the action NewConfigurationProfile into Splunk
+	err = s.Splunk.LogAction("NewConfigurationProfile", username[0], string(configuration))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	profiles, err := s.Storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
 	if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
