@@ -65,6 +65,13 @@ var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: prometheus.LinearBuckets(0, 20, 20),
 }, []string{"url"})
 
+// checkSplunkOperation checks whether the Splunk operation (write/record) was successful
+func checkSplunkOperation(err error) {
+	if err != nil {
+		log.Println("(not critical) Log into splunk failed", err)
+	}
+}
+
 func (s Server) createTLSServer(router http.Handler) *http.Server {
 	caCert, err := ioutil.ReadFile(s.TLSCert)
 	if err != nil {
@@ -226,8 +233,10 @@ func (s Server) Initialize() {
 
 	log.Println("Starting HTTP server at", s.Address)
 
-	s.Splunk.Log("Action", "starting service at address "+s.Address)
-	var err error
+	// try to record the action StartService into Splunk
+	err := s.Splunk.Log("Action", "starting service at address "+s.Address)
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
 
 	if s.UseHTTPS {
 		server := s.createTLSServer(router)
