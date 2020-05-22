@@ -246,7 +246,11 @@ func (s Server) Initialize() {
 	}
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
-		s.Splunk.Log("Error", "service can not be started at address "+s.Address)
+		// try to record the Error into Splunk
+		err = s.Splunk.Log("Error", "service can not be started at address "+s.Address)
+		// and check whether the Splunk operation was successful
+		checkSplunkOperation(err)
+		// TODO: name the magic constant 2
 		os.Exit(2)
 	}
 }
