@@ -61,7 +61,7 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	// try to record the action StartService into Splunk
+	// try to record the action DeleteTrigger into Splunk
 	err = s.Splunk.LogAction("DeleteTrigger", "tester", fmt.Sprint(id))
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
@@ -88,7 +88,11 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	s.Splunk.LogAction("ActivateTrigger", "tester", fmt.Sprint(id))
+	// try to record the action ActivateTrigger into Splunk
+	err = s.Splunk.LogAction("ActivateTrigger", "tester", fmt.Sprint(id))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	err = s.Storage.ChangeStateOfTriggerByID(id, 1)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
