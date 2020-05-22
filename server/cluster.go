@@ -62,9 +62,8 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 
 	// try to record the action CreateNewCluster into Splunk
 	err := s.Splunk.LogAction("CreateNewCluster", "tester", clusterName)
-	if err != nil {
-		log.Println("(not critical) Log into splunk failed", err)
-	}
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
 
 	//err := storage.CreateNewCluster(clusterId, clusterName)
 	err = s.Storage.RegisterNewCluster(clusterName)
