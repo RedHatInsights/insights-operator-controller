@@ -126,7 +126,10 @@ func retrieveIDRequestParameter(request *http.Request) (int64, error) {
 
 func (s Server) mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
-	io.WriteString(writer, "Hello world!\n")
+	_, err := io.WriteString(writer, "Hello world!\n")
+	if err != nil {
+		log.Println("Error preparing response", err)
+	}
 	countEndpoint(request, start)
 }
 
