@@ -176,8 +176,12 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 		return
 	}
 
-	s.Splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
-	err := s.Storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
+	// try to record the action RegisterTrigger into Splunk
+	err := s.Splunk.LogTriggerAction("RegisterTrigger", username[0], cluster, triggerType)
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
+	err = s.Storage.NewTrigger(cluster, triggerType, username[0], reason[0], link[0])
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
