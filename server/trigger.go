@@ -61,7 +61,11 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	s.Splunk.LogAction("DeleteTrigger", "tester", fmt.Sprint(id))
+	// try to record the action StartService into Splunk
+	err = s.Splunk.LogAction("DeleteTrigger", "tester", fmt.Sprint(id))
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
 	err = s.Storage.DeleteTriggerByID(id)
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(
