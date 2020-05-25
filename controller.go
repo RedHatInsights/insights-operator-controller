@@ -34,8 +34,8 @@ const ConfigurationEnvVarName = "INSIGHTS_CONTROLLER_CONFIG_FILE"
 type Configuration struct {
 	UseHTTPS             bool
 	Address              string
-	TlsCert              string
-	TlsKey               string
+	TLSCert              string
+	TLSKey               string
 	DbDriver             string
 	StorageSpecification string
 }
@@ -81,8 +81,8 @@ func readConfiguration(envVar string) (Configuration, error) {
 	serviceCfg := viper.Sub("service")
 	cfg.UseHTTPS = serviceCfg.GetBool("use_https")
 	cfg.Address = serviceCfg.GetString("address")
-	cfg.TlsCert = serviceCfg.GetString("tls_cert")
-	cfg.TlsKey = serviceCfg.GetString("tls_key")
+	cfg.TLSCert = serviceCfg.GetString("tls_cert")
+	cfg.TLSKey = serviceCfg.GetString("tls_key")
 
 	// parse all command-line arguments
 	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
@@ -116,8 +116,8 @@ func main() {
 		UseHTTPS: cfg.UseHTTPS,
 		Storage:  storage,
 		Splunk:   splunk,
-		TLSCert:  cfg.TlsCert,
-		TLSKey:   cfg.TlsKey,
+		TLSCert:  cfg.TLSCert,
+		TLSKey:   cfg.TLSKey,
 	}
 
 	s.Initialize()
