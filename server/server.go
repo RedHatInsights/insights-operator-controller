@@ -36,7 +36,7 @@ import (
 	"time"
 )
 
-// Server - configuration of server
+// Server data type represents configuration of server
 type Server struct {
 	Address  string
 	UseHTTPS bool
@@ -54,11 +54,13 @@ var APIPrefix = env.GetEnv("CONTROLLER_PREFIX", "/api/v1/")
 // Environment CONTROLLER_ENV const for specifying production vs test environment
 var Environment = os.Getenv("CONTROLLER_ENV")
 
+// Prometheus metric with counter of REST API requests
 var apiRequests = promauto.NewCounterVec(prometheus.CounterOpts{
 	Name: "api_endpoints_requests",
 	Help: "The total number requests per API endpoint",
 }, []string{"url"})
 
+// Prometheus metric with response times
 var apiResponses = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Name:    "response_time",
 	Help:    "Response time",
@@ -72,6 +74,7 @@ func checkSplunkOperation(err error) {
 	}
 }
 
+// createTLSServer methods creates an instance of HTTPS server using TLS
 func (s Server) createTLSServer(router http.Handler) *http.Server {
 	caCert, err := ioutil.ReadFile(s.TLSCert)
 	if err != nil {
@@ -93,6 +96,7 @@ func (s Server) createTLSServer(router http.Handler) *http.Server {
 	return server
 }
 
+// countEndpoint function measures time to process the request and updates Prometheus metric accordingly
 func countEndpoint(request *http.Request, start time.Time) {
 	url := request.URL.String()
 	duration := time.Since(start)
@@ -120,10 +124,12 @@ func retrievePositiveIntRequestParameter(request *http.Request, paramName string
 	return intValue, nil
 }
 
+// retrieveIDRequestParameter helper function reads value of parameter named "id"
 func retrieveIDRequestParameter(request *http.Request) (int64, error) {
 	return retrievePositiveIntRequestParameter(request, "id")
 }
 
+// mainEndpoint method is handler for the main endpoint of REST API server
 func (s Server) mainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	_, err := io.WriteString(writer, "Hello world!\n")
@@ -133,13 +139,14 @@ func (s Server) mainEndpoint(writer http.ResponseWriter, request *http.Request) 
 	countEndpoint(request, start)
 }
 
+// logRequestHandler is an implementation of middleware for logging request parameters
 func logRequestHandler(writer http.ResponseWriter, request *http.Request, nextHandler http.Handler) {
 	log.Println("Request URI: " + request.RequestURI)
 	log.Println("Request method: " + request.Method)
 	nextHandler.ServeHTTP(writer, request)
 }
 
-// LogRequest - middleware for loging requests
+// LogRequest method represents middleware for loging requests
 func (s Server) LogRequest(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(writer http.ResponseWriter, request *http.Request) {
@@ -147,7 +154,7 @@ func (s Server) LogRequest(nextHandler http.Handler) http.Handler {
 		})
 }
 
-// AddDefaultHeaders - middleware for adding headers that should be in any response
+// AddDefaultHeaders method represents middleware for adding headers that should be in any response
 func (s Server) AddDefaultHeaders(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
