@@ -45,7 +45,7 @@ abcgo: ## Run ABC metrics checker
 	@echo "Run ABC metrics checker"
 	./abcgo.sh
 
-style: fmt vet lint cyclo shellcheck gosec ineffassign abcgo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
+style: fmt vet lint cyclo shellcheck errcheck gosec ineffassign abcgo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
 
 run: clean build ## Build the project and executes the binary
 	./insights-operator-controller 
