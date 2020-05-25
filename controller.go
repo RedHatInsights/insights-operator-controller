@@ -27,6 +27,19 @@ import (
 	"strings"
 )
 
+// ConfigurationEnvVarName contains name of environment variable with configuration file name settiongs
+const ConfigurationEnvVarName = "INSIGHTS_CONTROLLER_CONFIG_FILE"
+
+// Configuration represents service configuration
+type Configuration struct {
+	UseHTTPS             bool
+	Address              string
+	TlsCert              string
+	TlsKey               string
+	DbDriver             string
+	StorageSpecification string
+}
+
 func initializeSplunk() logging.Client {
 	splunkCfg := viper.Sub("splunk")
 	enabled := splunkCfg.GetBool("enabled")
@@ -38,13 +51,8 @@ func initializeSplunk() logging.Client {
 	return logging.NewClient(enabled, address, token, source, sourceType, index)
 }
 
-// Entry point to the Insights operator controller.
-// It performs several tasks:
-// - connect to the storage with basic test if storage is accessible
-// - start the HTTP server with all required endpints
-// - TODO: initialize connection to the logging service
-func main() {
-	configFile, specified := os.LookupEnv("INSIGHTS_CONTROLLER_CONFIG_FILE")
+func readConfigurationFile(envVar string) error {
+	configFile, specified := os.LookupEnv(envVar)
 	if specified {
 		// we need to separate the directory name and filename without extension
 		directory, basename := filepath.Split(configFile)
@@ -59,33 +67,57 @@ func main() {
 	}
 
 	err := viper.ReadInConfig()
+	return err
+}
+
+func readConfiguration(envVar string) (Configuration, error) {
+	cfg := Configuration{}
+
+	err := readConfigurationFile(envVar)
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s", err))
+		return cfg, err
 	}
+
+	serviceCfg := viper.Sub("service")
+	cfg.UseHTTPS = serviceCfg.GetBool("use_https")
+	cfg.Address = serviceCfg.GetString("address")
+	cfg.TlsCert = serviceCfg.GetString("tls_cert")
+	cfg.TlsKey = serviceCfg.GetString("tls_key")
 
 	// parse all command-line arguments
 	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
 	storageSpecification := flag.String("storage", "./controller.db", "storage specification")
 	flag.Parse()
 
-	storage := storage.New(*dbDriver, *storageSpecification)
+	cfg.DbDriver = *dbDriver
+	cfg.StorageSpecification = *storageSpecification
+
+	return cfg, nil
+}
+
+// Entry point to the Insights operator controller.
+// It performs several tasks:
+// - connect to the storage with basic test if storage is accessible
+// - start the HTTP server with all required endpints
+// - TODO: initialize connection to the logging service
+func main() {
+	cfg, err := readConfiguration(ConfigurationEnvVarName)
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file: %s", err))
+	}
+
+	storage := storage.New(cfg.DbDriver, cfg.StorageSpecification)
 	defer storage.Close()
 
 	splunk := initializeSplunk()
 
-	serviceCfg := viper.Sub("service")
-	useHTTPS := serviceCfg.GetBool("use_https")
-	address := serviceCfg.GetString("address")
-	tlsCert := serviceCfg.GetString("tls_cert")
-	tlsKey := serviceCfg.GetString("tls_key")
-
 	s := server.Server{
-		Address:  address,
-		UseHTTPS: useHTTPS,
+		Address:  cfg.Address,
+		UseHTTPS: cfg.UseHTTPS,
 		Storage:  storage,
 		Splunk:   splunk,
-		TLSCert:  tlsCert,
-		TLSKey:   tlsKey,
+		TLSCert:  cfg.TlsCert,
+		TLSKey:   cfg.TlsKey,
 	}
 
 	s.Initialize()
