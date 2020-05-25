@@ -30,6 +30,7 @@ import (
 type contextKey string
 
 const (
+	// ContextKeyUser is a constant for user authentication token in request
 	contextKeyUser = contextKey("user")
 )
 
@@ -48,12 +49,14 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 
 		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
 			responses.SendForbidden(w, "Missing auth token")
+			// everything has been handled already
 			return
 		}
 
 		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
 		if len(splitted) != 2 {
 			responses.SendForbidden(w, "Invalid/Malformed auth token")
+			// everything has been handled already
 			return
 		}
 
@@ -66,11 +69,13 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 
 		if err != nil { //Malformed token, returns with http code 403 as usual
 			responses.SendForbidden(w, "Malformed authentication token")
+			// everything has been handled already
 			return
 		}
 
 		if !token.Valid { //Token is invalid, maybe not signed on this server
 			responses.SendForbidden(w, "Token is not valid.")
+			// everything has been handled already
 			return
 		}
 
