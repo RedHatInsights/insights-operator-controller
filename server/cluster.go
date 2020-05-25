@@ -32,9 +32,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetClusters - read list of all clusters from database and return it to a client.
+// GetClusters method reads list of all clusters from database and return it to a client.
 func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
+	// try to retrieve list of clusters from storage
 	clusters, err := s.Storage.ListOfClusters()
+
+	// check if the operation has been successful
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
 		responses.SendInternalServerError(writer, err.Error())
@@ -43,8 +46,9 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// NewCluster - create a record with new cluster in a database. The updated list of all clusters is returned to client.
+// NewCluster method creates a record with new cluster in a database. The updated list of all clusters is returned to client.
 func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
+	// get the cluster name from request
 	clusterName, foundName := mux.Vars(request)["name"]
 
 	if !foundName {
@@ -72,7 +76,10 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 		responses.SendInternalServerError(writer, err.Error())
 	}
 
+	// try to retrieve list of clusters from storage
 	clusters, err := s.Storage.ListOfClusters()
+
+	// check if the operation has been successful
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
 		responses.SendInternalServerError(writer, err.Error())
@@ -81,10 +88,12 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// GetClusterByID - read cluster specified by its ID and return it to a client.
+// GetClusterByID method reads cluster specified by its ID and return it to a client.
 func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request) {
 	// try to retrieve cluster ID from query
 	id, err := retrieveIDRequestParameter(request)
+
+	// check if the operation has been successful
 	if _, ok := err.(*strconv.NumError); ok {
 		log.Println("Bad cluster ID", err)
 		responses.Send(http.StatusBadRequest, writer, "Bad cluster ID")
@@ -104,7 +113,7 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 	}
 }
 
-// DeleteCluster - delete a cluster
+// DeleteCluster method deletes a cluster
 func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
 	clusterID, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -115,11 +124,13 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 
 	// try to record the action DeleteCluster into Splunk
 	err = s.Splunk.LogAction("DeleteCluster", "tester", fmt.Sprint(clusterID))
-	if err != nil {
-		log.Println("Unable to write log into Splunk", err)
-	}
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
 
+	// delete cluster in database
 	err = s.Storage.DeleteCluster(clusterID)
+
+	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -136,7 +147,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	}
 }
 
-// SearchCluster - search for a cluster specified by its ID or name.
+// SearchCluster method searchs for a cluster specified by its ID or name.
 func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
 	var (
 		req     storage.SearchClusterRequest
@@ -152,6 +163,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	// either cluster id or its name needs to be specified
 	cluster, err = s.ClusterQuery.QueryOne(request.Context(), req)
 
+	// check if the storage operation has been successful
 	if err == storage.ErrNoSuchObj {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 		return
@@ -192,6 +204,7 @@ func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
 	return false
 }
 
+// init function is called during module initialization
 func init() {
 	govalidator.CustomTypeTagMap.Set("oneOfIdOrName", govalidator.CustomTypeValidator(oneOfIDOrNameValidation))
 }
