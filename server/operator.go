@@ -26,8 +26,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ReadConfigurationForOperator - read configuration for the operator.
+// ReadConfigurationForOperator method reads configuration for the operator.
 func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
+	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
@@ -35,7 +36,10 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 		return
 	}
 
+	// try to read cluster active configuration from storage
 	configuration, err := s.Storage.GetClusterActiveConfiguration(cluster)
+
+	// check if the storage operation has been successful
 	if itemNotFoundError, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(
 			http.StatusNotFound,
@@ -51,8 +55,9 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	}
 }
 
-// RegisterCluster - register new cluster.
+// RegisterCluster method registers new cluster.
 func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Request) {
+	// cluster name needs to be specified in request
 	clusterName, foundName := mux.Vars(request)["cluster"]
 
 	// check parameters provided by client
@@ -68,7 +73,10 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 		log.Println("(not critical) Log into splunk failed", err)
 	}
 
+	// register new cluster in the storage
 	err = s.Storage.RegisterNewCluster(clusterName)
+
+	// check if the storage operation has been successful
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
 		responses.SendInternalServerError(writer, err.Error())
@@ -76,15 +84,19 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	responses.SendCreated(writer, responses.BuildOkResponse())
 }
 
-// GetActiveTriggersForCluster - return list of triggers for single cluster
+// GetActiveTriggersForCluster method returns list of triggers for single cluster
 func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) {
+	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
+	// try to read list of active cluster triggers
 	triggers, err := s.Storage.ListActiveClusterTriggers(cluster)
+
+	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -94,21 +106,26 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	}
 }
 
-// AckTriggerForCluster - ack single cluster's trigger
+// AckTriggerForCluster method perform ack for single cluster's trigger
 func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) {
+	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		responses.SendError(writer, "Cluster name needs to be specified")
 		return
 	}
 
+	// trigger ID needs to be specified in request
 	triggerID, err := retrievePositiveIntRequestParameter(request, "trigger")
 	if err != nil {
 		responses.Send(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
+	// try to ack cluster in storage
 	err = s.Storage.AckTrigger(cluster, triggerID)
+
+	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
