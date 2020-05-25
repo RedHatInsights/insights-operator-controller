@@ -13,10 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+RED_BG=$(tput setab 1)
+GREEN_BG=$(tput setab 2)
+BLUE=$(tput setaf 4)
+NC=$(tput sgr0) # No Color
+
+GO_SEC_ARGS=""
+
+if [[ $* != *verbose* ]]; then
+    GO_SEC_ARGS="-quiet"
+fi
 
 cd "$(dirname "$0")" || exit
 
@@ -24,11 +30,11 @@ echo -e "${BLUE}Security issues detection${NC}"
 
 GO111MODULE=off go get github.com/securego/gosec/cmd/gosec 2> /dev/null
 
-if ! gosec ./...
+if ! gosec $GO_SEC_ARGS ./...
 then
-    echo -e "${RED}Potential security issues detected!${NC}"
+    echo -e "${RED_BG}[FAIL]${NC} Potential security issues detected!"
     exit 1
 else
-    echo -e "${GREEN}No potential security issues has been detected${NC}"
+    echo -e "${GREEN_BG}[OK]${NC} No potential security issues has been detected"
     exit 0
 fi
