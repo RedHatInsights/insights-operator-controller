@@ -25,9 +25,12 @@ import (
 	"github.com/RedHatInsights/insights-operator-utils/responses"
 )
 
-// ListConfigurationProfiles - read list of configuration profiles.
+// ListConfigurationProfiles method reads list of configuration profiles.
 func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) {
+	// try to read list of configuration profiles from storage
 	profiles, err := s.Storage.ListConfigurationProfiles()
+
+	// check if the storage operation was successful
 	if err == nil {
 		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
@@ -35,15 +38,19 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 	}
 }
 
-// GetConfigurationProfile - read profile specified by its ID
+// GetConfigurationProfile method reads profile specified by its ID
 func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		responses.SendError(writer, "Error reading profile ID from request\n")
 		return
 	}
 
+	// try to read configuration for profile specified by its ID
 	profile, err := s.Storage.GetConfigurationProfile(int(id))
+
+	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -53,9 +60,12 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 }
 
-// NewConfigurationProfile - create new configuration profile
+// NewConfigurationProfile method creates new configuration profile
 func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	// username needs to be specified in request
 	username, foundUsername := request.URL.Query()["username"]
+
+	// description needs to be specified in request
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
@@ -68,6 +78,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 		return
 	}
 
+	// read configuration from request body
 	configuration, err := ioutil.ReadAll(request.Body)
 
 	if err != nil || len(configuration) == 0 {
@@ -80,7 +91,10 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
+	// try to store configuration profile into storage
 	profiles, err := s.Storage.StoreConfigurationProfile(username[0], description[0], string(configuration))
+
+	// check if the storage operation was successful
 	if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
@@ -88,8 +102,9 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 }
 
-// DeleteConfigurationProfile - delete configuration profile
+// DeleteConfigurationProfile method deletes configuration profile
 func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		responses.SendError(writer, "Error reading profile ID from request\n")
@@ -101,7 +116,10 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
+	// try to delete configuration profile from storage
 	profiles, err := s.Storage.DeleteConfigurationProfile(int(id))
+
+	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
@@ -111,10 +129,15 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	}
 }
 
-// ChangeConfigurationProfile - change configuration profile
+// ChangeConfigurationProfile method changes configuration profile
 func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
+
+	// username needs to be specified in request
 	username, foundUsername := request.URL.Query()["username"]
+
+	// description needs to be specified in request
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
@@ -143,7 +166,10 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
+	// try to change configuration profile configuration in storage
 	profiles, err := s.Storage.ChangeConfigurationProfile(int(id), username[0], description[0], string(configuration))
+
+	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
