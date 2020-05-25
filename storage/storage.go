@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -898,9 +899,13 @@ DELETE FROM trigger WHERE trigger.id = $1`)
 		log.Print(err)
 		return err
 	}
+
+	// non-existent trigger ID has been used
 	if rowsAffected == 0 {
+		// convert ID (numeric value) to string for proper logging
+		IDstr := strconv.Itoa(int(id))
 		return &ItemNotFoundError{
-			ItemID: id,
+			ItemID: IDstr,
 		}
 	}
 
@@ -923,9 +928,13 @@ UPDATE trigger SET active = $1 WHERE trigger.id = $2`)
 		log.Print(err)
 		return err
 	}
+
+	// non-existent trigger ID has been used
 	if rowsAffected == 0 {
+		// convert ID (numeric value) to string for proper logging
+		IDstr := strconv.Itoa(int(id))
 		return &ItemNotFoundError{
-			ItemID: id,
+			ItemID: IDstr,
 		}
 	}
 
