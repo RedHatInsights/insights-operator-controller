@@ -30,18 +30,22 @@ ineffassign: ## Run ineffassign checker
 	@echo "Running ineffassign checker"
 	./ineffassign.sh
 
-goerrcheck: ## Run error checks linter
-	@echo "Running error checks linter"
-	./goerrcheck.sh
-
 shellcheck: ## Run shellcheck
 	shellcheck *.sh
+
+errcheck: ## Run errcheck
+	@echo "Running errcheck"
+	./goerrcheck.sh
+
+gosec: ## Run gosec checker
+	@echo "Running gosec checker"
+	./gosec.sh
 
 abcgo: ## Run ABC metrics checker
 	@echo "Run ABC metrics checker"
 	./abcgo.sh
 
-style: fmt vet lint cyclo ineffassign shellcheck abcgo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
+style: fmt vet lint cyclo shellcheck gosec ineffassign abcgo ## Run all the formatting related commands (fmt, vet, lint, cyclo)
 
 run: clean build ## Build the project and executes the binary
 	./insights-operator-controller 
