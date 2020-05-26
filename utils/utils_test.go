@@ -60,8 +60,8 @@ func TestZeroValueForIntegerNumber(t *testing.T) {
 		t.Fatal("0 should be treated as zero value")
 	}
 
-	r2 := utils.ZeroValue(uint64(42))
-	if r2 {
+	r4 := utils.ZeroValue(uint64(42))
+	if r4 {
 		t.Fatal("non-zero number should be treated as non-zero value")
 	}
 }
@@ -97,7 +97,7 @@ func TestZeroValueForComplexNumber(t *testing.T) {
 	}
 
 	r4 := utils.ZeroValue(complex(0.1, 0.1))
-	if r3 {
+	if r4 {
 		t.Fatal("non-zero complex number should be treated as non-zero value")
 	}
 }
