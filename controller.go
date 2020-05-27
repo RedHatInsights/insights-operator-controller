@@ -18,13 +18,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/RedHatInsights/insights-operator-controller/logging"
-	"github.com/RedHatInsights/insights-operator-controller/server"
-	"github.com/RedHatInsights/insights-operator-controller/storage"
-	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/viper"
+
+	"github.com/RedHatInsights/insights-operator-controller/logging"
+	"github.com/RedHatInsights/insights-operator-controller/server"
+	"github.com/RedHatInsights/insights-operator-controller/storage"
 )
 
 // ConfigurationEnvVarName contains name of environment variable with configuration file name settiongs
@@ -38,17 +40,21 @@ type Configuration struct {
 	TLSKey               string
 	DbDriver             string
 	StorageSpecification string
+	SplunkEnabled        bool
+	SplunkAddress        string
+	SplunkToken          string
+	SplunkSource         string
+	SplunkSourceType     string
+	SplunkIndex          string
 }
 
-func initializeSplunk() logging.Client {
-	splunkCfg := viper.Sub("splunk")
-	enabled := splunkCfg.GetBool("enabled")
-	address := splunkCfg.GetString("address")
-	token := splunkCfg.GetString("token")
-	source := splunkCfg.GetString("source")
-	sourceType := splunkCfg.GetString("source_type")
-	index := splunkCfg.GetString("index")
-	return logging.NewClient(enabled, address, token, source, sourceType, index)
+func initializeSplunk(cfg *Configuration) logging.Client {
+	return logging.NewClient(cfg.SplunkEnabled,
+		cfg.SplunkAddress,
+		cfg.SplunkToken,
+		cfg.SplunkSource,
+		cfg.SplunkSourceType,
+		cfg.SplunkIndex)
 }
 
 func readConfigurationFile(envVar string) error {
@@ -84,6 +90,14 @@ func readConfiguration(envVar string) (Configuration, error) {
 	cfg.TLSCert = serviceCfg.GetString("tls_cert")
 	cfg.TLSKey = serviceCfg.GetString("tls_key")
 
+	splunkCfg := viper.Sub("splunk")
+	cfg.SplunkEnabled = splunkCfg.GetBool("enabled")
+	cfg.SplunkAddress = splunkCfg.GetString("address")
+	cfg.SplunkToken = splunkCfg.GetString("token")
+	cfg.SplunkSource = splunkCfg.GetString("source")
+	cfg.SplunkSourceType = splunkCfg.GetString("source_type")
+	cfg.SplunkIndex = splunkCfg.GetString("index")
+
 	// parse all command-line arguments
 	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
 	storageSpecification := flag.String("storage", "./controller.db", "storage specification")
@@ -109,7 +123,7 @@ func main() {
 	storage := storage.New(cfg.DbDriver, cfg.StorageSpecification)
 	defer storage.Close()
 
-	splunk := initializeSplunk()
+	splunk := initializeSplunk(&cfg)
 
 	s := server.Server{
 		Address:  cfg.Address,
