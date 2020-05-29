@@ -189,7 +189,14 @@ func (storage Storage) ListOfClusters() ([]Cluster, error) {
 	if err != nil {
 		return clusters, err
 	}
-	defer rows.Close()
+
+	// close the query at function exit
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	for rows.Next() {
 		var id int
