@@ -46,7 +46,17 @@ func enableForeignKeys(connections *sql.DB) {
 	if err != nil {
 		log.Fatal("Can prepare statement set PRAGMA for sqlite", err)
 	}
-	defer statement.Close()
+
+	// statement has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := statement.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
 	_, err = statement.Exec()
 	if err != nil {
 		log.Fatal("Can not set PRAGMA for sqlite", err)
