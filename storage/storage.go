@@ -282,6 +282,27 @@ func (storage Storage) DeleteCluster(id int64) error {
 	return nil
 }
 
+// DeleteClusterByName deletes cluster with specified name from the database.
+func (storage Storage) DeleteClusterByName(name string) error {
+	statement, err := storage.connections.Prepare("DELETE FROM cluster WHERE name = $1")
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	defer statement.Close()
+
+	rowsAffected, err := execStatementAndGetRowsAffected(statement, name)
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return &ItemNotFoundError{
+			ItemID: name,
+		}
+	}
+	return nil
+}
+
 // GetClusterByName selects a cluster specified by its name. Also see GetCluster.
 func (storage Storage) GetClusterByName(name string) (Cluster, error) {
 	var cluster Cluster
