@@ -147,6 +147,41 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	}
 }
 
+// DeleteClusterByName method deletes a cluster
+func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Request) {
+	// get the cluster name from request
+	clusterName, foundName := mux.Vars(request)["name"]
+	if !foundName {
+		log.Println("Cluster name is not provided")
+		responses.Send(http.StatusBadRequest, writer, "Cluster name needs to be specified")
+		return
+	}
+
+	// try to record the action DeleteCluster into Splunk
+	err := s.Splunk.LogAction("DeleteCluster", "tester", clusterName)
+	// and check whether the Splunk operation was successful
+	checkSplunkOperation(err)
+
+	// delete cluster in database
+	err = s.Storage.DeleteClusterByName(clusterName)
+
+	// check if the storage operation has been successful
+	if _, ok := err.(*storage.ItemNotFoundError); ok {
+		responses.Send(http.StatusNotFound, writer, err.Error())
+	} else if err != nil {
+		log.Println("Cannot delete cluster", err)
+		responses.SendInternalServerError(writer, err.Error())
+	} else {
+		clusters, err := s.Storage.ListOfClusters()
+		if err != nil {
+			log.Println("Unable to get list of clusters", err)
+			responses.SendInternalServerError(writer, err.Error())
+		} else {
+			responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		}
+	}
+}
+
 // SearchCluster method searchs for a cluster specified by its ID or name.
 func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
 	var (
