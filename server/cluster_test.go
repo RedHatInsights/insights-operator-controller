@@ -32,6 +32,7 @@ func TestNonErrorsClusterWithoutData(t *testing.T) {
 		{"SearchCluster Not found", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"id": "1"}, ""},
 		{"SearchCluster Not found", serv.SearchCluster, http.StatusNotFound, "GET", true, requestData{}, requestData{"name": "test"}, ""},
 		{"DeleteCluster Not found", serv.DeleteCluster, http.StatusNotFound, "DELETE", false, requestData{"id": "2"}, requestData{}, ""},
+		{"DeleteCluster Not found", serv.DeleteClusterByName, http.StatusNotFound, "DELETE", false, requestData{"name": "foobar"}, requestData{}, ""},
 		{"NewCluster OK", serv.NewCluster, http.StatusCreated, "POST", false, requestData{"name": "test"}, requestData{}, ""},
 	}
 
@@ -51,6 +52,7 @@ func TestNonErrorsClusterWithData(t *testing.T) {
 		{"GetClusterByID OK", serv.GetClusterByID, http.StatusOK, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"SearchCluster OK", serv.SearchCluster, http.StatusOK, "GET", true, requestData{}, requestData{"name": "test"}, ""},
 		{"DeleteCluster OK", serv.DeleteCluster, http.StatusOK, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteCluster OK", serv.DeleteClusterByName, http.StatusNotFound, "DELETE", false, requestData{"name": "foobar"}, requestData{}, ""},
 	}
 
 	for _, tt := range nonErrorTT {
@@ -67,6 +69,7 @@ func TestDatabaseErrorCluster(t *testing.T) {
 		{"NewCluster DB error", serv.NewCluster, http.StatusInternalServerError, "POST", false, requestData{"name": "test"}, requestData{}, ""},
 		{"GetClusterByID DB error", serv.GetClusterByID, http.StatusInternalServerError, "GET", true, requestData{"id": "1"}, requestData{}, ""},
 		{"DeleteCluster DB error", serv.DeleteCluster, http.StatusInternalServerError, "DELETE", false, requestData{"id": "1"}, requestData{}, ""},
+		{"DeleteCluster DB error", serv.DeleteClusterByName, http.StatusNotFound, "DELETE", false, requestData{"name": "foobar"}, requestData{}, ""},
 		{"SearchCluster DB error", serv.SearchCluster, http.StatusInternalServerError, "GET", true, requestData{}, requestData{"name": "test"}, ""},
 	}
 
@@ -90,6 +93,7 @@ func TestParameterErrorsCluster(t *testing.T) {
 		{"GetClusterByID non-int id", serv.GetClusterByID, http.StatusBadRequest, "GET", true, requestData{"id": "non-int"}, requestData{}, ""},
 		{"DeleteCluster no param", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{}, requestData{}, ""},
 		{"DeleteCluster by name", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"name": "test"}, requestData{}, ""},
+		{"DeleteCluster by name", serv.DeleteClusterByName, http.StatusBadRequest, "DELETE", false, requestData{"foo": "test"}, requestData{}, ""},
 		{"DeleteCluster by non-int id", serv.DeleteCluster, http.StatusBadRequest, "DELETE", false, requestData{"id": "non-int"}, requestData{}, ""},
 		{"SearchCluster no params", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{}, requestData{}, ""},
 		{"SearchCluster wrong data type", serv.SearchCluster, http.StatusBadRequest, "GET", true, requestData{"name": ""}, requestData{}, ""},
