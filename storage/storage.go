@@ -1253,6 +1253,21 @@ func (storage Storage) Map(cols []Column, mapper func(Column, interface{}) (inte
 	return mappedCols, nil
 }
 
+// Ping checks whether the database connection is really configured properly
+func (storage Storage) Ping() error {
+	rows, err := storage.connections.Query("SELECT id, name FROM cluster LIMIT 1")
+	if err != nil {
+		return err
+	}
+
+	err = rows.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ErrNoSuchObj is indicating no result returned from db
 var ErrNoSuchObj = fmt.Errorf("no such object")
 

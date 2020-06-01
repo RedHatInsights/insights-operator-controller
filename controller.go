@@ -120,19 +120,25 @@ func main() {
 		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
-	storage, err := storage.New(cfg.DbDriver, cfg.StorageSpecification)
+	// try to initialize the storage
+	storageInstance, err := storage.New(cfg.DbDriver, cfg.StorageSpecification)
 	if err != nil {
 		panic(err)
 	}
+	defer storageInstance.Close()
 
-	defer storage.Close()
+	// try to check if storage is really configured properly
+	err = storageInstance.Ping()
+	if err != nil {
+		panic(err)
+	}
 
 	splunk := initializeSplunk(&cfg)
 
 	s := server.Server{
 		Address:  cfg.Address,
 		UseHTTPS: cfg.UseHTTPS,
-		Storage:  storage,
+		Storage:  storageInstance,
 		Splunk:   splunk,
 		TLSCert:  cfg.TLSCert,
 		TLSKey:   cfg.TLSKey,
