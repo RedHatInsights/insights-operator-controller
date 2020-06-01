@@ -45,7 +45,7 @@ type dataConfiguration struct {
 // in your test to have meaningful and coherent tests
 func NewDataGenerator(dbDriver string, storageSpecification string) DataGenerator {
 	var returnMe DataGenerator
-	returnMe.storage = storage.New(dbDriver, storageSpecification)
+	returnMe.storage, _ = storage.New(dbDriver, storageSpecification)
 
 	viper.SetConfigName("testconfig")
 

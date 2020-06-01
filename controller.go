@@ -120,7 +120,11 @@ func main() {
 		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
-	storage := storage.New(cfg.DbDriver, cfg.StorageSpecification)
+	storage, err := storage.New(cfg.DbDriver, cfg.StorageSpecification)
+	if err != nil {
+		panic(err)
+	}
+
 	defer storage.Close()
 
 	splunk := initializeSplunk(&cfg)

@@ -64,12 +64,13 @@ func enableForeignKeys(connections *sql.DB) {
 }
 
 // New function creates and initializes a new instance of Storage structure
-func New(driverName string, dataSourceName string) Storage {
+func New(driverName string, dataSourceName string) (Storage, error) {
 	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
 
 	if err != nil {
-		log.Fatal("Can not connect to data storage", err)
+		log.Println("Can not connect to data storage", err)
+		return Storage{}, err
 	}
 	s := Storage{connections: connections, driver: driverName}
 
@@ -80,7 +81,7 @@ func New(driverName string, dataSourceName string) Storage {
 	case "postgres":
 		s.placeholder = sq.Dollar
 	}
-	return s
+	return s, nil
 }
 
 // Placeholder returns current query argument placeholder
