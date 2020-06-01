@@ -83,3 +83,376 @@ func TestNewStorageNoError(t *testing.T) {
 		t.Fatal("Error is not expected", err)
 	}
 }
+
+// TestDBStorageListOfClustersSchemalessDB check the behaviour of method ListOfClusters on DB without schema
+func TestDBStorageListOfClustersSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListOfClusters()
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetClusterSchemalessDB check the behaviour of method GetCluster on DB without schema
+func TestDBStorageGetClusterSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetCluster(0)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageRegisterNewClusterSchemalessDB check the behaviour of method RegisterNewCluster on DB without schema
+func TestDBStorageRegisterNewClusterSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster("foobar")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageCreateNewClusterSchemalessDB check the behaviour of method CreateNewCluster on DB without schema
+func TestDBStorageCreateNewClusterSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.CreateNewCluster(0, "foobar")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDeleteClusterSchemalessDB check the behaviour of method DeleteCluster on DB without schema
+func TestDBStorageDeleteClusterSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.DeleteCluster(0)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDeleteClusterByNameSchemalessDB check the behaviour of method DeleteClusterByName on DB without schema
+func TestDBStorageDeleteClusterByNameSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.DeleteClusterByName("foobar")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetClusterByNameSchemalessDB check the behaviour of method GetClusterByName on DB without schema
+func TestDBStorageGetClusterByNameSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetClusterByName("foobar")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListConfigurationProfiles check the behaviour of method ListOfConfigurationProfiles on DB without schema
+func TestDBStorageListConfigurationProfilesSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListConfigurationProfiles()
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetConfigurationProfileSchemalessDB check the behaviour of method GetConfigurationProfile on DB without schema
+func TestDBStorageGetConfigurationProfileSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetConfigurationProfile(0)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageStoreConfigurationProfileSchemalessDB check the behaviour of method StoreConfigurationProfile on DB without schema
+func TestDBStorageStoreConfigurationProfileSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.StoreConfigurationProfile("username0", "description0", "configuration0")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageChangeConfigurationProfileSchemalessDB check the behaviour of method ChangeConfigurationProfile on DB without schema
+func TestDBStorageChangeConfigurationProfileSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ChangeConfigurationProfile(42, "username0", "description0", "configuration0")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDeleteConfigurationProfileSchemalessDB check the behaviour of method DeleteConfigurationProfile on DB without schema
+func TestDBStorageDeleteConfigurationProfileSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.DeleteConfigurationProfile(42)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListAllClusterConfigurationsSchemalessDB check the behaviour of method ListAllClusterConfigurations on DB without schema
+func TestDBStorageListAllClusterConfigurationsSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListAllClusterConfigurations()
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListClusterConfigurationSchemalessDB check the behaviour of method ListClusterConfiguration on DB without schema
+func TestDBStorageListClusterConfigurationSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListClusterConfiguration("000ffff")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetClusterConfigurationByIDSchemalessDB check the behaviour of method GetClusterConfigurationByID on DB without schema
+func TestDBStorageGetClusterConfigurationByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetClusterConfigurationByID(0x0001111)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetClusterActiveConfigurationSchemalessDB check the behaviour of method GetClusterActiveConfiguration on DB without schema
+func TestDBStorageGetClusterActiveConfigurationSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetClusterActiveConfiguration("0x0002222")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetConfigurationIDForClusterSchemalessDB check the behaviour of method GetConfigurationIDForCluster on DB without schema
+func TestDBStorageGetConfigurationIDForClusterSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetConfigurationIDForCluster("0x0002222")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageCreateClusterConfigurationSchemalessDB check the behaviour of method CreateClusterConfiguration on DB without schema
+func TestDBStorageCreateClusterConfigurationSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.CreateClusterConfiguration("cluster1", "user1", "reason1", "description1", "configuration1")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageEnableClusterConfigurationSchemalessDB check the behaviour of method EnableClusterConfiguration on DB without schema
+func TestDBStorageEnableClusterConfigurationSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.EnableClusterConfiguration("cluster1", "user1", "reason1")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDisableClusterConfigurationSchemalessDB check the behaviour of method DisableClusterConfiguration on DB without schema
+func TestDBStorageDisableClusterConfigurationSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.DisableClusterConfiguration("cluster1", "user1", "reason1")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageEnableOrDisableClusterConfigurationByIDSchemalessDB check the behaviour of method EnableOrDisableClusterConfiguration on DB without schema
+func TestDBStorageEnableOrDisableClusterConfigurationByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.EnableOrDisableClusterConfigurationByID(1, "1")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+
+	err = mockStorage.EnableOrDisableClusterConfigurationByID(2, "0")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDeleteClusterConfigurationByIDSchemalessDB check the behaviour of method DeleteClusterConfiguration on DB without schema
+func TestDBStorageDeleteClusterConfigurationByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.DeleteClusterConfigurationByID(1)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetTriggerByIDSchemalessDB check the behaviour of method GetTriggerByID on DB without schema
+func TestDBStorageGetTriggerByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetTriggerByID(1)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageDeleteTriggerByIDSchemalessDB check the behaviour of method DeleteTriggerByID on DB without schema
+func TestDBStorageDeleteTriggerByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.DeleteTriggerByID(1)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageChangeOfStateTriggerByIDSchemalessDB check the behaviour of method ChangeStateTrigger on DB without schema
+func TestDBStorageChangeStateOfTriggerByIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.ChangeStateOfTriggerByID(1, 0)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+
+	err = mockStorage.ChangeStateOfTriggerByID(1, 1)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListAllTriggersSchemalessDB check the behaviour of method ListAllTriggers on DB without schema
+func TestDBStorageListAllTriggersSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListAllTriggers()
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListClusterTriggersSchemalessDB check the behaviour of method ListClusterTriggers on DB without schema
+func TestDBStorageListClusterTriggersSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListClusterTriggers("clusterX")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageListActiveClusterTriggersSchemalessDB check the behaviour of method ListActiveClusterTriggers on DB without schema
+func TestDBStorageListActiveClusterTriggersSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.ListActiveClusterTriggers("clusterX")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageGetTriggerIDSchemalessDB check the behaviour of method GetTriggerID on DB without schema
+func TestDBStorageGetTriggerIDSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.GetTriggerID("trigger1")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageNewTriggerSchemalessDB check the behaviour of method NewTrigger on DB without schema
+func TestDBStorageNewTriggerSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.NewTrigger("clusterY", "triggerType1", "user3", "reason3", "link3")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageNewTriggerTypeSchemalessDB check the behaviour of method NewTriggerType on DB without schema
+func TestDBStorageNewTriggerTypeSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.NewTriggerType("trigger-type-X", "description-of-new-trigger-type")
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStorageAckTriggerSchemalessDB check the behaviour of method AckTrigger on DB without schema
+func TestDBStorageAckTriggerSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.AckTrigger("cluster-to-ack", 42)
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
+
+// TestDBStoragePingSchemalessDB check the behaviour of method Ping on DB without schema
+func TestDBStoragePingSchemalessDB(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.Ping()
+	if err == nil {
+		emtpyDatabaseError(t)
+	}
+}
