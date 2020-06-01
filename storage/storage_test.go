@@ -1053,3 +1053,246 @@ func TestDBStorageConfigurationProfiles4(t *testing.T) {
 		unexpectedDatabaseError(t, err)
 	}
 }
+
+// TestDBClusterConfiguration1
+func TestDBClusterConfiguration1(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBClusterConfiguration2
+func TestDBClusterConfiguration2(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.EnableOrDisableClusterConfigurationByID(1, "0")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBClusterConfiguration3
+func TestDBClusterConfiguration3(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.EnableClusterConfiguration(clusterName, "user1", "reason1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBClusterConfiguration4
+func TestDBClusterConfiguration4(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.DisableClusterConfiguration(clusterName, "user2", "reason2")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBClusterConfiguration5
+func TestDBClusterConfiguration5(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.GetClusterConfigurationByID(1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBClusterConfiguration6
+func TestDBClusterConfiguration6(t *testing.T) {
+	const clusterName = "cluster2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.CreateClusterConfiguration(clusterName, "user1", "reason1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.GetClusterActiveConfiguration(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageTrigger1
+func TestDBStorageTrigger1(t *testing.T) {
+	const clusterName = "cluster3"
+	const triggerType = "trigger-type-Y"
+
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTriggerType(triggerType, "description-of-new-trigger-type")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTrigger(clusterName, triggerType, "user3", "reason3", "link3")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageTrigger2
+func TestDBStorageTrigger2(t *testing.T) {
+	const clusterName = "cluster3"
+	const triggerType = "trigger-type-Y"
+
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTriggerType(triggerType, "description-of-new-trigger-type")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTrigger(clusterName, triggerType, "user3", "reason3", "link3")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.ListClusterTriggers(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageTrigger3
+func TestDBStorageTrigger3(t *testing.T) {
+	const clusterName = "cluster3"
+	const triggerType = "trigger-type-Y"
+
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTriggerType(triggerType, "description-of-new-trigger-type")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTrigger(clusterName, triggerType, "user3", "reason3", "link3")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.ListActiveClusterTriggers(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageTrigger4
+func TestDBStorageTrigger4(t *testing.T) {
+	const clusterName = "cluster3"
+	const triggerType = "trigger-type-Y"
+
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTriggerType(triggerType, "description-of-new-trigger-type")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.NewTrigger(clusterName, triggerType, "user3", "reason3", "link3")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.AckTrigger(clusterName, 1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.ChangeStateOfTriggerByID(1, 0)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
