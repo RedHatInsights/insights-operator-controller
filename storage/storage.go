@@ -84,6 +84,14 @@ func New(driverName string, dataSourceName string) (Storage, error) {
 	return s, nil
 }
 
+// NewFromConnection function creates and initializes a new instance of Storage interface from prepared connection
+func NewFromConnection(connection *sql.DB, driverName string) Storage {
+	return Storage{
+		connections: connection,
+		driver:      driverName,
+	}
+}
+
 // Placeholder returns current query argument placeholder
 // (?, or $).It depends on driver used. In squirrel format
 func (storage Storage) Placeholder() sq.PlaceholderFormat {
