@@ -170,7 +170,7 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		log.Println("Cannot delete cluster", err)
-		responses.SendInternalServerError(writer, err.Error())
+		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else {
 		clusters, err := s.Storage.ListOfClusters()
 		if err != nil {
