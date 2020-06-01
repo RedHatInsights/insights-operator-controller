@@ -61,7 +61,7 @@ func TestMainEndpoint(t *testing.T) {
 	defer serv.Storage.Close()
 
 	nonErrorTT := []testCase{
-		{"Main endpoint", serv.MainEndpoint, http.StatusOK, "GET", true, requestData{}, requestData{}, ""},
+		{"Main endpoint", serv.MainEndpoint, http.StatusOK, "GET", false, requestData{}, requestData{}, ""},
 	}
 
 	for _, tt := range nonErrorTT {

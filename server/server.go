@@ -129,7 +129,7 @@ func retrieveIDRequestParameter(request *http.Request) (int64, error) {
 	return retrievePositiveIntRequestParameter(request, "id")
 }
 
-// mainEndpoint method is handler for the main endpoint of REST API server
+// MainEndpoint method is handler for the main endpoint of REST API server
 func (s Server) MainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	_, err := io.WriteString(writer, "Hello world!\n")
