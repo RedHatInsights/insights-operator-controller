@@ -1296,3 +1296,24 @@ func TestDBStorageTrigger4(t *testing.T) {
 		unexpectedDatabaseError(t, err)
 	}
 }
+
+func TestDBPlaceholder(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	p := mockStorage.Placeholder()
+	if p == nil {
+		t.Fatal("Placeholder should not be empty")
+	}
+
+}
+
+func TestDBConnections(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	c := mockStorage.Connections()
+	if c == nil {
+		t.Fatal("Connections should not be empty")
+	}
+}
