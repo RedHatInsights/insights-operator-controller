@@ -1298,10 +1298,13 @@ func TestDBStorageTrigger4(t *testing.T) {
 }
 
 func TestDBPlaceholder(t *testing.T) {
-	mockStorage, closer := MustGetMockStorage(t, true)
-	defer closer()
+	s, err := storage.New("sqlite3", ":memory:")
+	if err != nil {
+		t.Fatal("DB init error")
+	}
+	defer s.Close()
 
-	p := mockStorage.Placeholder()
+	p := s.Placeholder()
 	if p == nil {
 		t.Fatal("Placeholder should not be empty")
 	}
