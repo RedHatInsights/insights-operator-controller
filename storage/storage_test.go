@@ -915,3 +915,73 @@ func TestDBStoragePingEmptyDB(t *testing.T) {
 		unexpectedDatabaseError(t, err)
 	}
 }
+
+// TestDBStorageClusterOperation1 check the DB operations with clusers
+func TestDBStorageClusterOperation1(t *testing.T) {
+	const clusterName = "cluster_to_test_1"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.ListOfClusters()
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.GetCluster(1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.DeleteCluster(1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageClusterOperation2 check the DB operations with clusers
+func TestDBStorageClusterOperation2(t *testing.T) {
+	const clusterName = "cluster_to_test_2"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.GetClusterByName(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	err = mockStorage.DeleteClusterByName(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageClusterOperation3 check the DB operations with clusers
+func TestDBStorageClusterOperation3(t *testing.T) {
+	const clusterName = "cluster_to_test_3"
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	err := mockStorage.RegisterNewCluster(clusterName)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	clusters, err := mockStorage.ListOfClusters()
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	if len(clusters) != 1 {
+		t.Fatal("Unexpected # of clusters:", len(clusters))
+	}
+}
