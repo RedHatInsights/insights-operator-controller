@@ -136,7 +136,10 @@ func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
 	rmsqlite := exec.Command("rm", "-f", sqliteDB)
 	rmsqlite.Run()
 
-	db := storage.New(dbDriver, storageSpecification)
+	db, err := storage.New(dbDriver, storageSpecification)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	runSQLiteScript(t, "../local_storage/schema_sqlite.sql")
 
