@@ -65,3 +65,21 @@ func mustGetSqliteStorage(tb testing.TB, datasource string, init bool) storage.S
 
 	return sqliteStorage
 }
+
+func emtpyDatabaseError(t *testing.T) {
+	t.Fatal("Error should be reported on empty database")
+}
+
+// TestNewStorage checks whether constructor for new storage returns error for improper storage configuration
+func TestNewStorageError(t *testing.T) {
+	_, err := storage.New("non existing driver", "data source")
+	assert.EqualError(t, err, "sql: unknown driver \"non existing driver\" (forgotten import?)")
+}
+
+// TestNewStorage checks whether constructor for new storage does not return error for proper storage configuration
+func TestNewStorageNoError(t *testing.T) {
+	_, err := storage.New("sqlite3", dataSource)
+	if err != nil {
+		t.Fatal("Error is not expected", err)
+	}
+}
