@@ -985,3 +985,71 @@ func TestDBStorageClusterOperation3(t *testing.T) {
 		t.Fatal("Unexpected # of clusters:", len(clusters))
 	}
 }
+
+// TestDBStorageConfigurationProfiles1
+func TestDBStorageConfigurationProfiles1(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.StoreConfigurationProfile("username1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.GetConfigurationProfile(1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageConfigurationProfiles2
+func TestDBStorageConfigurationProfiles2(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.StoreConfigurationProfile("username1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	profiles, err := mockStorage.ListConfigurationProfiles()
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	if len(profiles) != 1 {
+		t.Fatal("Incorrect number of configuration profiles", len(profiles))
+	}
+}
+
+// TestDBStorageConfigurationProfiles3
+func TestDBStorageConfigurationProfiles3(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.StoreConfigurationProfile("username1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.ChangeConfigurationProfile(1, "username1", "description12", "configuration12")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
+
+// TestDBStorageConfigurationProfiles4
+func TestDBStorageConfigurationProfiles4(t *testing.T) {
+	mockStorage, closer := MustGetMockStorage(t, true)
+	defer closer()
+
+	_, err := mockStorage.StoreConfigurationProfile("username1", "description1", "configuration1")
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+
+	_, err = mockStorage.DeleteConfigurationProfile(1)
+	if err != nil {
+		unexpectedDatabaseError(t, err)
+	}
+}
