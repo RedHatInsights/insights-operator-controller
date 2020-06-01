@@ -20,6 +20,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/RedHatInsights/insights-operator-controller/logging"
+	"github.com/RedHatInsights/insights-operator-controller/server"
+	"github.com/RedHatInsights/insights-operator-controller/storage"
+
+	"github.com/RedHatInsights/insights-operator-controller/tests/helpers"
 )
 
 // TestAddDefaultHeaders tests middleware adding headers
@@ -67,4 +74,28 @@ func TestMainEndpoint(t *testing.T) {
 	for _, tt := range nonErrorTT {
 		testRequest(t, tt)
 	}
+}
+
+// TestServerInitialize check the initialization method
+func TestServerInitialize(t *testing.T) {
+	helpers.RunTestWithTimeout(t, func(t *testing.T) {
+		splunk := logging.NewClient(false, "", "", "", "", "")
+
+		storageInstance, err := storage.New("sqlite3", ":memory:")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer storageInstance.Close()
+
+		serv := server.Server{
+			Address:  "localhost:9999",
+			UseHTTPS: false,
+			Storage:  storageInstance,
+			Splunk:   splunk,
+			TLSCert:  "",
+			TLSKey:   "",
+		}
+
+		serv.Initialize()
+	}, 5*time.Second, false)
 }
