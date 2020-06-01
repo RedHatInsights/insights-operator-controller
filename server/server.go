@@ -129,8 +129,8 @@ func retrieveIDRequestParameter(request *http.Request) (int64, error) {
 	return retrievePositiveIntRequestParameter(request, "id")
 }
 
-// mainEndpoint method is handler for the main endpoint of REST API server
-func (s Server) mainEndpoint(writer http.ResponseWriter, request *http.Request) {
+// MainEndpoint method is handler for the main endpoint of REST API server
+func (s Server) MainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	_, err := io.WriteString(writer, "Hello world!\n")
 	if err != nil {
@@ -185,7 +185,7 @@ func (s Server) Initialize() {
 	router.Use(s.AddDefaultHeaders)
 
 	// common REST API endpoints
-	router.HandleFunc(APIPrefix, s.mainEndpoint).Methods("GET")
+	router.HandleFunc(APIPrefix, s.MainEndpoint).Methods("GET")
 
 	// REST API endpoints used by client
 	clientRouter := router.PathPrefix(APIPrefix + "client").Subrouter()

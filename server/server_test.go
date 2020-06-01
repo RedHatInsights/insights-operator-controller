@@ -54,3 +54,17 @@ func TestAddDefaultHeaders(t *testing.T) {
 	handl := serv.LogRequest(serv.AddDefaultHeaders(handler))
 	handl.ServeHTTP(rr, req)
 }
+
+// TestMainEndpoint tests OK behaviour with empty DB (schema only)
+func TestMainEndpoint(t *testing.T) {
+	serv := MockedIOCServer(t, false)
+	defer serv.Storage.Close()
+
+	nonErrorTT := []testCase{
+		{"Main endpoint", serv.MainEndpoint, http.StatusOK, "GET", false, requestData{}, requestData{}, ""},
+	}
+
+	for _, tt := range nonErrorTT {
+		testRequest(t, tt)
+	}
+}
