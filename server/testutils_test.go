@@ -89,7 +89,13 @@ func runSQLiteScript(t *testing.T, path string) {
 	if err != nil {
 		t.Fatalf("Unable to open %v", path)
 	}
-	defer script.Close()
+
+	defer func() {
+		err := script.Close()
+		if err != nil {
+			t.Fatalf("Unable to open %v", path)
+		}
+	}()
 
 	// sqlite3 test.db
 	cmd := exec.Command(dbDriver, sqliteDB)
