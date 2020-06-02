@@ -166,6 +166,14 @@ func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCo
 
 	result := rr.Result()
 	body, _ := ioutil.ReadAll(result.Body)
-	defer result.Body.Close()
+
+	// body needs to be properly closed
+	defer func() {
+		err := result.Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
 	t.Log(string(body))
 }
