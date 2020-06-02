@@ -98,13 +98,24 @@ func readConfiguration(envVar string) (Configuration, error) {
 	cfg.SplunkSourceType = splunkCfg.GetString("source_type")
 	cfg.SplunkIndex = splunkCfg.GetString("index")
 
+	storageCfg := viper.Sub("storage")
+	cfg.DbDriver = storageCfg.GetString("driver")
+	cfg.StorageSpecification = splunkCfg.GetString("source")
+
 	// parse all command-line arguments
 	dbDriver := flag.String("dbdriver", "sqlite3", "database driver specification")
 	storageSpecification := flag.String("storage", "./controller.db", "storage specification")
 	flag.Parse()
 
-	cfg.DbDriver = *dbDriver
-	cfg.StorageSpecification = *storageSpecification
+	// override configuration by CLI parameter
+	if dbDriver != nil {
+		cfg.DbDriver = *dbDriver
+	}
+
+	// override configuration by CLI parameter
+	if storageSpecification != nil {
+		cfg.StorageSpecification = *storageSpecification
+	}
 
 	return cfg, nil
 }
