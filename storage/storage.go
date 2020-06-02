@@ -989,7 +989,15 @@ DELETE FROM trigger WHERE trigger.id = $1`)
 		return err
 	}
 
-	defer statement.Close()
+	// statement has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := statement.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
 	if err != nil {
