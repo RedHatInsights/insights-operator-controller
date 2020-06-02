@@ -134,7 +134,11 @@ func MockedSQLite(t *testing.T, mockData bool) storage.Storage {
 	storageSpecification := sqliteDB
 
 	rmsqlite := exec.Command("rm", "-f", sqliteDB)
-	rmsqlite.Run()
+
+	err := rmsqlite.Run()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	db, err := storage.New(dbDriver, storageSpecification)
 	if err != nil {
