@@ -1115,7 +1115,16 @@ func (storage Storage) GetTriggerID(triggerType string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer rows.Close()
+
+	// rows has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := rows.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if rows.Next() {
 
