@@ -1173,8 +1173,16 @@ func (storage Storage) NewTriggerType(ttype string, description string) error {
 		log.Print(err)
 		return err
 	}
-	defer statement.Close()
 
+	// statement has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := statement.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 	_, err = statement.Exec(ttype, description)
 	if err != nil {
 		log.Print(err)
