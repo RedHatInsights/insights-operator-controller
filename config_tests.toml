@@ -11,3 +11,7 @@ token=""
 source="test"
 source_type="generic_single_line"
 index="main"
+
+[storage]
+driver="sqlite3"
+source="controller.db"
