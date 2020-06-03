@@ -622,7 +622,14 @@ SELECT configuration_profile.configuration
 		log.Print(err)
 		return configuration, err
 	}
-	defer row.Close()
+
+	// close the query at function exit
+	defer func() {
+		err := row.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if row.Next() {
 		err = row.Scan(&configuration)
