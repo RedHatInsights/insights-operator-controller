@@ -438,7 +438,14 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 	if err != nil {
 		return profile, err
 	}
-	defer rows.Close()
+
+	// close the query at function exit
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if rows.Next() {
 		var id int
