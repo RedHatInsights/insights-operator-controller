@@ -759,7 +759,17 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID Cl
 func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error {
 	t := time.Now()
 	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
-	defer statement.Close()
+
+	// statement has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := statement.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
 	if err != nil {
 		return err
 	}
