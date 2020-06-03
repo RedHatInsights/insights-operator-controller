@@ -239,7 +239,14 @@ func (storage Storage) GetCluster(id int) (Cluster, error) {
 	if err != nil {
 		return cluster, err
 	}
-	defer rows.Close()
+
+	// close the query at function exit
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if rows.Next() {
 		var id int
