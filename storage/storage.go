@@ -677,7 +677,16 @@ SELECT operator_configuration.id
 	if err != nil {
 		return 0, err
 	}
-	defer rows.Close()
+
+	// query has to be closed at function exit
+	defer func() {
+		// try to close the query
+		err := rows.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if rows.Next() {
 		var id int
