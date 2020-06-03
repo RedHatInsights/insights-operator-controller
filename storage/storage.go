@@ -741,13 +741,22 @@ func (storage Storage) SelectConfigurationProfileID(tx *sql.Tx) (int, error) {
 // DeactivatePreviousConfigurations deactivate all previous configurations for the specified trigger.
 // To be called inside transaction.
 func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID ClusterID) error {
-	stmt, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
-	defer stmt.Close()
+	statement, err := tx.Prepare("UPDATE operator_configuration SET active=0 WHERE cluster = $1")
+
+	// statement has to be closed at function exit
+	defer func() {
+		// try to close the statement
+		err := statement.Close()
+		// in case of error all we can do is to just log the error
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(clusterID)
+	_, err = statement.Exec(clusterID)
 	if err == nil {
 		log.Printf("All previous configuration has been deactivated for clusterID %d\n", clusterID)
 	}
