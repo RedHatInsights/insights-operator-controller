@@ -37,6 +37,9 @@ func setup() {
 
 	gen.PopulateCluster()
 	gen.PopulateOperatorConfiguration()
-	gen.InsertTriggerType("must-gather", "Triggers must-gather operation on selected cluster")
+	err := gen.InsertTriggerType("must-gather", "Triggers must-gather operation on selected cluster")
+	if err != nil {
+		panic(err)
+	}
 	gen.PopulateTrigger("must-gather")
 }
