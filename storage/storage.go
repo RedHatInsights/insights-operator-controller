@@ -532,7 +532,14 @@ func (storage Storage) DeleteConfigurationProfile(id int) ([]ConfigurationProfil
 		log.Print(err)
 		return profiles, err
 	}
-	defer statement.Close()
+
+	// close the statement at function exit
+	defer func() {
+		err := statement.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	rowsAffected, err := execStatementAndGetRowsAffected(statement, id)
 	if err != nil {
