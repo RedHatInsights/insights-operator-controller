@@ -957,7 +957,14 @@ func (storage Storage) DeleteClusterConfigurationByID(id int64) error {
 
 func (storage Storage) getTriggers(rows *sql.Rows) ([]Trigger, error) {
 	triggers := []Trigger{}
-	defer rows.Close()
+
+	// close the query at function exit
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	for rows.Next() {
 		var trigger Trigger
