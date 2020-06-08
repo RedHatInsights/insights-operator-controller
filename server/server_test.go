@@ -99,3 +99,34 @@ func TestServerInitialize(t *testing.T) {
 		serv.Initialize()
 	}, 5*time.Second, false)
 }
+
+// TestServerInitializeOnProduction check the initialization method
+func TestServerInitializeOnProduction(t *testing.T) {
+	helpers.RunTestWithTimeout(t, func(t *testing.T) {
+		environment := server.Environment
+		defer func() {
+			server.Environment = environment
+		}()
+
+		server.Environment = "production"
+
+		splunk := logging.NewClient(false, "", "", "", "", "")
+
+		storageInstance, err := storage.New("sqlite3", ":memory:")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer storageInstance.Close()
+
+		serv := server.Server{
+			Address:  "localhost:10000",
+			UseHTTPS: false,
+			Storage:  storageInstance,
+			Splunk:   splunk,
+			TLSCert:  "",
+			TLSKey:   "",
+		}
+
+		serv.Initialize()
+	}, 5*time.Second, false)
+}

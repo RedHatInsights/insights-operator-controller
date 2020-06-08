@@ -180,7 +180,12 @@ func (s Server) Initialize() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(s.LogRequest)
 	if Environment == "production" {
+		log.Println("Server is running in PRODUCTION mode")
+		log.Println("JWT authentication is enabled")
 		router.Use(s.JWTAuthentication)
+	} else {
+		log.Println("Server is running in DEBUG mode")
+		log.Println("JWT authentication is disabled")
 	}
 	router.Use(s.AddDefaultHeaders)
 
