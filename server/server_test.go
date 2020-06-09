@@ -130,3 +130,27 @@ func TestServerInitializeOnProduction(t *testing.T) {
 		serv.Initialize()
 	}, 5*time.Second, false)
 }
+
+// TestServerInitializeHTTPSServer check the initialization method
+func TestServerInitializeHTTPSServer(t *testing.T) {
+	helpers.RunTestWithTimeout(t, func(t *testing.T) {
+		splunk := logging.NewClient(false, "", "", "", "", "")
+
+		storageInstance, err := storage.New("sqlite3", ":memory:")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer storageInstance.Close()
+
+		serv := server.Server{
+			Address:  "localhost:10001",
+			UseHTTPS: true,
+			Storage:  storageInstance,
+			Splunk:   splunk,
+			TLSCert:  "../certs/cert.pem",
+			TLSKey:   "../certs/key.pem",
+		}
+
+		serv.Initialize()
+	}, 5*time.Second, false)
+}
