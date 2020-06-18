@@ -1,0 +1,24 @@
+title: Insights Operator Controller
+description: A service to be used to store Insights operator configuration and to offer the configuration to selected operator.
+baseurl: "/insights-operator-controller"
+url: "https://redhatinsights.github.io"
+
+heading_anchors: true
+search_enabled: false
+
+aux_links:
+  "Github repository":
+    - "https://github.com/RedHatInsights/insights-operator-controller"
+
+footer_content: "Copyright &copy; 2020 Red Hat, Inc.</a>"
+
+# Build settings
+markdown: kramdown
+remote_theme: pmarsceill/just-the-docs
+plugins:
+  - jekyll-remote-theme
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
