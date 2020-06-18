@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>configuration.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>configuration.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">server</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/storage&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/responses&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/gorilla/mux&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;io/ioutil&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>sendConfiguration is helper function to send cluster configuration to client</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">sendConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">configuration</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">resp</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">resp</div><div class="operator">[</div><div class="literal">&#34;configuration&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">configuration</div><div class="operator"></div>
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">resp</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetConfiguration method returns single configuration by id</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>configuration ID needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read cluster configuration specified by ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configuration</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">GetClusterConfigurationByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">sendConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>DeleteConfiguration method removes single configuration specified by its ID</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">DeleteConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>configuration ID needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action DeleteConfigurationById into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;DeleteClusterConfigurationById&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to delete cluster configuration specified by its ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">DeleteClusterConfigurationByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetAllConfigurations method reads and returns list of all configurations</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetAllConfigurations</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read list of all configurations from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configuration</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ListAllClusterConfigurations</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;configuration&#34;</div><div class="operator">,</div> <div class="ident">configuration</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetClusterConfiguration method returns list of configuration for single cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetClusterConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified it request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read list of cluster configurations from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configuration</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ListClusterConfiguration</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;configuration&#34;</div><div class="operator">,</div> <div class="ident">configuration</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>EnableOrDisableConfiguration method enables or disables single cluster configuration</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">EnableOrDisableConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">,</div> <div class="ident">active</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>configuration ID needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>&quot;0&quot; - disable
+&quot;1&quot; (or other value) - enable</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">active</div> <div class="operator">==</div> <div class="literal">&#34;0&#34;</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to write information about DisableClusterConfiguration operation into Splunk</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;DisableClusterConfiguration&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to write information about EnableClusterConfiguration operation into Splunk</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;EnableClusterConfiguration&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to enable or disable cluster configuration specified by its ID in storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">EnableOrDisableClusterConfigurationByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">,</div> <div class="ident">active</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="keyword">if</div> <div class="ident">active</div> <div class="operator">==</div> <div class="literal">&#34;0&#34;</div> <div class="operator">{</div>
+			<div class="ident">sendConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;disabled&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+			<div class="ident">sendConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;enabled&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>EnableConfiguration method enables single configuration</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">EnableConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">s</div><div class="operator">.</div><div class="ident">EnableOrDisableConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">request</div><div class="operator">,</div> <div class="literal">&#34;1&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>DisableConfiguration method disables single configuration</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">DisableConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">s</div><div class="operator">.</div><div class="ident">EnableOrDisableConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">request</div><div class="operator">,</div> <div class="literal">&#34;0&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>NewClusterConfiguration method creates configuration for single cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">NewClusterConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>username needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">username</div><div class="operator">,</div> <div class="ident">foundUsername</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;username&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reason needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">reason</div><div class="operator">,</div> <div class="ident">foundReason</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;reason&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>description needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">description</div><div class="operator">,</div> <div class="ident">foundDescription</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;description&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundUsername</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;User name needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundReason</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Reason needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundDescription</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Description needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read configuration from request body</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configuration</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">ioutil</div><div class="operator">.</div><div class="ident">ReadAll</div><div class="operator">(</div><div class="ident">request</div><div class="operator">.</div><div class="ident">Body</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">||</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div> <div class="operator">==</div> <div class="literal">0</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Configuration needs to be provided in the request body&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to create cluster configuration in storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configurations</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">CreateClusterConfiguration</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">reason</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">description</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">string</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to write information about NewClusterConfiguration operation into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;NewClusterConfiguration&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">string</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;configurations&#34;</div><div class="operator">,</div> <div class="ident">configurations</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>EnableClusterConfiguration method enables cluster configuration</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">EnableClusterConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>username needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">username</div><div class="operator">,</div> <div class="ident">foundUsername</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;username&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reason needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">reason</div><div class="operator">,</div> <div class="ident">foundReason</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;reason&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundUsername</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;User name needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundReason</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Reason needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to write information about EnableClusterConfiguration operation into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;EnableClusterConfiguration&#34;</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>perform storage operation, read the configuration</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configurations</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">EnableClusterConfiguration</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">reason</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;configurations&#34;</div><div class="operator">,</div> <div class="ident">configurations</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>DisableClusterConfiguration method disables cluster configuration</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">DisableClusterConfiguration</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>username needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">username</div><div class="operator">,</div> <div class="ident">foundUsername</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;username&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reason needs to be specified in request</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">reason</div><div class="operator">,</div> <div class="ident">foundReason</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;reason&#34;</div><div class="operator">]</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundUsername</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;User name needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundReason</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Reason needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to write information about DisableClusterConfiguration operation into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;DisableClusterConfiguration&#34;</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>perform storage operation, read the configuration</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configurations</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">DisableClusterConfiguration</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">reason</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;configurations&#34;</div><div class="operator">,</div> <div class="ident">configurations</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

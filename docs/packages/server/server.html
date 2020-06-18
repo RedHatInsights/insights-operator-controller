@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>server.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>server.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">server</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;crypto/tls&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;crypto/x509&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/logging&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/storage&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/env&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/gorilla/mux&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus/promauto&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus/promhttp&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;io&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;io/ioutil&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;log&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;strconv&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;time&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Server data type represents configuration of server</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">Server</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">Address</div>  <div class="ident">string</div><div class="operator"></div>
+	<div class="ident">UseHTTPS</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="ident">Storage</div>  <div class="ident">storage</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator"></div>
+	<div class="ident">Splunk</div>   <div class="ident">logging</div><div class="operator">.</div><div class="ident">Client</div><div class="operator"></div>
+	<div class="ident">TLSCert</div>  <div class="ident">string</div><div class="operator"></div>
+	<div class="ident">TLSKey</div>   <div class="ident">string</div><div class="operator"></div>
+
+	<div class="ident">ClusterQuery</div> <div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ClusterQuery</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>APIPrefix is appended before all REST API endpoint addresses</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">var</div> <div class="ident">APIPrefix</div> <div class="operator">=</div> <div class="ident">env</div><div class="operator">.</div><div class="ident">GetEnv</div><div class="operator">(</div><div class="literal">&#34;CONTROLLER_PREFIX&#34;</div><div class="operator">,</div> <div class="literal">&#34;/api/v1/&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Environment CONTROLLER_ENV const for specifying production vs test environment</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">var</div> <div class="ident">Environment</div> <div class="operator">=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Getenv</div><div class="operator">(</div><div class="literal">&#34;CONTROLLER_ENV&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Prometheus metric with counter of REST API requests</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">var</div> <div class="ident">apiRequests</div> <div class="operator">=</div> <div class="ident">promauto</div><div class="operator">.</div><div class="ident">NewCounterVec</div><div class="operator">(</div><div class="ident">prometheus</div><div class="operator">.</div><div class="ident">CounterOpts</div><div class="operator">{</div>
+	<div class="ident">Name</div><div class="operator">:</div> <div class="literal">&#34;api_endpoints_requests&#34;</div><div class="operator">,</div>
+	<div class="ident">Help</div><div class="operator">:</div> <div class="literal">&#34;The total number requests per API endpoint&#34;</div><div class="operator">,</div>
+<div class="operator">}</div><div class="operator">,</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;url&#34;</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Prometheus metric with response times</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">var</div> <div class="ident">apiResponses</div> <div class="operator">=</div> <div class="ident">promauto</div><div class="operator">.</div><div class="ident">NewHistogramVec</div><div class="operator">(</div><div class="ident">prometheus</div><div class="operator">.</div><div class="ident">HistogramOpts</div><div class="operator">{</div>
+	<div class="ident">Name</div><div class="operator">:</div>    <div class="literal">&#34;response_time&#34;</div><div class="operator">,</div>
+	<div class="ident">Help</div><div class="operator">:</div>    <div class="literal">&#34;Response time&#34;</div><div class="operator">,</div>
+	<div class="ident">Buckets</div><div class="operator">:</div> <div class="ident">prometheus</div><div class="operator">.</div><div class="ident">LinearBuckets</div><div class="operator">(</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">20</div><div class="operator">,</div> <div class="literal">20</div><div class="operator">)</div><div class="operator">,</div>
+<div class="operator">}</div><div class="operator">,</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;url&#34;</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>checkSplunkOperation checks whether the Splunk operation (write/record) was successful</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;(not critical) Log into splunk failed&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>createTLSServer methods creates an instance of HTTPS server using TLS</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">createTLSServer</div><div class="operator">(</div><div class="ident">router</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">)</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Server</div> <div class="operator">{</div>
+	<div class="ident">caCert</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">ioutil</div><div class="operator">.</div><div class="ident">ReadFile</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">TLSCert</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">caCertPool</div> <div class="operator">:=</div> <div class="ident">x509</div><div class="operator">.</div><div class="ident">NewCertPool</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">caCertPool</div><div class="operator">.</div><div class="ident">AppendCertsFromPEM</div><div class="operator">(</div><div class="ident">caCert</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">tlsConfig</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">tls</div><div class="operator">.</div><div class="ident">Config</div><div class="operator">{</div>
+		<div class="ident">ClientCAs</div><div class="operator">:</div>  <div class="ident">caCertPool</div><div class="operator">,</div>
+		<div class="ident">ClientAuth</div><div class="operator">:</div> <div class="ident">tls</div><div class="operator">.</div><div class="ident">RequireAndVerifyClientCert</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">tlsConfig</div><div class="operator">.</div><div class="ident">BuildNameToCertificate</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">server</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Server</div><div class="operator">{</div>
+		<div class="ident">Addr</div><div class="operator">:</div>      <div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">,</div>
+		<div class="ident">TLSConfig</div><div class="operator">:</div> <div class="ident">tlsConfig</div><div class="operator">,</div>
+		<div class="ident">Handler</div><div class="operator">:</div>   <div class="ident">router</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">return</div> <div class="ident">server</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>countEndpoint function measures time to process the request and updates Prometheus metric accordingly</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">countEndpoint</div><div class="operator">(</div><div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">,</div> <div class="ident">start</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">url</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">String</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">duration</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Since</div><div class="operator">(</div><div class="ident">start</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Printf</div><div class="operator">(</div><div class="literal">&#34;Time to serve the page: %s\n&#34;</div><div class="operator">,</div> <div class="ident">duration</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">apiRequests</div><div class="operator">.</div><div class="ident">With</div><div class="operator">(</div><div class="ident">prometheus</div><div class="operator">.</div><div class="ident">Labels</div><div class="operator">{</div><div class="literal">&#34;url&#34;</div><div class="operator">:</div> <div class="ident">url</div><div class="operator">}</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Inc</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">apiResponses</div><div class="operator">.</div><div class="ident">With</div><div class="operator">(</div><div class="ident">prometheus</div><div class="operator">.</div><div class="ident">Labels</div><div class="operator">{</div><div class="literal">&#34;url&#34;</div><div class="operator">:</div> <div class="ident">url</div><div class="operator">}</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Observe</div><div class="operator">(</div><div class="ident">float64</div><div class="operator">(</div><div class="ident">duration</div><div class="operator">.</div><div class="ident">Microseconds</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>retrievePositiveIntRequestParameter gets param with paramName converts to int and checks
+if it's positive</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">retrievePositiveIntRequestParameter</div><div class="operator">(</div><div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">,</div> <div class="ident">paramName</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int64</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">strValue</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="ident">paramName</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="literal">0</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;&#39;%v&#39; param not found&#34;</div><div class="operator">,</div> <div class="ident">paramName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">intValue</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">strconv</div><div class="operator">.</div><div class="ident">ParseInt</div><div class="operator">(</div><div class="ident">strValue</div><div class="operator">,</div> <div class="literal">10</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="literal">0</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">intValue</div> <div class="operator">&lt;</div> <div class="literal">0</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="literal">0</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;&#39;%v&#39; param cannot be negative&#34;</div><div class="operator">,</div> <div class="ident">paramName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">intValue</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>retrieveIDRequestParameter helper function reads value of parameter named &quot;id&quot;</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int64</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">retrievePositiveIntRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">,</div> <div class="literal">&#34;id&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>MainEndpoint method is handler for the main endpoint of REST API server</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">MainEndpoint</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">start</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Now</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">io</div><div class="operator">.</div><div class="ident">WriteString</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Hello world!\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error preparing response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">countEndpoint</div><div class="operator">(</div><div class="ident">request</div><div class="operator">,</div> <div class="ident">start</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>logRequestHandler is an implementation of middleware for logging request parameters</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">logRequestHandler</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">,</div> <div class="ident">nextHandler</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Request URI: &#34;</div> <div class="operator">&#43;</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">RequestURI</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Request method: &#34;</div> <div class="operator">&#43;</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">Method</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">nextHandler</div><div class="operator">.</div><div class="ident">ServeHTTP</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>LogRequest method represents middleware for loging requests</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">LogRequest</div><div class="operator">(</div><div class="ident">nextHandler</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">)</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">HandlerFunc</div><div class="operator">(</div>
+		<div class="keyword">func</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+			<div class="ident">logRequestHandler</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">request</div><div class="operator">,</div> <div class="ident">nextHandler</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>AddDefaultHeaders method represents middleware for adding headers that should be in any response</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">AddDefaultHeaders</div><div class="operator">(</div><div class="ident">nextHandler</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">)</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">HandlerFunc</div><div class="operator">(</div>
+		<div class="keyword">func</div><div class="operator">(</div><div class="ident">w</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">r</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+			<div class="keyword">if</div> <div class="ident">Environment</div> <div class="operator">!=</div> <div class="literal">&#34;production&#34;</div> <div class="operator">{</div>
+				<div class="keyword">if</div> <div class="ident">origin</div> <div class="operator">:=</div> <div class="ident">r</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">.</div><div class="ident">Get</div><div class="operator">(</div><div class="literal">&#34;Origin&#34;</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">origin</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
+					<div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Access-Control-Allow-Origin&#34;</div><div class="operator">,</div> <div class="ident">origin</div><div class="operator">)</div><div class="operator"></div>
+				<div class="operator">}</div><div class="operator"></div>
+				<div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Access-Control-Allow-Methods&#34;</div><div class="operator">,</div> <div class="literal">&#34;POST, GET, OPTIONS, PUT, DELETE&#34;</div><div class="operator">)</div><div class="operator"></div>
+				<div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Access-Control-Allow-Headers&#34;</div><div class="operator">,</div> <div class="literal">&#34;Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token&#34;</div><div class="operator">)</div><div class="operator"></div>
+				<div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Access-Control-Allow-Credentials&#34;</div><div class="operator">,</div> <div class="literal">&#34;true&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="operator">}</div><div class="operator"></div>
+			<div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Content-Type&#34;</div><div class="operator">,</div> <div class="literal">&#34;application/json; charset=utf-8&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">nextHandler</div><div class="operator">.</div><div class="ident">ServeHTTP</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="ident">r</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Initialize perform the server initialization</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">Initialize</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Environment: &#34;</div><div class="operator">,</div> <div class="ident">Environment</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;API Prefix: &#34;</div><div class="operator">,</div> <div class="ident">APIPrefix</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Initializing HTTP server at&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">s</div><div class="operator">.</div><div class="ident">ClusterQuery</div> <div class="operator">=</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">NewClusterQuery</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">router</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">NewRouter</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">StrictSlash</div><div class="operator">(</div><div class="ident">true</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">router</div><div class="operator">.</div><div class="ident">Use</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">LogRequest</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">Environment</div> <div class="operator">==</div> <div class="literal">&#34;production&#34;</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Server is running in PRODUCTION mode&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;JWT authentication is enabled&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">router</div><div class="operator">.</div><div class="ident">Use</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">JWTAuthentication</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Server is running in DEBUG mode&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;JWT authentication is disabled&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">router</div><div class="operator">.</div><div class="ident">Use</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">AddDefaultHeaders</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>common REST API endpoints</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">router</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="ident">APIPrefix</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">MainEndpoint</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>REST API endpoints used by client</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div> <div class="operator">:=</div> <div class="ident">router</div><div class="operator">.</div><div class="ident">PathPrefix</div><div class="operator">(</div><div class="ident">APIPrefix</div> <div class="operator">&#43;</div> <div class="literal">&#34;client&#34;</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Subrouter</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>clusters-related operations
+(handlers are implemented in the file cluster.go)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetClusters</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{name}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{id:[0-9]&#43;}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{id:[0-9]&#43;}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;DELETE&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/search&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>configuration profiles
+(handlers are implemented in the file profile.go)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/profile&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">ListConfigurationProfiles</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/profile/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetConfigurationProfile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/profile/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">ChangeConfigurationProfile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/profile&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">NewConfigurationProfile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/profile/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DeleteConfigurationProfile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;DELETE&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>configurations
+(handlers are implemented in the file configuration.go)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetAllConfigurations</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DeleteConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;DELETE&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration/{id}/enable&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">EnableConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration/{id}/disable&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DisableConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>clusters and its configurations
+(handlers are implemented in the file configuration.go)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/configuration&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetClusterConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/configuration/create&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">NewClusterConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/configuration/enable&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">EnableClusterConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/configuration/disable&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DisableClusterConfiguration</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>triggers</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetAllTriggers</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetTrigger</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger/{id}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DeleteTrigger</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;DELETE&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger/{id}/activate&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">ActivateTrigger</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger/{id}/deactivate&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">DeactivateTrigger</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;PUT&#34;</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/trigger&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetClusterTriggers</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">clientRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/cluster/{cluster}/trigger/{trigger}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">RegisterClusterTrigger</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;POST&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>REST API endpoints used by insights operator
+(handlers are implemented in the file operator.go)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">operatorRouter</div> <div class="operator">:=</div> <div class="ident">router</div><div class="operator">.</div><div class="ident">PathPrefix</div><div class="operator">(</div><div class="ident">APIPrefix</div> <div class="operator">&#43;</div> <div class="literal">&#34;operator&#34;</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Subrouter</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">operatorRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/register/{cluster}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">RegisterCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">operatorRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/configuration/{cluster}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">ReadConfigurationForOperator</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">operatorRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/triggers/{cluster}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">GetActiveTriggersForCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">operatorRouter</div><div class="operator">.</div><div class="ident">HandleFunc</div><div class="operator">(</div><div class="literal">&#34;/trigger/{cluster}/ack/{trigger}&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">AckTriggerForCluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="literal">&#34;PUT&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Prometheus metrics</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">router</div><div class="operator">.</div><div class="ident">Handle</div><div class="operator">(</div><div class="literal">&#34;/metrics&#34;</div><div class="operator">,</div> <div class="ident">promhttp</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Methods</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Starting HTTP server at&#34;</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action StartService into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">Log</div><div class="operator">(</div><div class="literal">&#34;Action&#34;</div><div class="operator">,</div> <div class="literal">&#34;starting service at address &#34;</div><div class="operator">&#43;</div><div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">UseHTTPS</div> <div class="operator">{</div>
+		<div class="ident">server</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">createTLSServer</div><div class="operator">(</div><div class="ident">router</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">server</div><div class="operator">.</div><div class="ident">ListenAndServeTLS</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">TLSCert</div><div class="operator">,</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">TLSKey</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ListenAndServe</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">,</div> <div class="ident">router</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Unable to initialize HTTP server&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the Error into Splunk</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">Log</div><div class="operator">(</div><div class="literal">&#34;Error&#34;</div><div class="operator">,</div> <div class="literal">&#34;service can not be started at address &#34;</div><div class="operator">&#43;</div><div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TODO: name the magic constant 2</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">os</div><div class="operator">.</div><div class="ident">Exit</div><div class="operator">(</div><div class="literal">2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>trigger.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>trigger.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">server</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/storage&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/responses&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/gorilla/mux&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetAllTriggers method returns list of all triggers</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetAllTriggers</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read list of all triggers from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">triggers</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ListAllTriggers</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;triggers&#34;</div><div class="operator">,</div> <div class="ident">triggers</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetTrigger method returns single trigger by id</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetTrigger</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>trigger ID needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read trigger identified by its ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">trigger</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">GetTriggerByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">==</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">ErrNoSuchObj</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;No such trigger for ID %v&#34;</div><div class="operator">,</div> <div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;trigger&#34;</div><div class="operator">,</div> <div class="ident">trigger</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>DeleteTrigger method deletes single trigger</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">DeleteTrigger</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>trigger ID needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action DeleteTrigger into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;DeleteTrigger&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to delete trigger identified by its ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">DeleteTriggerByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div>
+			<div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div>
+			<div class="ident">writer</div><div class="operator">,</div>
+			<div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">,</div>
+		<div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ActivateTrigger method actives single trigger</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">ActivateTrigger</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>trigger ID needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action ActivateTrigger into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;ActivateTrigger&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to activate trigger identified by its ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ChangeStateOfTriggerByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>DeactivateTrigger method deactivates single trigger</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">DeactivateTrigger</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>trigger ID needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">id</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrieveIDRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action DeactivateTrigger into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;DeactivateTrigger&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprint</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to deactivate trigger identified by its ID from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ChangeStateOfTriggerByID</div><div class="operator">(</div><div class="ident">id</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>GetClusterTriggers method returns list of triggers for single cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">GetClusterTriggers</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read list of all triggers for specified cluster from storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">triggers</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">ListClusterTriggers</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;triggers&#34;</div><div class="operator">,</div> <div class="ident">triggers</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>RegisterClusterTrigger method registers new trigger for cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">RegisterClusterTrigger</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">request</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster name needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>trigger type needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">triggerType</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;trigger&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Trigger type needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>user name needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">username</div><div class="operator">,</div> <div class="ident">foundUsername</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;username&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundUsername</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;User name needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reason needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">reason</div><div class="operator">,</div> <div class="ident">foundReason</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;reason&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundReason</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Reason needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>link needs to be specified in request parameter</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">link</div><div class="operator">,</div> <div class="ident">foundReason</div> <div class="operator">:=</div> <div class="ident">request</div><div class="operator">.</div><div class="ident">URL</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;link&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundReason</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Link needs to be specified\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to record the action RegisterTrigger into Splunk</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogTriggerAction</div><div class="operator">(</div><div class="literal">&#34;RegisterTrigger&#34;</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">,</div> <div class="ident">triggerType</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and check whether the Splunk operation was successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to create new trigger in storage</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">NewTrigger</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="ident">triggerType</div><div class="operator">,</div> <div class="ident">username</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">reason</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">link</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if the storage operation has been successful</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
