@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>cluster.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>cluster.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">storage</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;context&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;database/sql&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
+
+	<div class="ident">sq</div> <div class="literal">&#34;github.com/Masterminds/squirrel&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/utils&#34;</div><div class="operator"></div>
+	<div class="ident">_</div> <div class="literal">&#34;github.com/lib/pq&#34;</div>           <div class="operator"></div><div class="comment">// PostgreSQL database driver</div>
+	<div class="ident">_</div> <div class="literal">&#34;github.com/mattn/go-sqlite3&#34;</div> <div class="operator"></div><div class="comment">// SQLite database driver</div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>SearchClusterRequest defines type safe SearchCluster request, it is reused and defines request validation tags</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">SearchClusterRequest</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">utils</div><div class="operator">.</div><div class="ident">Pagination</div><div class="operator"></div>
+	<div class="ident">ID</div>   <div class="ident">int</div>    <div class="literal">`schema:&#34;id&#34;`</div><div class="operator"></div>
+	<div class="ident">Name</div> <div class="ident">string</div> <div class="literal">`schema:&#34;name&#34;`</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ClusterQuery is Sql query model for Cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">ClusterQuery</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">storage</div> <div class="ident">Storager</div><div class="operator"></div>
+
+	<div class="ident">Cols</div>          <div class="ident">Cols</div><div class="operator"></div>
+	<div class="ident">selectColumns</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterCol</div><div class="operator"></div>
+	<div class="ident">TableName</div>     <div class="ident">string</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">var</div> <div class="ident">clusterTableName</div> <div class="operator">=</div> <div class="literal">&#34;cluster&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Cols defines which columns exist in Clusters table, just for tyoe safe operations with them</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">Cols</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">ID</div>   <div class="ident">ClusterCol</div><div class="operator"></div>
+	<div class="ident">Name</div> <div class="ident">ClusterCol</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ClusterCol is type of cluster column</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">ClusterCol</div> <div class="ident">Column</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cols is filling Cols structure with actual column names</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">var</div> <div class="ident">clusterColsDef</div> <div class="ident">Cols</div> <div class="operator">=</div> <div class="ident">Cols</div><div class="operator">{</div>
+	<div class="ident">ID</div><div class="operator">:</div>   <div class="ident">ClusterCol</div><div class="operator">(</div><div class="literal">&#34;ID&#34;</div><div class="operator">)</div><div class="operator">,</div>
+	<div class="ident">Name</div><div class="operator">:</div> <div class="ident">ClusterCol</div><div class="operator">(</div><div class="literal">&#34;Name&#34;</div><div class="operator">)</div><div class="operator">,</div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>mapCol defines mapping from type safe column to a struct field in result Cluster.
+Used by db row.Scan</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">mapCol</div><div class="operator">(</div><div class="ident">col</div> <div class="ident">ClusterCol</div><div class="operator">,</div> <div class="ident">r</div> <div class="operator">*</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">switch</div> <div class="ident">col</div> <div class="operator">{</div>
+	<div class="keyword">case</div> <div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">:</div>
+		<div class="keyword">return</div> <div class="operator">&amp;</div><div class="ident">r</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">:</div>
+		<div class="keyword">return</div> <div class="operator">&amp;</div><div class="ident">r</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">default</div><div class="operator">:</div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;unknown col %s&#34;</div><div class="operator">,</div> <div class="ident">col</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Map creates a list of destination struct fields using columns to select</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">c</div> <div class="operator">*</div><div class="ident">ClusterQuery</div><div class="operator">)</div> <div class="ident">Map</div><div class="operator">(</div><div class="ident">cols</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterCol</div><div class="operator">,</div> <div class="ident">r</div> <div class="operator">*</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">var</div> <div class="ident">mappedCols</div> <div class="operator">[</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">c</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">cols</div> <div class="operator">{</div>
+		<div class="ident">mc</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">mapCol</div><div class="operator">(</div><div class="ident">c</div><div class="operator">,</div> <div class="ident">r</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">mappedCols</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">mappedCols</div><div class="operator">,</div> <div class="ident">mc</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">mappedCols</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">var</div> <div class="ident">clusterCols</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterCol</div><div class="operator">{</div><div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">,</div> <div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>NewClusterQuery creates new ClusterQuery Sql model</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">NewClusterQuery</div><div class="operator">(</div><div class="ident">s</div> <div class="ident">Storager</div><div class="operator">)</div> <div class="operator">*</div><div class="ident">ClusterQuery</div> <div class="operator">{</div>
+	<div class="ident">c</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">ClusterQuery</div><div class="operator">{</div><div class="ident">storage</div><div class="operator">:</div> <div class="ident">s</div><div class="operator">,</div> <div class="ident">Cols</div><div class="operator">:</div> <div class="ident">clusterColsDef</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">c</div><div class="operator">.</div><div class="ident">selectColumns</div> <div class="operator">=</div> <div class="ident">clusterCols</div><div class="operator"></div>
+	<div class="ident">c</div><div class="operator">.</div><div class="ident">TableName</div> <div class="operator">=</div> <div class="ident">clusterTableName</div><div class="operator"></div>
+
+	<div class="keyword">return</div> <div class="ident">c</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Storager exposes interface for testing</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">Storager</div> <div class="keyword">interface</div> <div class="operator">{</div>
+	<div class="ident">Connections</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator"></div>
+	<div class="ident">Placeholder</div><div class="operator">(</div><div class="operator">)</div> <div class="ident">sq</div><div class="operator">.</div><div class="ident">PlaceholderFormat</div><div class="operator"></div>
+	<div class="ident">QueryOne</div><div class="operator">(</div><div class="ident">context</div><div class="operator">.</div><div class="ident">Context</div><div class="operator">,</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Column</div><div class="operator">,</div> <div class="ident">sq</div><div class="operator">.</div><div class="ident">SelectBuilder</div><div class="operator">,</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">Column</div><div class="operator">,</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div><div class="operator">,</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">error</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ClusterQueryBuilder is just a typed wrapped to build queries more conviniently using only exposed methods</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">ClusterQueryBuilder</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">sb</div> <div class="ident">sq</div><div class="operator">.</div><div class="ident">SelectBuilder</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Query exposes typed Cluster queryBuilder</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">c</div> <div class="ident">ClusterQuery</div><div class="operator">)</div> <div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div> <div class="ident">ClusterQueryBuilder</div> <div class="operator">{</div>
+	<div class="ident">qb</div> <div class="operator">:=</div> <div class="ident">ClusterQueryBuilder</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">builder</div> <div class="operator">:=</div> <div class="ident">sq</div><div class="operator">.</div><div class="ident">StatementBuilder</div><div class="operator">.</div><div class="ident">PlaceholderFormat</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">Placeholder</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">qb</div><div class="operator">.</div><div class="ident">sb</div> <div class="operator">=</div> <div class="ident">builder</div><div class="operator">.</div><div class="ident">Select</div><div class="operator">(</div><div class="ident">ColNames</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">selectColumns</div><div class="operator">...</div><div class="operator">)</div><div class="operator">...</div><div class="operator">)</div><div class="operator">.</div><div class="ident">From</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">TableName</div><div class="operator">)</div><div class="operator">.</div><div class="ident">RunWith</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">Connections</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">qb</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Equals add a SQL Where Predicate using AND (if any exists) using Equals (=) operand.
+Ignores Zero values in values
+For example: WHERE col = 3</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">b</div> <div class="ident">ClusterQueryBuilder</div><div class="operator">)</div> <div class="ident">Equals</div><div class="operator">(</div><div class="ident">col</div> <div class="ident">ClusterCol</div><div class="operator">,</div> <div class="ident">v</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">ClusterQueryBuilder</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>We will ignore Zero values and skip condition</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">ZeroValue</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">b</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>squirell QueryBuilder is immutable, so after adding new condition it needs to be assigned back for further changes
+also only result q := Equals (q from that case) contains change
+AND this condition</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div> <div class="operator">=</div> <div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div><div class="operator">.</div><div class="ident">Where</div><div class="operator">(</div><div class="ident">sq</div><div class="operator">.</div><div class="ident">Eq</div><div class="operator">{</div><div class="ident">string</div><div class="operator">(</div><div class="ident">col</div><div class="operator">)</div><div class="operator">:</div> <div class="ident">v</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">b</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>WithPaging is setting how many recors (limit) and from which record (offset)
+This can be used for paging.
+It skips Zero values</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">b</div> <div class="ident">ClusterQueryBuilder</div><div class="operator">)</div> <div class="ident">WithPaging</div><div class="operator">(</div><div class="ident">limit</div><div class="operator">,</div> <div class="ident">offset</div> <div class="ident">int</div><div class="operator">)</div> <div class="ident">ClusterQueryBuilder</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">limit</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+		<div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div> <div class="operator">=</div> <div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div><div class="operator">.</div><div class="ident">Limit</div><div class="operator">(</div><div class="ident">uint64</div><div class="operator">(</div><div class="ident">limit</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">offset</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+		<div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div> <div class="operator">=</div> <div class="ident">b</div><div class="operator">.</div><div class="ident">sb</div><div class="operator">.</div><div class="ident">Offset</div><div class="operator">(</div><div class="ident">uint64</div><div class="operator">(</div><div class="ident">offset</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">b</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>mapCol defines mapping from type safe column to a struct field in result Cluster.
+Used by db row.Scan</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">c</div> <div class="operator">*</div><div class="ident">ClusterQuery</div><div class="operator">)</div> <div class="ident">mapCol</div><div class="operator">(</div><div class="ident">storageCol</div> <div class="ident">Column</div><div class="operator">,</div> <div class="ident">cluster</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">col</div> <div class="operator">:=</div> <div class="ident">ClusterCol</div><div class="operator">(</div><div class="ident">storageCol</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">r</div> <div class="operator">:=</div> <div class="ident">cluster</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">Cluster</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">sc</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">switch</div> <div class="ident">col</div> <div class="operator">{</div>
+	<div class="keyword">case</div> <div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">:</div>
+		<div class="ident">sc</div> <div class="operator">=</div> <div class="operator">&amp;</div><div class="ident">r</div><div class="operator">.</div><div class="ident">ID</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">clusterColsDef</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">:</div>
+		<div class="ident">sc</div> <div class="operator">=</div> <div class="operator">&amp;</div><div class="ident">r</div><div class="operator">.</div><div class="ident">Name</div><div class="operator"></div>
+	<div class="keyword">default</div><div class="operator">:</div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;unknown col %s&#34;</div><div class="operator">,</div> <div class="ident">col</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">sc</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>QueryOne will query DB with generated command and return one row as Cluster</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">c</div> <div class="operator">*</div><div class="ident">ClusterQuery</div><div class="operator">)</div> <div class="ident">QueryOne</div><div class="operator">(</div><div class="ident">ctx</div> <div class="ident">context</div><div class="operator">.</div><div class="ident">Context</div><div class="operator">,</div> <div class="ident">req</div> <div class="ident">SearchClusterRequest</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">*</div><div class="ident">Cluster</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">c</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">panic</div><div class="operator">(</div><div class="literal">&#34;ClusterQuery must not be nil. Make sure the Server has a pointer reference to ClusterQuery by calling NewClusterQuery().&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">qb</div> <div class="operator">:=</div> <div class="ident">c</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div>
+		<div class="ident">Equals</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">Cols</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">,</div> <div class="ident">req</div><div class="operator">.</div><div class="ident">ID</div><div class="operator">)</div><div class="operator">.</div>
+		<div class="ident">Equals</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">Cols</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">,</div> <div class="ident">req</div><div class="operator">.</div><div class="ident">Name</div><div class="operator">)</div><div class="operator">.</div>
+		<div class="ident">WithPaging</div><div class="operator">(</div><div class="ident">req</div><div class="operator">.</div><div class="ident">Limit</div><div class="operator">,</div> <div class="ident">req</div><div class="operator">.</div><div class="ident">Offset</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">cluster</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">Cluster</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">c</div><div class="operator">.</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">QueryOne</div><div class="operator">(</div><div class="ident">ctx</div><div class="operator">,</div> <div class="ident">storageCols</div><div class="operator">(</div><div class="ident">c</div><div class="operator">.</div><div class="ident">selectColumns</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">qb</div><div class="operator">.</div><div class="ident">sb</div><div class="operator">,</div> <div class="ident">c</div><div class="operator">.</div><div class="ident">mapCol</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">cluster</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">storageCols</div><div class="operator">(</div><div class="ident">cols</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterCol</div><div class="operator">)</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Column</div> <div class="operator">{</div>
+	<div class="ident">c</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Column</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">s</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">cols</div> <div class="operator">{</div>
+		<div class="ident">c</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">c</div><div class="operator">,</div> <div class="ident">Column</div><div class="operator">(</div><div class="ident">s</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">c</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ColNames Creates a list fo string column names from list of typed ClusterCols</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">ColNames</div><div class="operator">(</div><div class="ident">cols</div> <div class="operator">...</div><div class="ident">ClusterCol</div><div class="operator">)</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div> <div class="operator">{</div>
+	<div class="ident">cns</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">c</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">cols</div> <div class="operator">{</div>
+		<div class="ident">cns</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">cns</div><div class="operator">,</div> <div class="ident">string</div><div class="operator">(</div><div class="ident">c</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">cns</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

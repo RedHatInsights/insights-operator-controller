@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>maps.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>maps.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"><p>Utils for working with maps</p>
+</td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">utils</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="literal">&#34;net/url&#34;</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="literal">&#34;strings&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>mergeMapsT merges multiple maps of various types, trying to convert them
+srcs can be;
+map[string]interface{} (for example body dedoded from json)
+map[string][]string  (for example r.URL.Query() or r.Form (as url.Values))</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">mergeMapsT</div><div class="operator">(</div><div class="ident">srcs</div> <div class="operator">...</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div> <div class="operator">{</div>
+	<div class="ident">input</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">srcm</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">srcs</div> <div class="operator">{</div>
+		<div class="keyword">var</div> <div class="ident">toMerge</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+
+		<div class="keyword">switch</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="ident">srcm</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">type</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="keyword">case</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">:</div>
+			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">v</div><div class="operator"></div>
+
+		<div class="keyword">case</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">:</div>
+			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">interMap</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="keyword">case</div> <div class="ident">url</div><div class="operator">.</div><div class="ident">Values</div><div class="operator">:</div>
+			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">interMap</div><div class="operator">(</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="keyword">default</div><div class="operator">:</div>
+			<div class="ident">panic</div><div class="operator">(</div><div class="literal">&#34;unknown type&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+
+		<div class="ident">input</div> <div class="operator">=</div> <div class="ident">MergeMaps</div><div class="operator">(</div><div class="ident">input</div><div class="operator">,</div> <div class="ident">toMerge</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">input</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>stringsMap converts map[string]interface{} to flat map[string][]string
+Main use case is convert already flat map[string][]string or map[string]string</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">stringsMap</div><div class="operator">(</div><div class="ident">m</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div> <div class="operator">{</div>
+	<div class="ident">sm</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>add more types if needed</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">for</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">m</div> <div class="operator">{</div>
+		<div class="keyword">if</div> <div class="ident">s</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+			<div class="ident">sm</div><div class="operator">[</div><div class="ident">k</div><div class="operator">]</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="ident">s</div><div class="operator">}</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">s</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">.</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+			<div class="ident">sm</div><div class="operator">[</div><div class="ident">k</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">s</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
+			<div class="ident">fm</div> <div class="operator">:=</div> <div class="ident">stringsMap</div><div class="operator">(</div><div class="ident">s</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">for</div> <div class="ident">kk</div><div class="operator">,</div> <div class="ident">vv</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">fm</div> <div class="operator">{</div>
+				<div class="ident">sm</div><div class="operator">[</div><div class="ident">kk</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">vv</div><div class="operator"></div>
+			<div class="operator">}</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">sm</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>LowerCaseKeys returns new map with keys changed to lowercase</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">LowerCaseKeys</div><div class="operator">(</div><div class="ident">m</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div> <div class="operator">{</div>
+	<div class="ident">nm</div> <div class="operator">:=</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">m</div> <div class="operator">{</div>
+		<div class="ident">nm</div><div class="operator">[</div><div class="ident">strings</div><div class="operator">.</div><div class="ident">ToLower</div><div class="operator">(</div><div class="ident">k</div><div class="operator">)</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">v</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">nm</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>interMap converts map from [string][]string to [string]interface{}
+taking last value from many in []string if more exists</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">interMap</div><div class="operator">(</div><div class="ident">m</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div> <div class="operator">{</div>
+	<div class="ident">r</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">m</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>use last provided value</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div> <div class="operator">&gt;</div> <div class="literal">0</div> <div class="operator">{</div>
+			<div class="ident">r</div><div class="operator">[</div><div class="ident">k</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">v</div><div class="operator">[</div><div class="ident">len</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator">-</div><div class="literal">1</div><div class="operator">]</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">r</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>MergeMaps Merges provided maps into one</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">MergeMaps</div><div class="operator">(</div><div class="ident">maps</div> <div class="operator">...</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div> <div class="operator">{</div>
+	<div class="ident">r</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">m</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">maps</div> <div class="operator">{</div>
+		<div class="keyword">for</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">m</div> <div class="operator">{</div>
+			<div class="ident">r</div><div class="operator">[</div><div class="ident">k</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">v</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">r</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

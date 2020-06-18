@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>maps_test.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>maps_test.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">utils_test</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;net/url&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;testing&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/utils&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLowerCaseKeys test the utility function LowerCaseKeys</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLowerCaseKeys</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">inputMap</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap</div><div class="operator">[</div><div class="literal">&#34;FOO&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;bar&#34;</div><div class="operator"></div>
+	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">LowerCaseKeys</div><div class="operator">(</div><div class="ident">inputMap</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">1</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;FOO&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Old key is still there&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMergeMaps checks the utility function MergeMaps</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMergeMaps</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>first map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap1</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap1</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;foo&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>second map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap2</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap2</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;bar&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to merge maps</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">MergeMaps</div><div class="operator">(</div><div class="ident">inputMap1</div><div class="operator">,</div> <div class="ident">inputMap2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for first key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v1</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v1</div> <div class="operator">!=</div> <div class="literal">&#34;foo&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for second key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v2</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v2</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMergeMapsTMapOfInterfaces checks the utility function MergeMapsT</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMergeMapsTMapOfInterfaces</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>first map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap1</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap1</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;foo&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>second map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap2</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap2</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;bar&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to merge maps</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">MergeMapsT</div><div class="operator">(</div><div class="ident">inputMap1</div><div class="operator">,</div> <div class="ident">inputMap2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for first key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v1</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v1</div> <div class="operator">!=</div> <div class="literal">&#34;foo&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for second key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v2</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v2</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMergeMapsTMapOfStrings checks the utility function MergeMapsT</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMergeMapsTMapOfStrings</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>first map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap1</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap1</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;foo&#34;</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>second map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap2</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap2</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;bar&#34;</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to merge maps</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">MergeMapsT</div><div class="operator">(</div><div class="ident">inputMap1</div><div class="operator">,</div> <div class="ident">inputMap2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for first key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v1</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v1</div> <div class="operator">!=</div> <div class="literal">&#34;foo&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for second key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v2</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v2</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMergeMapsTURLValues checks the utility function MergeMapsT</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMergeMapsTURLValues</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>first map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap1</div> <div class="operator">:=</div> <div class="ident">url</div><div class="operator">.</div><div class="ident">Values</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">inputMap1</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;foo&#34;</div><div class="operator">,</div> <div class="literal">&#34;foo&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>second map to be merged</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">inputMap2</div> <div class="operator">:=</div> <div class="ident">url</div><div class="operator">.</div><div class="ident">Values</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">inputMap2</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;bar&#34;</div><div class="operator">,</div> <div class="literal">&#34;bar&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to merge maps</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">MergeMapsT</div><div class="operator">(</div><div class="ident">inputMap1</div><div class="operator">,</div> <div class="ident">inputMap2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for first key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v1</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v1</div> <div class="operator">!=</div> <div class="literal">&#34;foo&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for second key+value pair</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v2</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v2</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMergeMapsWrongType check if wrong types are handled properly by the utility function mergeMapsT</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMergeMapsWrongType</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for panic()</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="keyword">if</div> <div class="ident">r</div> <div class="operator">:=</div> <div class="ident">recover</div><div class="operator">(</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">r</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;The code did not panic as expected&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to merge values with incorrect data types</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">utils</div><div class="operator">.</div><div class="ident">MergeMapsT</div><div class="operator">(</div><div class="literal">&#34;foo&#34;</div><div class="operator">,</div> <div class="literal">&#34;bar&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestStringsMapMapOfStrings check the utility function stringsMap</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestStringsMapMapOfStrings</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">inputMap</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;bar&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>construct output map from input map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">StringsMap</div><div class="operator">(</div><div class="ident">inputMap</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">1</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestStringsMapMapOfSlices check the utility function stringsMap</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestStringsMapMapOfSlices</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">inputMap</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;bar&#34;</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>construct output map from input map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">StringsMap</div><div class="operator">(</div><div class="ident">inputMap</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">1</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">v</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">0</div><div class="operator">]</div> <div class="operator">!=</div> <div class="literal">&#34;bar&#34;</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Improper value&#34;</div><div class="operator">,</div> <div class="ident">v</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestStringsMapEmptyInterface check the utility function stringsMap</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestStringsMapEmptyInterface</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">inputMap</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">inputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>construct output map from input map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">StringsMap</div><div class="operator">(</div><div class="ident">inputMap</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was found, which is not expected&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestStringsMapFilledInInterface check the utility function stringsMap</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestStringsMapFilledInInterface</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">var</div> <div class="ident">inputMap</div> <div class="operator">=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">entry</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">entry</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">&#34;baz&#34;</div><div class="operator"></div>
+	<div class="ident">inputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div> <div class="operator">=</div> <div class="ident">entry</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>construct output map from input map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">outputMap</div> <div class="operator">:=</div> <div class="ident">utils</div><div class="operator">.</div><div class="ident">StringsMap</div><div class="operator">(</div><div class="ident">inputMap</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check number of pairs stored in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">outputMap</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">1</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Invalid length of output map&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;foo&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was found, which is not expected&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check pairs in output map</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">=</div> <div class="ident">outputMap</div><div class="operator">[</div><div class="literal">&#34;bar&#34;</div><div class="operator">]</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">ok</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="literal">&#34;Key was not found&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>server_test.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>server_test.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">server_test</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;net/http/httptest&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;testing&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;time&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/logging&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/server&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/storage&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/tests/helpers&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestAddDefaultHeaders tests middleware adding headers</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestAddDefaultHeaders</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">expectedHeaders</div> <div class="operator">:=</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div>
+		<div class="literal">&#34;Access-Control-Allow-Methods&#34;</div><div class="operator">:</div>     <div class="literal">&#34;POST, GET, OPTIONS, PUT, DELETE&#34;</div><div class="operator">,</div>
+		<div class="literal">&#34;Access-Control-Allow-Headers&#34;</div><div class="operator">:</div>     <div class="literal">&#34;Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token&#34;</div><div class="operator">,</div>
+		<div class="literal">&#34;Access-Control-Allow-Credentials&#34;</div><div class="operator">:</div> <div class="literal">&#34;true&#34;</div><div class="operator">,</div>
+		<div class="literal">&#34;Access-Control-Allow-Origin&#34;</div><div class="operator">:</div>      <div class="literal">&#34;local&#34;</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">handler</div> <div class="operator">:=</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">HandlerFunc</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="ident">w</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">r</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">headers</div> <div class="operator">:=</div> <div class="ident">w</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">for</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">expectedHeaders</div> <div class="operator">{</div>
+			<div class="keyword">if</div> <div class="ident">header</div> <div class="operator">:=</div> <div class="ident">headers</div><div class="operator">.</div><div class="ident">Get</div><div class="operator">(</div><div class="ident">k</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">header</div> <div class="operator">!=</div> <div class="ident">v</div> <div class="operator">{</div>
+				<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;Unexpected header value of %v. Expected %v, got %v&#34;</div><div class="operator">,</div> <div class="ident">k</div><div class="operator">,</div> <div class="ident">v</div><div class="operator">,</div> <div class="ident">header</div><div class="operator">)</div><div class="operator"></div>
+			<div class="operator">}</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Add header to test addition of Access-Control-Allow-Origin</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">req</div><div class="operator">,</div> <div class="ident">_</div> <div class="operator">:=</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">NewRequest</div><div class="operator">(</div><div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="literal">&#34;/health-check&#34;</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">req</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">.</div><div class="ident">Set</div><div class="operator">(</div><div class="literal">&#34;Origin&#34;</div><div class="operator">,</div> <div class="literal">&#34;local&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">rr</div> <div class="operator">:=</div> <div class="ident">httptest</div><div class="operator">.</div><div class="ident">NewRecorder</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the handler with the middleware
+test call LogRequest too</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">handl</div> <div class="operator">:=</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">LogRequest</div><div class="operator">(</div><div class="ident">serv</div><div class="operator">.</div><div class="ident">AddDefaultHeaders</div><div class="operator">(</div><div class="ident">handler</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">handl</div><div class="operator">.</div><div class="ident">ServeHTTP</div><div class="operator">(</div><div class="ident">rr</div><div class="operator">,</div> <div class="ident">req</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestMainEndpoint tests OK behaviour with empty DB (schema only)</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestMainEndpoint</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">nonErrorTT</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">testCase</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">&#34;Main endpoint&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">MainEndpoint</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tt</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">nonErrorTT</div> <div class="operator">{</div>
+		<div class="ident">testRequest</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">tt</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestServerInitialize check the initialization method</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestServerInitialize</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">helpers</div><div class="operator">.</div><div class="ident">RunTestWithTimeout</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">splunk</div> <div class="operator">:=</div> <div class="ident">logging</div><div class="operator">.</div><div class="ident">NewClient</div><div class="operator">(</div><div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">storageInstance</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="literal">&#34;sqlite3&#34;</div><div class="operator">,</div> <div class="literal">&#34;:memory:&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">defer</div> <div class="ident">storageInstance</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">server</div><div class="operator">.</div><div class="ident">Server</div><div class="operator">{</div>
+			<div class="ident">Address</div><div class="operator">:</div>  <div class="literal">&#34;localhost:9999&#34;</div><div class="operator">,</div>
+			<div class="ident">UseHTTPS</div><div class="operator">:</div> <div class="ident">false</div><div class="operator">,</div>
+			<div class="ident">Storage</div><div class="operator">:</div>  <div class="ident">storageInstance</div><div class="operator">,</div>
+			<div class="ident">Splunk</div><div class="operator">:</div>   <div class="ident">splunk</div><div class="operator">,</div>
+			<div class="ident">TLSCert</div><div class="operator">:</div>  <div class="literal">&#34;&#34;</div><div class="operator">,</div>
+			<div class="ident">TLSKey</div><div class="operator">:</div>   <div class="literal">&#34;&#34;</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+
+		<div class="ident">serv</div><div class="operator">.</div><div class="ident">Initialize</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">,</div> <div class="literal">5</div><div class="operator">*</div><div class="ident">time</div><div class="operator">.</div><div class="ident">Second</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestServerInitializeOnProduction check the initialization method</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestServerInitializeOnProduction</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">helpers</div><div class="operator">.</div><div class="ident">RunTestWithTimeout</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">environment</div> <div class="operator">:=</div> <div class="ident">server</div><div class="operator">.</div><div class="ident">Environment</div><div class="operator"></div>
+		<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+			<div class="ident">server</div><div class="operator">.</div><div class="ident">Environment</div> <div class="operator">=</div> <div class="ident">environment</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">server</div><div class="operator">.</div><div class="ident">Environment</div> <div class="operator">=</div> <div class="literal">&#34;production&#34;</div><div class="operator"></div>
+
+		<div class="ident">splunk</div> <div class="operator">:=</div> <div class="ident">logging</div><div class="operator">.</div><div class="ident">NewClient</div><div class="operator">(</div><div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">storageInstance</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="literal">&#34;sqlite3&#34;</div><div class="operator">,</div> <div class="literal">&#34;:memory:&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">defer</div> <div class="ident">storageInstance</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">server</div><div class="operator">.</div><div class="ident">Server</div><div class="operator">{</div>
+			<div class="ident">Address</div><div class="operator">:</div>  <div class="literal">&#34;localhost:10000&#34;</div><div class="operator">,</div>
+			<div class="ident">UseHTTPS</div><div class="operator">:</div> <div class="ident">false</div><div class="operator">,</div>
+			<div class="ident">Storage</div><div class="operator">:</div>  <div class="ident">storageInstance</div><div class="operator">,</div>
+			<div class="ident">Splunk</div><div class="operator">:</div>   <div class="ident">splunk</div><div class="operator">,</div>
+			<div class="ident">TLSCert</div><div class="operator">:</div>  <div class="literal">&#34;&#34;</div><div class="operator">,</div>
+			<div class="ident">TLSKey</div><div class="operator">:</div>   <div class="literal">&#34;&#34;</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+
+		<div class="ident">serv</div><div class="operator">.</div><div class="ident">Initialize</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">,</div> <div class="literal">5</div><div class="operator">*</div><div class="ident">time</div><div class="operator">.</div><div class="ident">Second</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestServerInitializeHTTPSServer check the initialization method</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestServerInitializeHTTPSServer</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">helpers</div><div class="operator">.</div><div class="ident">RunTestWithTimeout</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">splunk</div> <div class="operator">:=</div> <div class="ident">logging</div><div class="operator">.</div><div class="ident">NewClient</div><div class="operator">(</div><div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">storageInstance</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="literal">&#34;sqlite3&#34;</div><div class="operator">,</div> <div class="literal">&#34;:memory:&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">defer</div> <div class="ident">storageInstance</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+		<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">server</div><div class="operator">.</div><div class="ident">Server</div><div class="operator">{</div>
+			<div class="ident">Address</div><div class="operator">:</div>  <div class="literal">&#34;localhost:10001&#34;</div><div class="operator">,</div>
+			<div class="ident">UseHTTPS</div><div class="operator">:</div> <div class="ident">true</div><div class="operator">,</div>
+			<div class="ident">Storage</div><div class="operator">:</div>  <div class="ident">storageInstance</div><div class="operator">,</div>
+			<div class="ident">Splunk</div><div class="operator">:</div>   <div class="ident">splunk</div><div class="operator">,</div>
+			<div class="ident">TLSCert</div><div class="operator">:</div>  <div class="literal">&#34;../certs/cert.pem&#34;</div><div class="operator">,</div>
+			<div class="ident">TLSKey</div><div class="operator">:</div>   <div class="literal">&#34;../certs/key.pem&#34;</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+
+		<div class="ident">serv</div><div class="operator">.</div><div class="ident">Initialize</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">,</div> <div class="literal">5</div><div class="operator">*</div><div class="ident">time</div><div class="operator">.</div><div class="ident">Second</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

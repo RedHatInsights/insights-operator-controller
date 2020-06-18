@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>cluster_test.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>cluster_test.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">server_test</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;testing&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestNonErrorsClusterWithoutData tests OK behaviour with empty DB (schema only)</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestNonErrorsClusterWithoutData</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">nonErrorTT</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">testCase</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusters OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusters</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusterByID Not found&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster Not found&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster Not found&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster Not found&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;2&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster Not found&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteClusterByName</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;foobar&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;NewCluster OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusCreated</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tt</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">nonErrorTT</div> <div class="operator">{</div>
+		<div class="ident">testRequest</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">tt</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestNonErrorsClusterWithData tests OK behaviour with mock data</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestNonErrorsClusterWithData</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">nonErrorTT</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">testCase</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusters OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusters</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;NewCluster OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusCreated</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusterByID OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusOK</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster OK&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteClusterByName</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;foobar&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tt</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">nonErrorTT</div> <div class="operator">{</div>
+		<div class="ident">testRequest</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">tt</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestDatabaseErrorsCluster tests unexpected behaviour by closing DB connection (consistency check)</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDatabaseErrorCluster</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">dbErrorTT</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">testCase</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusters DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusters</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;NewCluster DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusterByID DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;1&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteClusterByName</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;foobar&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster DB error&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusInternalServerError</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>close DB</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tt</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">dbErrorTT</div> <div class="operator">{</div>
+		<div class="ident">testRequest</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">tt</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestParameterErrorsCluster tests wrong request parameters</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestParameterErrorsCluster</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">serv</div> <div class="operator">:=</div> <div class="ident">MockedIOCServer</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">paramErrorTT</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">testCase</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">&#34;NewCluster no param&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;NewCluster empty name key&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">NewCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;POST&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusterByID no param&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;GetClusterByID non-int id&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">GetClusterByID</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;non-int&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster no param&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster by name&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster by name&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteClusterByName</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;foo&#34;</div><div class="operator">:</div> <div class="literal">&#34;test&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;DeleteCluster by non-int id&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">DeleteCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;DELETE&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;id&#34;</div><div class="operator">:</div> <div class="literal">&#34;non-int&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster no params&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">&#34;SearchCluster wrong data type&#34;</div><div class="operator">,</div> <div class="ident">serv</div><div class="operator">.</div><div class="ident">SearchCluster</div><div class="operator">,</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="literal">&#34;GET&#34;</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="literal">&#34;name&#34;</div><div class="operator">:</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">requestData</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tt</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">paramErrorTT</div> <div class="operator">{</div>
+		<div class="ident">testRequest</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">tt</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
