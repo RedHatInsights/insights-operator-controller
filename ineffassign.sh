@@ -13,5 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-go get github.com/gordonklaus/ineffassign
+if ! [ -x "$(command -v ineffassign)" ]
+then
+    echo -e "${BLUE}Installing ineffassign${NC}"
+    GO111MODULE=off go get github.com/gordonklaus/ineffassign
+fi
+
 ineffassign .

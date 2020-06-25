@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Copyright 2020 Red Hat, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,17 @@
 # limitations under the License.
 
 
-if ! [ -x "$(command -v gocyclo)" ]
+if ! [ -x "$(command -v goconst)" ]
 then
-    echo -e "${BLUE}Installing gocyclo${NC}"
-    GO111MODULE=off go get github.com/fzipp/gocyclo
+    echo -e "${BLUE}Installing goconst${NC}"
+    GO111MODULE=off go get github.com/jgautheron/goconst/cmd/goconst
 fi
 
-gocyclo -over 9 -avg .
+if [[ $(goconst -min-occurrences=2 ./... | tee /dev/tty | wc -l) -ne 0 ]]
+then
+    echo "Duplicated string(s) found"
+    exit 1
+else
+    echo "No duplicated strings found"
+    exit 0
+fi

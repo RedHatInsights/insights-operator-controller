@@ -15,7 +15,11 @@
 
 cd "$(dirname "$0")" || exit
 
-go get golang.org/x/lint/golint
+if ! [ -x "$(command -v golint)" ]
+then
+    echo -e "${BLUE}Installing golint${NC}"
+    GO111MODULE=off go get golang.org/x/lint/golint 2> /dev/null
+fi
 
 # shellcheck disable=SC2046
 if golint $(go list ./...) |
