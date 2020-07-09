@@ -1,0 +1,367 @@
+@startuml
+namespace helpers {
+    class helpers.TestFunctionPtr << (T, #FF7700) >>  {
+    }
+    class "<font color=blue>func</font>(*testing.T) " as fontcolorbluefuncfonttestingT {
+        'This class was created so that we can correctly have an alias pointing to this name. Since it contains dots that can break namespaces
+    }
+}
+
+
+namespace logging {
+    class Client << (S,Aquamarine) >> {
+        + ClientImpl *splunk.Client
+
+        + Log(key string, value string) error
+        + LogAction(action string, user string, description string) error
+        + LogTriggerAction(action string, user string, cluster string, trigger string) error
+        + LogWithTime(time int64, key string, value string) error
+
+    }
+}
+
+
+namespace main {
+    class Configuration << (S,Aquamarine) >> {
+        + UseHTTPS bool
+        + Address string
+        + TLSCert string
+        + TLSKey string
+        + DbDriver string
+        + StorageSpecification string
+        + SplunkEnabled bool
+        + SplunkAddress string
+        + SplunkToken string
+        + SplunkSource string
+        + SplunkSourceType string
+        + SplunkIndex string
+
+    }
+}
+
+
+namespace server {
+    class Server << (S,Aquamarine) >> {
+        + Address string
+        + UseHTTPS bool
+        + Storage storage.Storage
+        + Splunk logging.Client
+        + TLSCert string
+        + TLSKey string
+        + ClusterQuery *storage.ClusterQuery
+
+        - createTLSServer(router http.Handler) *http.Server
+
+        + GetAllTriggers(writer http.ResponseWriter, request *http.Request) 
+        + GetTrigger(writer http.ResponseWriter, request *http.Request) 
+        + DeleteTrigger(writer http.ResponseWriter, request *http.Request) 
+        + ActivateTrigger(writer http.ResponseWriter, request *http.Request) 
+        + DeactivateTrigger(writer http.ResponseWriter, request *http.Request) 
+        + GetClusterTriggers(writer http.ResponseWriter, request *http.Request) 
+        + RegisterClusterTrigger(writer http.ResponseWriter, request *http.Request) 
+        + ReadConfigurationForOperator(writer http.ResponseWriter, request *http.Request) 
+        + RegisterCluster(writer http.ResponseWriter, request *http.Request) 
+        + GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) 
+        + AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) 
+        + GetClusters(writer http.ResponseWriter, request *http.Request) 
+        + NewCluster(writer http.ResponseWriter, request *http.Request) 
+        + GetClusterByID(writer http.ResponseWriter, request *http.Request) 
+        + DeleteCluster(writer http.ResponseWriter, request *http.Request) 
+        + DeleteClusterByName(writer http.ResponseWriter, request *http.Request) 
+        + SearchCluster(writer http.ResponseWriter, request *http.Request) 
+        + MainEndpoint(writer http.ResponseWriter, request *http.Request) 
+        + LogRequest(nextHandler http.Handler) http.Handler
+        + AddDefaultHeaders(nextHandler http.Handler) http.Handler
+        + Initialize() 
+        + JWTAuthentication(next http.Handler) http.Handler
+        + ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) 
+        + GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) 
+        + NewConfigurationProfile(writer http.ResponseWriter, request *http.Request) 
+        + DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) 
+        + ChangeConfigurationProfile(writer http.ResponseWriter, request *http.Request) 
+        + GetConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + DeleteConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + GetAllConfigurations(writer http.ResponseWriter, request *http.Request) 
+        + GetClusterConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + EnableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, active string) 
+        + EnableConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + DisableConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + NewClusterConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + EnableClusterConfiguration(writer http.ResponseWriter, request *http.Request) 
+        + DisableClusterConfiguration(writer http.ResponseWriter, request *http.Request) 
+
+    }
+    class Token << (S,Aquamarine) >> {
+        + Login string
+
+    }
+    class server.contextKey << (T, #FF7700) >>  {
+    }
+}
+"jwt-go.StandardClaims" *-- "server.Token"
+
+
+namespace storage {
+    class Cluster << (S,Aquamarine) >> {
+        + ID ClusterID
+        + Name ClusterName
+
+    }
+    class ClusterConfiguration << (S,Aquamarine) >> {
+        + ID ClusterConfigurationID
+        + Cluster string
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Active string
+        + Reason string
+
+    }
+    class ClusterQuery << (S,Aquamarine) >> {
+        - storage Storager
+        - selectColumns []ClusterCol
+
+        + Cols Cols
+        + TableName string
+
+        - mapCol(storageCol Column, cluster <font color=blue>interface</font>{}) (<font color=blue>interface</font>{}, error)
+
+        + Map(cols []ClusterCol, r *Cluster) ([]<font color=blue>interface</font>{}, error)
+        + Query() ClusterQueryBuilder
+        + QueryOne(ctx context.Context, req SearchClusterRequest) (*Cluster, error)
+
+    }
+    class ClusterQueryBuilder << (S,Aquamarine) >> {
+        - sb squirrel.SelectBuilder
+
+        + Equals(col ClusterCol, v <font color=blue>interface</font>{}) ClusterQueryBuilder
+        + WithPaging(limit int, offset int) ClusterQueryBuilder
+
+    }
+    class Cols << (S,Aquamarine) >> {
+        + ID ClusterCol
+        + Name ClusterCol
+
+    }
+    class ConfigurationProfile << (S,Aquamarine) >> {
+        + ID ConfigurationID
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Description string
+
+    }
+    class ItemNotFoundError << (S,Aquamarine) >> {
+        + ItemID <font color=blue>interface</font>{}
+
+        + Error() string
+
+    }
+    class SearchClusterRequest << (S,Aquamarine) >> {
+        + ID int
+        + Name string
+
+    }
+    class Storage << (S,Aquamarine) >> {
+        - connections *sql.DB
+        - driver string
+        - placeholder squirrel.PlaceholderFormat
+
+        - readClusterConfigurations(rows *sql.Rows) ([]ClusterConfiguration, error)
+        - getTriggers(rows *sql.Rows) ([]Trigger, error)
+
+        + Placeholder() squirrel.PlaceholderFormat
+        + Connections() *sql.DB
+        + Close() 
+        + ListOfClusters() ([]Cluster, error)
+        + GetCluster(id int) (Cluster, error)
+        + RegisterNewCluster(name string) error
+        + CreateNewCluster(id int64, name string) error
+        + DeleteCluster(id int64) error
+        + DeleteClusterByName(name string) error
+        + GetClusterByName(name string) (Cluster, error)
+        + ListConfigurationProfiles() ([]ConfigurationProfile, error)
+        + GetConfigurationProfile(id int) (ConfigurationProfile, error)
+        + StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error)
+        + ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error)
+        + DeleteConfigurationProfile(id int) ([]ConfigurationProfile, error)
+        + ListAllClusterConfigurations() ([]ClusterConfiguration, error)
+        + ListClusterConfiguration(cluster string) ([]ClusterConfiguration, error)
+        + GetClusterConfigurationByID(id int64) (string, error)
+        + GetClusterActiveConfiguration(cluster string) (string, error)
+        + GetConfigurationIDForCluster(cluster string) (int, error)
+        + InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool
+        + SelectConfigurationProfileID(tx *sql.Tx) (int, error)
+        + DeactivatePreviousConfigurations(tx *sql.Tx, clusterID ClusterID) error
+        + InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error
+        + CreateClusterConfiguration(cluster string, username string, reason string, description string, configuration string) ([]ClusterConfiguration, error)
+        + EnableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error)
+        + DisableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error)
+        + EnableOrDisableClusterConfigurationByID(id int64, active string) error
+        + DeleteClusterConfigurationByID(id int64) error
+        + GetTriggerByID(id int64) (Trigger, error)
+        + DeleteTriggerByID(id int64) error
+        + ChangeStateOfTriggerByID(id int64, active int) error
+        + ListAllTriggers() ([]Trigger, error)
+        + ListClusterTriggers(clusterName string) ([]Trigger, error)
+        + ListActiveClusterTriggers(clusterName string) ([]Trigger, error)
+        + GetTriggerID(triggerType string) (int, error)
+        + NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error
+        + NewTriggerType(ttype string, description string) error
+        + AckTrigger(clusterName string, triggerID int64) error
+        + QueryOne(ctx context.Context, selectCols []Column, selectBuilder squirrel.SelectBuilder, mapper <font color=blue>func</font>(Column, <font color=blue>interface</font>{}) (<font color=blue>interface</font>{}, error), res <font color=blue>interface</font>{}) error
+        + Map(cols []Column, mapper <font color=blue>func</font>(Column, <font color=blue>interface</font>{}) (<font color=blue>interface</font>{}, error), r <font color=blue>interface</font>{}) ([]<font color=blue>interface</font>{}, error)
+        + Ping() error
+
+    }
+    interface Storager  {
+        + Connections() *sql.DB
+        + Placeholder() squirrel.PlaceholderFormat
+        + QueryOne( context.Context,  []Column,  squirrel.SelectBuilder,  <font color=blue>func</font>(Column, <font color=blue>interface</font>{}) (<font color=blue>interface</font>{}, error),  <font color=blue>interface</font>{}) error
+
+    }
+    class Trigger << (S,Aquamarine) >> {
+        + ID TriggerID
+        + Type string
+        + Cluster string
+        + Reason string
+        + Link string
+        + TriggeredAt string
+        + TriggeredBy string
+        + AckedAt string
+        + Parameters string
+        + Active int
+
+    }
+    class storage.ClusterCol << (T, #FF7700) >>  {
+    }
+    class storage.ClusterConfigurationID << (T, #FF7700) >>  {
+    }
+    class storage.ClusterID << (T, #FF7700) >>  {
+    }
+    class storage.ClusterName << (T, #FF7700) >>  {
+    }
+    class storage.Column << (T, #FF7700) >>  {
+    }
+    class storage.ConfigurationID << (T, #FF7700) >>  {
+    }
+    class storage.ID << (T, #FF7700) >>  {
+    }
+    class storage.Name << (T, #FF7700) >>  {
+    }
+    class storage.TriggerID << (T, #FF7700) >>  {
+    }
+}
+"utils.Pagination" *-- "storage.SearchClusterRequest"
+
+"storage.Storager" <|-- "storage.Storage"
+
+namespace testdata {
+    class DataGenerator << (S,Aquamarine) >> {
+        - storage storage.Storage
+        - config dataConfiguration
+
+        + Close() 
+        + PopulateCluster() []error
+        + PopulateConfigurationProfile() []error
+        + PopulateOperatorConfiguration() []error
+        + PopulateTrigger(triggerType string) []error
+        + InsertTriggerType(ttype string, description string) error
+
+    }
+    class dataConfiguration << (S,Aquamarine) >> {
+        + OperatorConfigurationNo int
+        + ClusterNo int
+        + TriggerNo int
+        + ConfProfileNo int
+
+    }
+}
+
+
+namespace tests {
+    class Cluster << (S,Aquamarine) >> {
+        + ID int
+        + Name string
+
+    }
+    class ClusterConfiguration << (S,Aquamarine) >> {
+        + ID int
+        + Cluster string
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Active string
+        + Reason string
+
+    }
+    class ClusterConfigurationsResponse << (S,Aquamarine) >> {
+        + Status string
+        + Configuration []ClusterConfiguration
+
+    }
+    class ClusterResponse << (S,Aquamarine) >> {
+        + Status string
+        + Clusters []Cluster
+
+    }
+    class ConfigurationProfile << (S,Aquamarine) >> {
+        + ID int
+        + Configuration string
+        + ChangedAt string
+        + ChangedBy string
+        + Description string
+
+    }
+    class ConfigurationProfileResponse << (S,Aquamarine) >> {
+        + Status string
+        + Profile ConfigurationProfile
+
+    }
+    class ConfigurationProfilesResponse << (S,Aquamarine) >> {
+        + Status string
+        + Profiles []ConfigurationProfile
+
+    }
+    class Trigger << (S,Aquamarine) >> {
+        + ID int
+        + Type string
+        + Cluster string
+        + Reason string
+        + Link string
+        + TriggeredAt string
+        + TriggeredBy string
+        + AckedAt string
+        + Parameters string
+        + Active int
+
+    }
+    class TriggerResponse << (S,Aquamarine) >> {
+        + Status string
+        + Triggers []Trigger
+
+    }
+}
+
+
+namespace utils {
+    class Pagination << (S,Aquamarine) >> {
+        + Limit int
+        + Offset int
+
+    }
+}
+
+
+"__builtin__.int" #.. "storage.ID"
+"__builtin__.string" #.. "server.contextKey"
+"__builtin__.string" #.. "storage.Column"
+"__builtin__.string" #.. "storage.Name"
+"helpers.fontcolorbluefuncfonttestingT" #.. "helpers.TestFunctionPtr"
+"storage.Column" #.. "storage.ClusterCol"
+"storage.ID" #.. "storage.ClusterConfigurationID"
+"storage.ID" #.. "storage.ClusterID"
+"storage.ID" #.. "storage.ConfigurationID"
+"storage.ID" #.. "storage.TriggerID"
+"storage.Name" #.. "storage.ClusterName"
+@enduml
