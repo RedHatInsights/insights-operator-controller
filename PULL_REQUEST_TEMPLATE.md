@@ -15,7 +15,7 @@ Please delete options that are not relevant.
 - Refactor (refactoring code, removing useless files)
 - Unit tests (no changes in the code)
 - REST API tests
-- Benchmarks
+- Benchmarks (no changes in the code)
 - Documentation update
 
 ## Testing steps
