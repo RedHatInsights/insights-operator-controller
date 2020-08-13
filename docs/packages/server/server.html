@@ -220,7 +220,15 @@ limitations under the License.
 	<div class="operator">}</div><div class="operator"></div>
 	<div class="ident">caCertPool</div> <div class="operator">:=</div> <div class="ident">x509</div><div class="operator">.</div><div class="ident">NewCertPool</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">caCertPool</div><div class="operator">.</div><div class="ident">AppendCertsFromPEM</div><div class="operator">(</div><div class="ident">caCert</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">tlsConfig</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">tls</div><div class="operator">.</div><div class="ident">Config</div><div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>disable &quot;G402 (CWE-295): TLS MinVersion too low. (Confidence: HIGH, Severity: HIGH)&quot;</p>
+
+<h1>nosec G402</h1>
+</td>
+	<td class="code"><pre><code>	<div class="ident">tlsConfig</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">tls</div><div class="operator">.</div><div class="ident">Config</div><div class="operator">{</div>
 		<div class="ident">ClientCAs</div><div class="operator">:</div>  <div class="ident">caCertPool</div><div class="operator">,</div>
 		<div class="ident">ClientAuth</div><div class="operator">:</div> <div class="ident">tls</div><div class="operator">.</div><div class="ident">RequireAndVerifyClientCert</div><div class="operator">,</div>
 	<div class="operator">}</div><div class="operator"></div>
