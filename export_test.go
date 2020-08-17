@@ -16,6 +16,12 @@ limitations under the License.
 
 package main
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/export_test.html
+
 // Export for testing
 //
 // This source file contains name aliases of all package-private functions
