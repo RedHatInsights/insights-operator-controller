@@ -16,6 +16,12 @@ limitations under the License.
 
 package server
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/server
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/server/trigger.html
+
 import (
 	"fmt"
 	"net/http"
