@@ -16,6 +16,9 @@ limitations under the License.
 
 package logging_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/logging/splunk_test.html
+
 import (
 	"testing"
 
