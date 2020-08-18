@@ -117,7 +117,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */</div>
 
-<div class="keyword">package</div> <div class="ident">storage</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Package storage contains an implementation of interface between Go code and
+(almost any) SQL database like PostgreSQL, SQLite, or MariaDB. An implementation
+named DBStorage is constructed via New function and it is mandatory to call Close
+for any opened connection to database.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">package</div> <div class="ident">storage</div><div class="operator"></div>
 
 <div class="keyword">import</div> <div class="operator">(</div>
 	<div class="literal">&#34;context&#34;</div><div class="operator"></div>
