@@ -403,7 +403,7 @@
         "/client/cluster/{cluster}/trigger/{trigger}": {
             "post": {
                 "summary": "Register new trigger for cluster",
-                "description": "",
+                "description": "Register new trigger (and all its information) for a cluster specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "cluster",
