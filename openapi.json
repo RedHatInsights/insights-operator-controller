@@ -523,12 +523,12 @@
         "/metrics": {
             "get": {
                 "summary": "Read all metrics exposed by this service",
-                "description": "",
+                "description": "Set of metrics providing total number of requests counter, API endpoints response times, and counter of HTTP status code responses. Additionally it is possible to consume all metrics provided by Go runtime. These metrics start with go_ and process_ prefixes.",
                 "parameters": [],
                 "operationId": "getMetrics",
                 "responses": {
                     "default": {
-                        "description": "Default response"
+                        "description": "Default response containing all metrics in semi-structured text format"
                     }
                 }
             }
