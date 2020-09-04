@@ -479,7 +479,7 @@
         "/client/trigger/{id}/deactivate": {
             "post": {
                 "summary": "Deactivate trigger",
-                "description": "",
+                "description": "Deactivate trigger identified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
