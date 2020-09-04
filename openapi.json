@@ -380,7 +380,7 @@
         "/client/cluster/{cluster}/trigger": {
             "get": {
                 "summary": "Return list of triggers for single cluster",
-                "description": "",
+                "description": "Retrieve list of triggers for specified cluster. Cluster needs to be specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "cluster",
