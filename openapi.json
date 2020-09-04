@@ -548,8 +548,8 @@
         },
         "/operator/configuration/{cluster}": {
             "get": {
-                "summary": "Read configuration for operator",
-                "description": "",
+                "summary": "Read configuration for operator for given cluster",
+                "description": "Retrieve configuration for operator running in given cluster. Cluster is specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "cluster",
