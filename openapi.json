@@ -572,7 +572,7 @@
         "/operator/triggers/{cluster}": {
             "get": {
                 "summary": "Get all active triggers for a given cluster",
-                "description": "",
+                "description": "Retrieve list of all triggers that are set active for a given cluster. Cluster needs to be specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "cluster",
