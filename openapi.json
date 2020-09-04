@@ -625,7 +625,7 @@
             },
             "put": {
                 "summary": "Ack single cluster's trigger",
-                "description": "",
+                "description": "Ack trigger for selected cluster. Cluster and trigger have to be identified by theirs unique ID.",
                 "parameters": [
                     {
                         "name": "cluster",
