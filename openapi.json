@@ -335,7 +335,7 @@
         },
         "/client/trigger/{id}": {
             "get": {
-                "summary": "Return single trigger by its id",
+                "summary": "Return single trigger specified by its ID",
                 "description": "",
                 "parameters": [
                     {
@@ -357,7 +357,7 @@
             },
             "delete": {
                 "summary": "Delete single trigger",
-                "description": "",
+                "description": "Delete trigger specified by its unique ID from service database.",
                 "parameters": [
                     {
                         "name": "id",
