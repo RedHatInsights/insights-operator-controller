@@ -336,7 +336,7 @@
         "/client/trigger/{id}": {
             "get": {
                 "summary": "Return single trigger specified by its ID",
-                "description": "",
+                "description": "Retrieve information about trigger specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
