@@ -435,7 +435,7 @@
         "/client/trigger/{id}/activate": {
             "post": {
                 "summary": "Activate filter",
-                "description": "",
+                "description": "Activate trigger identified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
