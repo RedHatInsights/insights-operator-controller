@@ -536,7 +536,7 @@
         "/operator/register/{cluster}": {
             "get": {
                 "summary": "Register new cluster",
-                "description": "",
+                "description": "Register new cluster in this service. Cluster needs to be specified by its unique ID.",
                 "parameters": [],
                 "operationId": "registerCluster",
                 "responses": {
