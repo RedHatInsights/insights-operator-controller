@@ -323,7 +323,7 @@
         "/client/trigger": {
             "get": {
                 "summary": "Return list of all triggers",
-                "description": "",
+                "description": "Return list of all triggers that are stored in database.",
                 "parameters": [],
                 "operationId": "getAllTriggers",
                 "responses": {
