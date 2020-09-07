@@ -232,8 +232,8 @@
         },
         "/client/configuration/{id}": {
             "get": {
-                "summary": "Return single configuration by id",
-                "description": "",
+                "summary": "Return single configuration identified by its ID",
+                "description": "Return single configuration identified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
