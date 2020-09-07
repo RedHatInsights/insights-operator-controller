@@ -220,7 +220,7 @@
         "/client/configuration": {
             "get": {
                 "summary": "Return list of all configurations",
-                "description": "",
+                "description": "Return list of all cluster configurations.",
                 "parameters": [],
                 "operationId": "getAllConfigurations",
                 "responses": {
