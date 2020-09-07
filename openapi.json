@@ -277,7 +277,7 @@
         "/client/configuration/{id}/enable": {
             "put": {
                 "summary": "Enable configuration identified by its ID",
-                "description": "",
+                "description": "Enable cluster configuration identified by its ID.",
                 "parameters": [
                     {
                         "name": "id",
