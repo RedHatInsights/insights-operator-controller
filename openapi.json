@@ -300,7 +300,7 @@
         "/client/configuration/{id}/disable": {
             "put": {
                 "summary": "Disable configuration identified by its ID",
-                "description": "",
+                "description": "Disable cluster configuration identified by its ID.",
                 "parameters": [
                     {
                         "name": "od",
