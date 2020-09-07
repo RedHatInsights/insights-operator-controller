@@ -254,7 +254,7 @@
             },
             "delete": {
                 "summary": "Remove single configuration identified by its ID",
-                "description": "",
+                "description": "Remove single configuration identified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
