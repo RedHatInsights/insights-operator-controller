@@ -142,7 +142,7 @@
             },
             "post": {
                 "summary": "Creates new configuration profile",
-                "description": "",
+                "description": "Create new configuration profile from data that needs to be sent in payload.",
                 "parameters": [],
                 "operationId": "newConfigurationProfile",
                 "responses": {
