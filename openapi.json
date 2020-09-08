@@ -197,7 +197,7 @@
             },
             "put": {
                 "summary": "Change configuration profile",
-                "description": "",
+                "description": "Change configuration profile identified by its unique ID. Profile data need to be sent in payload.",
                 "parameters": [
                     {
                         "name": "id",
