@@ -176,7 +176,7 @@
             },
             "delete": {
                 "summary": "Delete configuration profile",
-                "description": "",
+                "description": "Delete configuration profile specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
