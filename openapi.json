@@ -155,7 +155,7 @@
         "/client/profile/{id}": {
             "get": {
                 "summary": "Read profile specified by its ID",
-                "description": "",
+                "description": "Read configuration profile specified by its unique ID.",
                 "parameters": [
                     {
                         "name": "id",
