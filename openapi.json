@@ -131,7 +131,7 @@
         "/client/profile": {
             "get": {
                 "summary": "Read list of configuration profiles",
-                "description": "",
+                "description": "Read list of all configuration profiles without any filtering.",
                 "parameters": [],
                 "operationId": "listConfigurationProfiles",
                 "responses": {
