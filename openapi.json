@@ -73,7 +73,7 @@
             },
             "post": {
                 "summary": "Create a record with new cluster in a database. The updated list of all clusters is returned to client",
-                "description": "",
+                "description": "Create a record with new cluster in a database. The updated list of all clusters is returned to client to recheck.",
                 "parameters": [],
                 "operationId": "newCluster",
                 "responses": {
