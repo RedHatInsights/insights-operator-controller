@@ -97,7 +97,7 @@
         "/client/cluster/search": {
             "get": {
                 "summary": "Search for a cluster specified by its ID or name",
-                "description": "",
+                "description": "Search for a cluster specified by its ID or by its name. Both parameters are optional.",
                 "parameters": [
                     {
                         "name": "id",
