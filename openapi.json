@@ -84,7 +84,7 @@
             },
             "delete": {
                 "summary": "Delete a cluster specified by its ID",
-                "description": "",
+                "description": "Delete a cluster specified by its unique ID.",
                 "parameters": [],
                 "operationId": "deleteCluster",
                 "responses": {
