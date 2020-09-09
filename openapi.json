@@ -62,7 +62,7 @@
         "/client/cluster/{name}": {
             "get": {
                 "summary": "Read cluster specified by its ID and return it to a client",
-                "description": "",
+                "description": "Read cluster specified by its unique ID and return it to a client.",
                 "parameters": [],
                 "operationId": "getClusterById",
                 "responses": {
