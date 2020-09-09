@@ -49,7 +49,7 @@
             },
             "get": {
                 "summary": "Read list of all clusters from database and return it to a client",
-                "description": "",
+                "description": "Read list of all clusters from database and return it to a client.",
                 "parameters": [],
                 "operationId": "getClusters",
                 "responses": {
