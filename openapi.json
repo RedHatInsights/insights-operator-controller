@@ -25,7 +25,7 @@
         "/": {
             "get": {
                 "summary": "Returns valid HTTP 200 ok status when the service is ready",
-                "description": "",
+                "description": "Returns valid HTTP 200 ok status when the service is ready to response to requests that come from clients",
                 "parameters": [],
                 "operationId": "main",
                 "responses": {
