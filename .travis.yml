@@ -18,6 +18,9 @@ go:
 
 jobs:
   include:
+    - stage: build
+      script:
+        - go build
     - stage: style
       script:
         - make style
@@ -32,6 +35,7 @@ jobs:
         - ./test.sh
 
 stages:
+  - build
   - style
   - unit tests
   - REST API tests
