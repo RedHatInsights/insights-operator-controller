@@ -18,6 +18,9 @@ limitations under the License.
 
 package server_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/server/testutils_test.html
+
 import (
 	"bytes"
 	"github.com/RedHatInsights/insights-operator-controller/logging"
