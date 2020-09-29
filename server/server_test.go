@@ -16,6 +16,9 @@ limitations under the License.
 
 package server_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/server/server_test.html
+
 import (
 	"net/http"
 	"net/http/httptest"
