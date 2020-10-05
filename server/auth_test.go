@@ -16,4 +16,7 @@ limitations under the License.
 
 package server_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/server/auth_test.html
+
 // JWTAuthentication func is tested very atomically in REST API tests
