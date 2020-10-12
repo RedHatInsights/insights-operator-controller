@@ -14,6 +14,9 @@
 
 package testsbenchmark
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/benchmark/operator_test.html
+
 import (
 	//"fmt"
 	"testing"
