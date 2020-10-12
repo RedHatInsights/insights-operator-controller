@@ -16,6 +16,9 @@ limitations under the License.
 
 package storage_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/storage/storage_test.html
+
 import (
 	"database/sql"
 	"testing"
