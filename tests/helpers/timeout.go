@@ -16,6 +16,12 @@ limitations under the License.
 
 package helpers
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/tests/helpers
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/helpers/timeout.html
+
 import (
 	"testing"
 	"time"
