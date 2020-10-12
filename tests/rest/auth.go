@@ -16,6 +16,9 @@ limitations under the License.
 
 package tests
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/rest/auth.html
+
 import (
 	"github.com/verdverm/frisby"
 	"os"
