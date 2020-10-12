@@ -16,6 +16,9 @@ limitations under the License.
 
 package storage
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/storage/cluster_test.html
+
 import (
 	"context"
 	"database/sql"
