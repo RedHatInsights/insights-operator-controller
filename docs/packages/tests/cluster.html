@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>cluster.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>cluster.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2019, 2020 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+<div class="keyword">package</div> <div class="ident">tests</div><div class="operator"></div>
+
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;encoding/json&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/verdverm/frisby&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Cluster represents cluster record in the controller service.
+    ID: unique key
+    Name: cluster GUID in the following format:
+        c8590f31-e97e-4b85-b506-c45ce1911a12</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">Cluster</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">ID</div>   <div class="ident">int</div>    <div class="literal">`json:&#34;id&#34;`</div><div class="operator"></div>
+	<div class="ident">Name</div> <div class="ident">string</div> <div class="literal">`json:&#34;name&#34;`</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ClusterResponse represents default response for cluster request</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">ClusterResponse</div> <div class="keyword">struct</div> <div class="operator">{</div>
+	<div class="ident">Status</div>   <div class="ident">string</div>    <div class="literal">`json:&#34;status&#34;`</div><div class="operator"></div>
+	<div class="ident">Clusters</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div> <div class="literal">`json:&#34;clusters&#34;`</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>readListOfClusters tries to read list of clusters from the HTTP server response</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">)</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to get response from REST API server</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">f</div><div class="operator">.</div><div class="ident">Get</div><div class="operator">(</div><div class="ident">API_URL</div> <div class="operator">&#43;</div> <div class="literal">&#34;/client/cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectHeader</div><div class="operator">(</div><div class="literal">&#34;Content-Type&#34;</div><div class="operator">,</div> <div class="literal">&#34;application/json; charset=utf-8&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>default return value from this function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">response</div> <div class="operator">:=</div> <div class="ident">ClusterResponse</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to read payload from response</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">text</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">f</div><div class="operator">.</div><div class="ident">Resp</div><div class="operator">.</div><div class="ident">Content</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to unmarshall response body and check if it's correct</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">json</div><div class="operator">.</div><div class="ident">Unmarshal</div><div class="operator">(</div><div class="ident">text</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">response</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>any error needs to be recorded</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">response</div><div class="operator">.</div><div class="ident">Clusters</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusterID</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">Post</div><div class="operator">(</div><div class="ident">API_URL</div> <div class="operator">&#43;</div> <div class="literal">&#34;client/cluster/&#34;</div> <div class="operator">&#43;</div> <div class="ident">clusterName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">201</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusterID</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">Delete</div><div class="operator">(</div><div class="ident">API_URL</div> <div class="operator">&#43;</div> <div class="literal">&#34;client/cluster/&#34;</div> <div class="operator">&#43;</div> <div class="ident">clusterID</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectHeader</div><div class="operator">(</div><div class="literal">&#34;Content-Type&#34;</div><div class="operator">,</div> <div class="literal">&#34;application/json; charset=utf-8&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div> <div class="operator">!=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;%d clusters are expected, but got %d&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">i</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator">;</div> <div class="ident">i</div> <div class="operator">&lt;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">i</div><div class="operator">&#43;&#43;</div> <div class="operator">{</div>
+		<div class="keyword">if</div> <div class="ident">clusters</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div> <div class="operator">!=</div> <div class="ident">expected</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div> <div class="operator">{</div>
+			<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;Different cluster info returned: %v != %v&#34;</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div> <div class="operator">!=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;%d clusters are expected, but got %d&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">i</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator">;</div> <div class="ident">i</div> <div class="operator">&lt;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">i</div><div class="operator">&#43;&#43;</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>we are not interested in comparing IDs</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">clusters</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">.</div><div class="ident">ID</div> <div class="operator">=</div> <div class="literal">0</div><div class="operator"></div>
+		<div class="ident">expected</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">.</div><div class="ident">ID</div> <div class="operator">=</div> <div class="literal">0</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">clusters</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div> <div class="operator">!=</div> <div class="ident">expected</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div> <div class="operator">{</div>
+			<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;Different cluster info returned: %v != %v&#34;</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">[</div><div class="ident">i</div><div class="operator">]</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkInitialListOfClusters</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check the initial list of clusters&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkAddCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check adding new cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;50&#34;</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">5</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkDeleteCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check deleting existing cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">5</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;5&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkDeleteAnotherCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check deleting another existing cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000004&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;4&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkDeleteNonexistentCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check deleting nonexistent cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;40&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">404</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkDeleteAllClusters</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check deleting all existing clusters&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;0&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;1&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;3&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkCreateNewCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check creating new cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;50&#34;</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">checkCreateCluster1234</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check creating new cluster&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;1234&#34;</div><div class="operator">,</div> <div class="literal">&#34;00000001-0002-0003-0004-000000000005&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
+		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">4</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+		<div class="operator">{</div><div class="literal">5</div><div class="operator">,</div> <div class="literal">&#34;00000001-0002-0003-0004-000000000005&#34;</div><div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ClusterTests run all cluster-related REST API tests.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">ClusterTests</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">checkInitialListOfClusters</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">checkAddCluster</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">checkDeleteCluster</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">checkDeleteAnotherCluster</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">checkDeleteNonexistentCluster</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>checkDeleteAllClusters() - not used ATM, DB constraint</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCreateNewCluster</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">checkCreateCluster1234</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TODO:
+add new cluster with improper name
+delete a cluster with improper name</p>
+</td>
+	<td class="code"><pre><code><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
