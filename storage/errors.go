@@ -14,6 +14,12 @@
 
 package storage
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/storage
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/storage/errors.html
+
 import (
 	"fmt"
 )
