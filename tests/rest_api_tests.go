@@ -14,6 +14,12 @@
 
 package main
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/tests
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/rest_api_tests.html
+
 import (
 	"github.com/RedHatInsights/insights-operator-controller/server"
 	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"
