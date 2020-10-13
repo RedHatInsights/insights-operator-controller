@@ -16,6 +16,9 @@
 // testing the insight-operator-controller .
 package testdata
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/setup/testdata.html
+
 import (
 	"fmt"
 
