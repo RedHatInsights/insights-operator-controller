@@ -16,6 +16,9 @@ limitations under the License.
 
 package utils
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/utils/export_test.html
+
 // Export for testing
 //
 // This source file contains name aliases of all package-private functions
