@@ -16,6 +16,9 @@ limitations under the License.
 
 package tests
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/tests/rest/profile.html
+
 import (
 	"encoding/json"
 	"fmt"
