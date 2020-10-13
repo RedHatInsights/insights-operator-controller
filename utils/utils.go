@@ -18,6 +18,12 @@ limitations under the License.
 
 package utils
 
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/utils
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/utils/utils.html
+
 import (
 	"reflect"
 )
