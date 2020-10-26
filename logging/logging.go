@@ -17,3 +17,9 @@ limitations under the License.
 // Package logging contains implementation of various logging strategies.
 // Currently supported strategy includes logging into Splunk.
 package logging
+
+// Generated documentation is available at:
+// https://godoc.org/github.com/RedHatInsights/insights-operator-controller/logging
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-operator-controller/packages/logging/logging.html
