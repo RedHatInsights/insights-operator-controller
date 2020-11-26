@@ -16,7 +16,6 @@ limitations under the License.
 
 // Package server contains implementation of REST API server (HTTPServer) for the
 // Insights Operator controller service.
-
 package server
 
 // Generated documentation is available at:
