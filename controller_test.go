@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//
+package main_test
+
 // Documentation in literate-programming-style is available at:
 // https://redhatinsights.github.io/insights-operator-controller/packages/controller_test.html
-package main_test
 
 import (
 	"os"
