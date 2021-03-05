@@ -10,6 +10,8 @@ A service to be used to store Insights operator configuration and to offer the c
 
 ## How to build the tool
 
+Go version 1.14 or higher is required to build the client.
+
 Use the standard Go command:
 
 ```
