@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/RedHatInsights/insights-operator-controller?status.svg)](https://godoc.org/github.com/RedHatInsights/insights-operator-controller)
 [![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://redhatinsights.github.io/insights-operator-controller/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-operator-controller)](https://goreportcard.com/report/github.com/RedHatInsights/insights-operator-controller) [![Build Status](https://travis-ci.org/RedHatInsights/insights-operator-controller.svg?branch=master)](https://travis-ci.org/RedHatInsights/insights-operator-controller) [![codecov](https://codecov.io/gh/RedHatInsights/insights-operator-controller/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/insights-operator-controller)
-[![License](https://img.shields.io/badge/license-Apache--2.0%20%2F%20MIT-%2397ca00.svg)](https://github.com/RedHatInsights/insights-operator-controller/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/RedHatInsights/insights-operator-controller/blob/master/LICENSE)
 
 ## Description
 
