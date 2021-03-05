@@ -1,6 +1,6 @@
 module github.com/RedHatInsights/insights-operator-controller
 
-go 1.13
+go 1.14
 
 require (
 	github.com/Masterminds/squirrel v1.2.0
