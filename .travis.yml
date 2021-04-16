@@ -29,6 +29,7 @@ jobs:
         - make test
         - go tool cover -func=coverage.out
       after_success:
+        - env
         - bash <(curl -s https://codecov.io/bash)
     - stage: REST API tests
       script:
