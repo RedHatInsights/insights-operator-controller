@@ -38,7 +38,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
-		responses.SendError(writer, "Cluster ID needs to be specified")
+		responses.SendBadRequest(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -69,7 +69,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check parameters provided by client
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		responses.SendError(writer, "Cluster name needs to be specified")
+		responses.SendBadRequest(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -95,7 +95,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		responses.SendBadRequest(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -108,7 +108,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
 }
 
@@ -117,7 +117,7 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		responses.SendBadRequest(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -137,6 +137,6 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
