@@ -41,7 +41,7 @@ func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request
 		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 }
 
 // GetTrigger method returns single trigger by id
@@ -62,7 +62,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("trigger", trigger))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("trigger", trigger))
 	}
 }
 
@@ -93,7 +93,7 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 	} else if err != nil {
 		responses.Send(http.StatusInternalServerError, writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -120,7 +120,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -147,7 +147,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -169,7 +169,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
 }
 
@@ -224,6 +224,6 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }

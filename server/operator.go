@@ -108,7 +108,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
 }
 
@@ -137,6 +137,6 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }

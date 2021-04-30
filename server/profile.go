@@ -38,7 +38,7 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 
 	// check if the storage operation was successful
 	if err == nil {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
 		TryToSendInternalServerError(writer, err.Error())
 	}
@@ -62,7 +62,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("profile", profile))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profile", profile))
 	}
 }
 
@@ -131,7 +131,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -181,6 +181,6 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }

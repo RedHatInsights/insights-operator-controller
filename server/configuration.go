@@ -36,7 +36,7 @@ import (
 func sendConfiguration(writer http.ResponseWriter, configuration string) {
 	resp := responses.BuildOkResponse()
 	resp["configuration"] = configuration
-	responses.SendOK(writer, resp)
+	TryToSendOKServerResponse(writer, resp)
 }
 
 // GetConfiguration method returns single configuration by id
@@ -84,7 +84,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -98,7 +98,7 @@ func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.R
 		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 }
 
 // GetClusterConfiguration method returns list of configuration for single cluster
@@ -119,7 +119,7 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 	}
 }
 
@@ -225,7 +225,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
-	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // EnableClusterConfiguration method enables cluster configuration
@@ -266,7 +266,7 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // DisableClusterConfiguration method disables cluster configuration
@@ -307,5 +307,5 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }

@@ -281,6 +281,12 @@ func (s Server) Initialize() {
 	}
 }
 
+// UnableToSendOKResponse function log an error when server response can
+// not be delivered to client.
+func UnableToSendOKResponse(err error) {
+	log.Println("Unable to send server 'OK' response", err)
+}
+
 // UnableToSendBadRequestServerResponse function log an error when server
 // response can not be delivered to client.
 func UnableToSendBadRequestServerResponse(err error) {
@@ -308,5 +314,14 @@ func TryToSendBadRequestServerResponse(writer http.ResponseWriter, message strin
 	err := responses.SendBadRequest(writer, message)
 	if err != nil {
 		UnableToSendBadRequestServerResponse(err)
+	}
+}
+
+// TryToSendOKServerResponse function tries to send server response with
+// bad request info.
+func TryToSendOKServerResponse(writer http.ResponseWriter, payload map[string]interface{}) {
+	err := responses.SendOK(writer, payload)
+	if err != nil {
+		UnableToSendOKResponse(err)
 	}
 }
