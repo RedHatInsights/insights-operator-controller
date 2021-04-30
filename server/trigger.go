@@ -41,7 +41,7 @@ func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request
 		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
 }
 
 // GetTrigger method returns single trigger by id
@@ -62,7 +62,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("trigger", trigger))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("trigger", trigger))
 	}
 }
 
@@ -93,7 +93,7 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 	} else if err != nil {
 		responses.Send(http.StatusInternalServerError, writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -120,7 +120,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -147,7 +147,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -156,7 +156,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		responses.SendBadRequest(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -169,7 +169,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
 }
 
@@ -178,35 +178,35 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		responses.SendBadRequest(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	// trigger type needs to be specified in request parameter
 	triggerType, found := mux.Vars(request)["trigger"]
 	if !found {
-		responses.SendError(writer, "Trigger type needs to be specified")
+		responses.SendBadRequest(writer, "Trigger type needs to be specified")
 		return
 	}
 
 	// user name needs to be specified in request parameter
 	username, foundUsername := request.URL.Query()["username"]
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	// reason needs to be specified in request parameter
 	reason, foundReason := request.URL.Query()["reason"]
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		responses.SendBadRequest(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	// link needs to be specified in request parameter
 	link, foundReason := request.URL.Query()["link"]
 	if !foundReason {
-		responses.SendError(writer, "Link needs to be specified\n")
+		responses.SendBadRequest(writer, "Link needs to be specified\n")
 		return
 	}
 
@@ -224,6 +224,6 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
