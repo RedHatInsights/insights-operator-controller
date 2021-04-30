@@ -58,7 +58,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -127,7 +127,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -177,7 +177,7 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {

@@ -61,12 +61,12 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 		log.Println("Cluster name is not provided")
 		// query parameter 'name' can't be found in request,
 		// which might be caused by issue in Gorilla mux (not on client side)
-		responses.Send(http.StatusBadRequest, writer, "Cluster name needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster name needs to be specified")
 		return
 	}
 
 	if len(strings.TrimSpace(clusterName)) == 0 {
-		responses.Send(http.StatusBadRequest, writer, "Cluster name shouldn't be empty")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster name shouldn't be empty")
 		return
 	}
 
@@ -102,14 +102,14 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 	// check if the operation has been successful
 	if _, ok := err.(*strconv.NumError); ok {
 		log.Println("Bad cluster ID", err)
-		responses.Send(http.StatusBadRequest, writer, "Bad cluster ID")
+		TryToSendResponse(http.StatusBadRequest, writer, "Bad cluster ID")
 	} else if err != nil {
 		log.Println("Cluster ID is not specified in a request", err)
-		responses.Send(http.StatusBadRequest, writer, "Error reading cluster ID from request")
+		TryToSendResponse(http.StatusBadRequest, writer, "Error reading cluster ID from request")
 	} else {
 		cluster, err := s.Storage.GetCluster(int(id))
 		if _, ok := err.(*storage.ItemNotFoundError); ok {
-			responses.Send(http.StatusNotFound, writer, err.Error())
+			TryToSendResponse(http.StatusNotFound, writer, err.Error())
 		} else if err != nil {
 			log.Println("Unable to read cluster from database", err)
 			TryToSendInternalServerError(writer, err.Error())
@@ -124,7 +124,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 	clusterID, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not provided or not an integer")
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified and to be an integer")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster ID needs to be specified and to be an integer")
 		return
 	}
 
@@ -138,7 +138,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		log.Println("Cannot delete cluster", err)
 		TryToSendInternalServerError(writer, err.Error())
@@ -159,7 +159,7 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 	clusterName, foundName := mux.Vars(request)["name"]
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		responses.Send(http.StatusBadRequest, writer, "Cluster name needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -173,10 +173,10 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		log.Println("Cannot delete cluster", err)
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else {
 		clusters, err := s.Storage.ListOfClusters()
 		if err != nil {
@@ -198,7 +198,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 	err := utils.DecodeValidRequest(&req, SearchClusterTemplate, request.URL.Query())
 	if err != nil {
 		log.Println(err)
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 	// either cluster id or its name needs to be specified
@@ -206,7 +206,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 
 	// check if the storage operation has been successful
 	if err == storage.ErrNoSuchObj {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 		return
 	}
 

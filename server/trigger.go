@@ -49,7 +49,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -58,7 +58,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 
 	// check if the storage operation has been successful
 	if err == storage.ErrNoSuchObj {
-		responses.Send(http.StatusNotFound, writer, fmt.Sprintf("No such trigger for ID %v", id))
+		TryToSendResponse(http.StatusNotFound, writer, fmt.Sprintf("No such trigger for ID %v", id))
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -71,7 +71,7 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -85,13 +85,13 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(
+		TryToSendResponse(
 			http.StatusNotFound,
 			writer,
 			responses.BuildOkResponse(),
 		)
 	} else if err != nil {
-		responses.Send(http.StatusInternalServerError, writer, err.Error())
+		TryToSendResponse(http.StatusInternalServerError, writer, err.Error())
 	} else {
 		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
@@ -102,7 +102,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -116,7 +116,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -129,7 +129,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -143,7 +143,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -165,7 +165,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
@@ -220,7 +220,7 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
