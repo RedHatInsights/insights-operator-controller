@@ -55,7 +55,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 		)
 	} else if err != nil {
 		log.Println("Cannot read cluster configuration", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		sendConfiguration(writer, configuration)
 	}
@@ -85,7 +85,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check if the storage operation has been successful
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	}
 	responses.SendCreated(writer, responses.BuildOkResponse())
 }
@@ -106,7 +106,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
@@ -135,7 +135,7 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponse())
 	}

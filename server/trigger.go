@@ -38,7 +38,7 @@ func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request
 
 	// check if the storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
@@ -60,7 +60,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	if err == storage.ErrNoSuchObj {
 		responses.Send(http.StatusNotFound, writer, fmt.Sprintf("No such trigger for ID %v", id))
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("trigger", trigger))
 	}
@@ -118,7 +118,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponse())
 	}
@@ -145,7 +145,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponse())
 	}
@@ -167,7 +167,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
@@ -222,7 +222,7 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponse())
 	}

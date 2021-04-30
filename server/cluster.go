@@ -46,7 +46,7 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 	// check if the operation has been successful
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
@@ -79,7 +79,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	err = s.Storage.RegisterNewCluster(clusterName)
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	}
 
 	// try to retrieve list of clusters from storage
@@ -88,7 +88,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	// check if the operation has been successful
 	if err != nil {
 		log.Println("Unable to get list of clusters", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendCreated(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
@@ -112,7 +112,7 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 			responses.Send(http.StatusNotFound, writer, err.Error())
 		} else if err != nil {
 			log.Println("Unable to read cluster from database", err)
-			responses.SendInternalServerError(writer, err.Error())
+			TryToSendInternalServerError(writer, err.Error())
 		} else {
 			responses.SendOK(writer, responses.BuildOkResponseWithData("cluster", cluster))
 		}
@@ -141,12 +141,12 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
 		log.Println("Cannot delete cluster", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		clusters, err := s.Storage.ListOfClusters()
 		if err != nil {
 			log.Println("Unable to get list of clusters", err)
-			responses.SendInternalServerError(writer, err.Error())
+			TryToSendInternalServerError(writer, err.Error())
 		} else {
 			responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 		}
@@ -181,7 +181,7 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 		clusters, err := s.Storage.ListOfClusters()
 		if err != nil {
 			log.Println("Unable to get list of clusters", err)
-			responses.SendInternalServerError(writer, err.Error())
+			TryToSendInternalServerError(writer, err.Error())
 		} else {
 			responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 		}
@@ -212,7 +212,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 
 	if err != nil {
 		log.Println("Unable to read cluster from database", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 

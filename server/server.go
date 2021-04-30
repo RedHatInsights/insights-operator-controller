@@ -31,6 +31,7 @@ import (
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/env"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -277,5 +278,20 @@ func (s Server) Initialize() {
 		checkSplunkOperation(err)
 		// TODO: name the magic constant 2
 		os.Exit(2)
+	}
+}
+
+// UnableToSendInternalServerErrorResponse function log an error when server
+// response can not be delivered to client.
+func UnableToSendInternalServerErrorResponse(err error) {
+	log.Println("Unable to send internal server error response", err)
+}
+
+// TryToSendInternalServerError function tries to send server response with
+// internal server error info.
+func TryToSendInternalServerError(writer http.ResponseWriter, message string) {
+	err := responses.SendInternalServerError(writer, message)
+	if err != nil {
+		UnableToSendInternalServerErrorResponse(err)
 	}
 }

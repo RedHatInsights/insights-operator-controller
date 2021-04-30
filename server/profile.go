@@ -40,7 +40,7 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 	if err == nil {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	}
 }
 
@@ -60,7 +60,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("profile", profile))
 	}
@@ -102,7 +102,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 
 	// check if the storage operation was successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendCreated(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
@@ -129,7 +129,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
@@ -179,7 +179,7 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}

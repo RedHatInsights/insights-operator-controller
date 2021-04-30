@@ -55,7 +55,7 @@ func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Reque
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		sendConfiguration(writer, configuration)
 	}
@@ -82,7 +82,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponse())
 	}
@@ -95,7 +95,7 @@ func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.R
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
@@ -117,7 +117,7 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
 	}
@@ -153,7 +153,7 @@ func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
 		responses.Send(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		if active == "0" {
 			sendConfiguration(writer, "disabled")
@@ -216,7 +216,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	// try to create cluster configuration in storage
 	configurations, err := s.Storage.CreateClusterConfiguration(cluster, username[0], reason[0], description[0], string(configuration))
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 
@@ -263,7 +263,7 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
@@ -304,7 +304,7 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
