@@ -36,7 +36,7 @@ import (
 func sendConfiguration(writer http.ResponseWriter, configuration string) {
 	resp := responses.BuildOkResponse()
 	resp["configuration"] = configuration
-	responses.SendResponse(writer, resp)
+	responses.SendOK(writer, resp)
 }
 
 // GetConfiguration method returns single configuration by id
@@ -84,7 +84,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		responses.SendOK(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -98,7 +98,7 @@ func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.R
 		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
 }
 
 // GetClusterConfiguration method returns list of configuration for single cluster
@@ -119,7 +119,7 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("configuration", configuration))
 	}
 }
 
@@ -192,24 +192,24 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		responses.SendBadRequest(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		responses.SendBadRequest(writer, "Description needs to be specified\n")
 		return
 	}
 
 	// try to read configuration from request body
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -225,7 +225,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // EnableClusterConfiguration method enables cluster configuration
@@ -244,12 +244,12 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		responses.SendBadRequest(writer, "Reason needs to be specified\n")
 		return
 	}
 
@@ -266,7 +266,7 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // DisableClusterConfiguration method disables cluster configuration
@@ -285,12 +285,12 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		responses.SendBadRequest(writer, "Reason needs to be specified\n")
 		return
 	}
 
@@ -307,5 +307,5 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 		responses.SendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
