@@ -49,7 +49,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -75,12 +75,12 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendBadRequest(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
@@ -88,7 +88,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	configuration, err := ioutil.ReadAll(request.Body)
 
 	if err != nil || len(configuration) == 0 {
-		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -113,7 +113,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -147,23 +147,23 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
-		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendBadRequest(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 

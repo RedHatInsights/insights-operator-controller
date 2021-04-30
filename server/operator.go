@@ -38,7 +38,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
-		responses.SendBadRequest(writer, "Cluster ID needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -69,7 +69,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check parameters provided by client
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		responses.SendBadRequest(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -95,7 +95,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendBadRequest(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -117,7 +117,7 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendBadRequest(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 

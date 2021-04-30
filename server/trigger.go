@@ -156,7 +156,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendBadRequest(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -178,35 +178,35 @@ func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendBadRequest(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	// trigger type needs to be specified in request parameter
 	triggerType, found := mux.Vars(request)["trigger"]
 	if !found {
-		responses.SendBadRequest(writer, "Trigger type needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Trigger type needs to be specified")
 		return
 	}
 
 	// user name needs to be specified in request parameter
 	username, foundUsername := request.URL.Query()["username"]
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	// reason needs to be specified in request parameter
 	reason, foundReason := request.URL.Query()["reason"]
 	if !foundReason {
-		responses.SendBadRequest(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	// link needs to be specified in request parameter
 	link, foundReason := request.URL.Query()["link"]
 	if !foundReason {
-		responses.SendBadRequest(writer, "Link needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Link needs to be specified\n")
 		return
 	}
 

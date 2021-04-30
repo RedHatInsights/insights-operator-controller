@@ -281,6 +281,12 @@ func (s Server) Initialize() {
 	}
 }
 
+// UnableToSendBadRequestServerResponse function log an error when server
+// response can not be delivered to client.
+func UnableToSendBadRequestServerResponse(err error) {
+	log.Println("Unable to send bad request server response", err)
+}
+
 // UnableToSendInternalServerErrorResponse function log an error when server
 // response can not be delivered to client.
 func UnableToSendInternalServerErrorResponse(err error) {
@@ -293,5 +299,14 @@ func TryToSendInternalServerError(writer http.ResponseWriter, message string) {
 	err := responses.SendInternalServerError(writer, message)
 	if err != nil {
 		UnableToSendInternalServerErrorResponse(err)
+	}
+}
+
+// TryToSendBadRequestServerResponse function tries to send server response with
+// bad request info.
+func TryToSendBadRequestServerResponse(writer http.ResponseWriter, message string) {
+	err := responses.SendBadRequest(writer, message)
+	if err != nil {
+		UnableToSendBadRequestServerResponse(err)
 	}
 }

@@ -192,24 +192,24 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendBadRequest(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendBadRequest(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
 	// try to read configuration from request body
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -244,12 +244,12 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendBadRequest(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
@@ -285,12 +285,12 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendBadRequest(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendBadRequest(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
