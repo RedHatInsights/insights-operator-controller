@@ -104,7 +104,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	if err != nil {
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendCreated(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendCreatedServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 

@@ -90,7 +90,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 		log.Println("Unable to get list of clusters", err)
 		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendCreated(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		TryToSendCreatedServerResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 

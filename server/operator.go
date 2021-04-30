@@ -87,7 +87,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 		log.Println("Cannot create new cluster", err)
 		TryToSendInternalServerError(writer, err.Error())
 	}
-	responses.SendCreated(writer, responses.BuildOkResponse())
+	TryToSendCreatedServerResponse(writer, responses.BuildOkResponse())
 }
 
 // GetActiveTriggersForCluster method returns list of triggers for single cluster

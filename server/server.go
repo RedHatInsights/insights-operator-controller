@@ -293,6 +293,12 @@ func UnableToSendOKResponse(err error) {
 	log.Println("Unable to send server 'OK' response", err)
 }
 
+// UnableToSendCreatedResponse function log an error when server response can
+// not be delivered to client.
+func UnableToSendCreatedResponse(err error) {
+	log.Println("Unable to send server 'Created' response", err)
+}
+
 // UnableToSendBadRequestServerResponse function log an error when server
 // response can not be delivered to client.
 func UnableToSendBadRequestServerResponse(err error) {
@@ -329,6 +335,15 @@ func TryToSendOKServerResponse(writer http.ResponseWriter, payload map[string]in
 	err := responses.SendOK(writer, payload)
 	if err != nil {
 		UnableToSendOKResponse(err)
+	}
+}
+
+// TryToSendCreatedServerResponse function tries to send server response with
+// info about created resource.
+func TryToSendCreatedServerResponse(writer http.ResponseWriter, payload map[string]interface{}) {
+	err := responses.SendCreated(writer, payload)
+	if err != nil {
+		UnableToSendCreatedResponse(err)
 	}
 }
 
