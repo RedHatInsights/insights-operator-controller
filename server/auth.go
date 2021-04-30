@@ -26,11 +26,14 @@ package server
 
 import (
 	"context"
-	"github.com/RedHatInsights/insights-operator-utils/responses"
-	jwt "github.com/dgrijalva/jwt-go"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/RedHatInsights/insights-operator-utils/responses"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type contextKey string
@@ -54,14 +57,20 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 		tokenHeader := r.Header.Get("Authorization") //Grab the token from the header
 
 		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
-			responses.SendForbidden(w, "Missing auth token")
+			err := responses.SendForbidden(w, "Missing auth token")
+			if err != nil {
+				log.Println("Error sending response about missing auth token")
+			}
 			// everything has been handled already
 			return
 		}
 
 		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
 		if len(splitted) != 2 {
-			responses.SendForbidden(w, "Invalid/Malformed auth token")
+			err := responses.SendForbidden(w, "Invalid/Malformed auth token")
+			if err != nil {
+				log.Println("Error sending response about invalid/malformed auth token")
+			}
 			// everything has been handled already
 			return
 		}
@@ -74,13 +83,19 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 		})
 
 		if err != nil { //Malformed token, returns with http code 403 as usual
-			responses.SendForbidden(w, "Malformed authentication token")
+			err := responses.SendForbidden(w, "Malformed authentication token")
+			if err != nil {
+				log.Println("Error sending response about malformed authentication token")
+			}
 			// everything has been handled already
 			return
 		}
 
 		if !token.Valid { //Token is invalid, maybe not signed on this server
-			responses.SendForbidden(w, "Token is not valid.")
+			err := responses.SendForbidden(w, "Token is not valid.")
+			if err != nil {
+				log.Println("Error sending response about not valid authentication token")
+			}
 			// everything has been handled already
 			return
 		}

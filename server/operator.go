@@ -38,7 +38,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
 		log.Println("Cluster name is not provided")
-		responses.SendError(writer, "Cluster ID needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -47,7 +47,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 
 	// check if the storage operation has been successful
 	if itemNotFoundError, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(
+		TryToSendResponse(
 			http.StatusNotFound,
 			writer,
 			fmt.Sprintf("unable to read any active configuration for the cluster %v",
@@ -55,7 +55,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 		)
 	} else if err != nil {
 		log.Println("Cannot read cluster configuration", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		sendConfiguration(writer, configuration)
 	}
@@ -69,7 +69,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check parameters provided by client
 	if !foundName {
 		log.Println("Cluster name is not provided")
-		responses.SendError(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -85,9 +85,9 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 	// check if the storage operation has been successful
 	if err != nil {
 		log.Println("Cannot create new cluster", err)
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	}
-	responses.SendCreated(writer, responses.BuildOkResponse())
+	TryToSendCreatedServerResponse(writer, responses.BuildOkResponse())
 }
 
 // GetActiveTriggersForCluster method returns list of triggers for single cluster
@@ -95,7 +95,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
@@ -104,11 +104,11 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("triggers", triggers))
 	}
 }
 
@@ -117,14 +117,14 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.SendError(writer, "Cluster name needs to be specified")
+		TryToSendBadRequestServerResponse(writer, "Cluster name needs to be specified")
 		return
 	}
 
 	// trigger ID needs to be specified in request
 	triggerID, err := retrievePositiveIntRequestParameter(request, "trigger")
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -133,10 +133,10 @@ func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.R
 
 	// check if the storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }

@@ -31,6 +31,7 @@ import (
 	"github.com/RedHatInsights/insights-operator-controller/logging"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/env"
+	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -277,5 +278,79 @@ func (s Server) Initialize() {
 		checkSplunkOperation(err)
 		// TODO: name the magic constant 2
 		os.Exit(2)
+	}
+}
+
+// UnableToSendServerResponse function log an error when server response can
+// not be delivered to client.
+func UnableToSendServerResponse(err error) {
+	log.Println("Unable to send server response", err)
+}
+
+// UnableToSendOKResponse function log an error when server response can
+// not be delivered to client.
+func UnableToSendOKResponse(err error) {
+	log.Println("Unable to send server 'OK' response", err)
+}
+
+// UnableToSendCreatedResponse function log an error when server response can
+// not be delivered to client.
+func UnableToSendCreatedResponse(err error) {
+	log.Println("Unable to send server 'Created' response", err)
+}
+
+// UnableToSendBadRequestServerResponse function log an error when server
+// response can not be delivered to client.
+func UnableToSendBadRequestServerResponse(err error) {
+	log.Println("Unable to send bad request server response", err)
+}
+
+// UnableToSendInternalServerErrorResponse function log an error when server
+// response can not be delivered to client.
+func UnableToSendInternalServerErrorResponse(err error) {
+	log.Println("Unable to send internal server error response", err)
+}
+
+// TryToSendInternalServerError function tries to send server response with
+// internal server error info.
+func TryToSendInternalServerError(writer http.ResponseWriter, message string) {
+	err := responses.SendInternalServerError(writer, message)
+	if err != nil {
+		UnableToSendInternalServerErrorResponse(err)
+	}
+}
+
+// TryToSendBadRequestServerResponse function tries to send server response with
+// bad request info.
+func TryToSendBadRequestServerResponse(writer http.ResponseWriter, message string) {
+	err := responses.SendBadRequest(writer, message)
+	if err != nil {
+		UnableToSendBadRequestServerResponse(err)
+	}
+}
+
+// TryToSendOKServerResponse function tries to send server response with
+// bad request info.
+func TryToSendOKServerResponse(writer http.ResponseWriter, payload map[string]interface{}) {
+	err := responses.SendOK(writer, payload)
+	if err != nil {
+		UnableToSendOKResponse(err)
+	}
+}
+
+// TryToSendCreatedServerResponse function tries to send server response with
+// info about created resource.
+func TryToSendCreatedServerResponse(writer http.ResponseWriter, payload map[string]interface{}) {
+	err := responses.SendCreated(writer, payload)
+	if err != nil {
+		UnableToSendCreatedResponse(err)
+	}
+}
+
+// TryToSendResponse function tries to send server response with any payload.
+func TryToSendResponse(httpStatus int, writer http.ResponseWriter, payload interface{}) {
+	err := responses.Send(httpStatus, writer, payload)
+	if err != nil {
+		UnableToSendServerResponse(err)
 	}
 }

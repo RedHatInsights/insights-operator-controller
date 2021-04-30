@@ -36,7 +36,7 @@ import (
 func sendConfiguration(writer http.ResponseWriter, configuration string) {
 	resp := responses.BuildOkResponse()
 	resp["configuration"] = configuration
-	responses.SendResponse(writer, resp)
+	TryToSendOKServerResponse(writer, resp)
 }
 
 // GetConfiguration method returns single configuration by id
@@ -44,7 +44,7 @@ func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Reque
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -53,9 +53,9 @@ func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Reque
 
 	// check if storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		sendConfiguration(writer, configuration)
 	}
@@ -66,7 +66,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -80,11 +80,11 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 
 	// check if storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponse())
+		TryToSendOKServerResponse(writer, responses.BuildOkResponse())
 	}
 }
 
@@ -95,10 +95,10 @@ func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.R
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 }
 
 // GetClusterConfiguration method returns list of configuration for single cluster
@@ -106,7 +106,7 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 	// cluster name needs to be specified it request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -115,11 +115,11 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 
 	// check if storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configuration", configuration))
 	}
 }
 
@@ -128,7 +128,7 @@ func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.Send(http.StatusBadRequest, writer, err.Error())
+		TryToSendResponse(http.StatusBadRequest, writer, err.Error())
 		return
 	}
 
@@ -151,9 +151,9 @@ func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request
 
 	// check if storage operation has been successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
 		if active == "0" {
 			sendConfiguration(writer, "disabled")
@@ -178,7 +178,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -192,31 +192,31 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
 	// try to read configuration from request body
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
 	// try to create cluster configuration in storage
 	configurations, err := s.Storage.CreateClusterConfiguration(cluster, username[0], reason[0], description[0], string(configuration))
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
 
@@ -225,7 +225,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	// and check whether the Splunk operation was successful
 	checkSplunkOperation(err)
 
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // EnableClusterConfiguration method enables cluster configuration
@@ -233,7 +233,7 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -244,12 +244,12 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
@@ -263,10 +263,10 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }
 
 // DisableClusterConfiguration method disables cluster configuration
@@ -274,7 +274,7 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
-		responses.Send(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
+		TryToSendResponse(http.StatusBadRequest, writer, "Cluster ID needs to be specified")
 		return
 	}
 
@@ -285,12 +285,12 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 	reason, foundReason := request.URL.Query()["reason"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundReason {
-		responses.SendError(writer, "Reason needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Reason needs to be specified\n")
 		return
 	}
 
@@ -304,8 +304,8 @@ func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request 
 
 	// check if storage operation has been successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 		return
 	}
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
+	TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("configurations", configurations))
 }

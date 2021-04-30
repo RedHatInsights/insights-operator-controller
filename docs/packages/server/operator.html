@@ -156,7 +156,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Cluster name is not provided&#34;</div><div class="operator">)</div><div class="operator"></div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster ID needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -175,7 +175,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 	<td class="doc"><p>check if the storage operation has been successful</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">itemNotFoundError</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div>
+		<div class="ident">TryToSendResponse</div><div class="operator">(</div>
 			<div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div>
 			<div class="ident">writer</div><div class="operator">,</div>
 			<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;unable to read any active configuration for the cluster %v&#34;</div><div class="operator">,</div>
@@ -183,7 +183,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 		<div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Cannot read cluster configuration&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
 		<div class="ident">sendConfiguration</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
@@ -212,7 +212,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">foundName</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Cluster name is not provided&#34;</div><div class="operator">)</div><div class="operator"></div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -243,9 +243,9 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Cannot create new cluster&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendCreated</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">TryToSendCreatedServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -263,7 +263,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 </td>
 	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -282,11 +282,11 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 	<td class="doc"><p>check if the storage operation has been successful</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendResponse</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;triggers&#34;</div><div class="operator">,</div> <div class="ident">triggers</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendOKServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponseWithData</div><div class="operator">(</div><div class="literal">&#34;triggers&#34;</div><div class="operator">,</div> <div class="ident">triggers</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
@@ -305,7 +305,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 </td>
 	<td class="code"><pre><code>	<div class="ident">cluster</div><div class="operator">,</div> <div class="ident">found</div> <div class="operator">:=</div> <div class="ident">mux</div><div class="operator">.</div><div class="ident">Vars</div><div class="operator">(</div><div class="ident">request</div><div class="operator">)</div><div class="operator">[</div><div class="literal">&#34;cluster&#34;</div><div class="operator">]</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">found</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name needs to be specified&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -317,7 +317,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 </td>
 	<td class="code"><pre><code>	<div class="ident">triggerID</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">retrievePositiveIntRequestParameter</div><div class="operator">(</div><div class="ident">request</div><div class="operator">,</div> <div class="literal">&#34;trigger&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendResponse</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -336,11 +336,11 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/op
 	<td class="doc"><p>check if the storage operation has been successful</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">err</div><div class="operator">.</div><div class="operator">(</div><div class="operator">*</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">ItemNotFoundError</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendResponse</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusNotFound</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
-		<div class="ident">responses</div><div class="operator">.</div><div class="ident">SendResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">TryToSendOKServerResponse</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">BuildOkResponse</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 

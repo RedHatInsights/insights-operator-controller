@@ -38,9 +38,9 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 
 	// check if the storage operation was successful
 	if err == nil {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	}
 }
 
@@ -49,7 +49,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -58,11 +58,11 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profile", profile))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profile", profile))
 	}
 }
 
@@ -75,12 +75,12 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
@@ -88,7 +88,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	configuration, err := ioutil.ReadAll(request.Body)
 
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -102,9 +102,9 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 
 	// check if the storage operation was successful
 	if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendCreated(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendCreatedServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -113,7 +113,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -127,11 +127,11 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -147,23 +147,23 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		TryToSendBadRequestServerResponse(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		TryToSendBadRequestServerResponse(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -177,10 +177,10 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 
 	// check if the storage operation was successful
 	if _, ok := err.(*storage.ItemNotFoundError); ok {
-		responses.Send(http.StatusNotFound, writer, err.Error())
+		TryToSendResponse(http.StatusNotFound, writer, err.Error())
 	} else if err != nil {
-		responses.SendInternalServerError(writer, err.Error())
+		TryToSendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		TryToSendOKServerResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }

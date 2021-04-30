@@ -144,6 +144,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/se
 	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/logging&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-controller/storage&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/env&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/responses&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/gorilla/mux&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus/promauto&#34;</div><div class="operator"></div>
@@ -541,6 +542,130 @@ if it's positive</p>
 	<td class="doc"><p>TODO: name the magic constant 2</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">os</div><div class="operator">.</div><div class="ident">Exit</div><div class="operator">(</div><div class="literal">2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>UnableToSendServerResponse function log an error when server response can
+not be delivered to client.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">UnableToSendServerResponse</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Unable to send server response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>UnableToSendOKResponse function log an error when server response can
+not be delivered to client.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">UnableToSendOKResponse</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Unable to send server &#39;OK&#39; response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>UnableToSendCreatedResponse function log an error when server response can
+not be delivered to client.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">UnableToSendCreatedResponse</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Unable to send server &#39;Created&#39; response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>UnableToSendBadRequestServerResponse function log an error when server
+response can not be delivered to client.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">UnableToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Unable to send bad request server response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>UnableToSendInternalServerErrorResponse function log an error when server
+response can not be delivered to client.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">UnableToSendInternalServerErrorResponse</div><div class="operator">(</div><div class="ident">err</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Unable to send internal server error response&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TryToSendInternalServerError function tries to send server response with
+internal server error info.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">message</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">message</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">UnableToSendInternalServerErrorResponse</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TryToSendBadRequestServerResponse function tries to send server response with
+bad request info.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TryToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">message</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendBadRequest</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">message</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">UnableToSendBadRequestServerResponse</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TryToSendOKServerResponse function tries to send server response with
+bad request info.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TryToSendOKServerResponse</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">payload</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendOK</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">payload</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">UnableToSendOKResponse</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TryToSendCreatedServerResponse function tries to send server response with
+info about created resource.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TryToSendCreatedServerResponse</div><div class="operator">(</div><div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">payload</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendCreated</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">payload</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">UnableToSendCreatedResponse</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TryToSendResponse function tries to send server response with any payload.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TryToSendResponse</div><div class="operator">(</div><div class="ident">httpStatus</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">writer</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">payload</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="ident">httpStatus</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">payload</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">UnableToSendServerResponse</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
