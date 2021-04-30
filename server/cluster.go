@@ -48,7 +48,7 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 		log.Println("Unable to get list of clusters", err)
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 	}
 }
 
@@ -114,7 +114,7 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 			log.Println("Unable to read cluster from database", err)
 			responses.SendInternalServerError(writer, err.Error())
 		} else {
-			responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
+			responses.SendOK(writer, responses.BuildOkResponseWithData("cluster", cluster))
 		}
 	}
 }
@@ -148,7 +148,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 			log.Println("Unable to get list of clusters", err)
 			responses.SendInternalServerError(writer, err.Error())
 		} else {
-			responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+			responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 		}
 	}
 }
@@ -183,7 +183,7 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 			log.Println("Unable to get list of clusters", err)
 			responses.SendInternalServerError(writer, err.Error())
 		} else {
-			responses.SendResponse(writer, responses.BuildOkResponseWithData("clusters", clusters))
+			responses.SendOK(writer, responses.BuildOkResponseWithData("clusters", clusters))
 		}
 	}
 }
@@ -216,7 +216,7 @@ func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 
-	responses.SendResponse(writer, responses.BuildOkResponseWithData("cluster", cluster))
+	responses.SendOK(writer, responses.BuildOkResponseWithData("cluster", cluster))
 }
 
 // SearchClusterTemplate defines validation rules and messages for SearchCluster
