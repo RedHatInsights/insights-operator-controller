@@ -38,7 +38,7 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 
 	// check if the storage operation was successful
 	if err == nil {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	} else {
 		responses.SendInternalServerError(writer, err.Error())
 	}
@@ -49,7 +49,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -62,7 +62,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profile", profile))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("profile", profile))
 	}
 }
 
@@ -75,12 +75,12 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	description, foundDescription := request.URL.Query()["description"]
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		responses.SendBadRequest(writer, "Description needs to be specified\n")
 		return
 	}
 
@@ -88,7 +88,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	configuration, err := ioutil.ReadAll(request.Body)
 
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -113,7 +113,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
 		return
 	}
 
@@ -131,7 +131,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
 
@@ -147,23 +147,23 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	description, foundDescription := request.URL.Query()["description"]
 
 	if err != nil {
-		responses.SendError(writer, "Error reading profile ID from request\n")
+		responses.SendBadRequest(writer, "Error reading profile ID from request\n")
 		return
 	}
 
 	if !foundUsername {
-		responses.SendError(writer, "User name needs to be specified\n")
+		responses.SendBadRequest(writer, "User name needs to be specified\n")
 		return
 	}
 
 	if !foundDescription {
-		responses.SendError(writer, "Description needs to be specified\n")
+		responses.SendBadRequest(writer, "Description needs to be specified\n")
 		return
 	}
 
 	configuration, err := ioutil.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
-		responses.SendError(writer, "Configuration needs to be provided in the request body")
+		responses.SendBadRequest(writer, "Configuration needs to be provided in the request body")
 		return
 	}
 
@@ -181,6 +181,6 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 	} else if err != nil {
 		responses.SendInternalServerError(writer, err.Error())
 	} else {
-		responses.SendResponse(writer, responses.BuildOkResponseWithData("profiles", profiles))
+		responses.SendOK(writer, responses.BuildOkResponseWithData("profiles", profiles))
 	}
 }
