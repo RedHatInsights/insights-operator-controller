@@ -20,7 +20,7 @@ RUN git clone $SOURCE_REPOSITORY_URL && \
     cd insights-operator-controller && \
     go build 
 
-FROM registry.access.redhat.com/ubi8-minimal
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
 COPY --from=builder /go/insights-operator-controller/insights-operator-controller .
 
