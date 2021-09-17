@@ -16,6 +16,7 @@ Please delete options that are not relevant.
 - Unit tests (no changes in the code)
 - Behavioral tests (no changes in the code)
 - REST API tests
+- Bump-up dependent library (no changes in the code)
 - Benchmarks (no changes in the code)
 - Documentation update
 
