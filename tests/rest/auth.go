@@ -73,7 +73,7 @@ func checkSuccessfulAuth() {
 	}
 }
 
-//AuthTests - authorization related tests
+// AuthTests - authorization related tests
 func AuthTests() {
 	checkMissingToken()
 	checkMalformedToken()

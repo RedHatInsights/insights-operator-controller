@@ -76,7 +76,7 @@ func (g DataGenerator) Close() {
 	g.storage.Close()
 }
 
-//PopulateCluster inserts clusterNo cluster objects in the database
+// PopulateCluster inserts clusterNo cluster objects in the database
 func (g DataGenerator) PopulateCluster() []error {
 
 	var err error
@@ -133,7 +133,7 @@ func (g DataGenerator) PopulateOperatorConfiguration() []error {
 	}
 
 	for i := 0; i < g.config.OperatorConfigurationNo; i++ {
-		//creates configuration profiles and operator Configuration
+		// creates configuration profiles and operator Configuration
 		_, err := g.storage.CreateClusterConfiguration(
 			string(clusters[i%len(clusters)].Name),
 			gofakeit.Username(),

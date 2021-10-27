@@ -18,7 +18,6 @@ package testsbenchmark
 // https://redhatinsights.github.io/insights-operator-controller/packages/tests/benchmark/operator_test.html
 
 import (
-	//"fmt"
 	"testing"
 
 	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"

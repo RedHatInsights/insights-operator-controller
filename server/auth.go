@@ -54,9 +54,10 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		tokenHeader := r.Header.Get("Authorization") //Grab the token from the header
+		tokenHeader := r.Header.Get("Authorization") // Grab the token from the header
 
-		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
+		if tokenHeader == "" {
+			// Token is missing, returns with error code 403 Unauthorized
 			err := responses.SendForbidden(w, "Missing auth token")
 			if err != nil {
 				log.Println("Error sending response about missing auth token")
@@ -65,7 +66,9 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
+		splitted := strings.Split(tokenHeader, " ")
+		// The token normally comes in format `Bearer {token-body}`, we
+		// check if the retrieved token matched this requirement
 		if len(splitted) != 2 {
 			err := responses.SendForbidden(w, "Invalid/Malformed auth token")
 			if err != nil {
@@ -75,14 +78,15 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		tokenPart := splitted[1] //Grab the token part, what we are truly interested in
+		tokenPart := splitted[1] // Grab the token part, what we are truly interested in
 		tk := &Token{}
 
 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("token_password")), nil
 		})
 
-		if err != nil { //Malformed token, returns with http code 403 as usual
+		if err != nil {
+			// malformed token, returns with HTTP code 403 as usual
 			err := responses.SendForbidden(w, "Malformed authentication token")
 			if err != nil {
 				log.Println("Error sending response about malformed authentication token")
@@ -91,7 +95,8 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		if !token.Valid { //Token is invalid, maybe not signed on this server
+		if !token.Valid {
+			// token is invalid, maybe not signed on this server
 			err := responses.SendForbidden(w, "Token is not valid.")
 			if err != nil {
 				log.Println("Error sending response about not valid authentication token")
@@ -100,9 +105,11 @@ func (s Server) JWTAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		//Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
+		// Everything went well, proceed with the request and set the
+		// caller to the user retrieved from the parsed token
 		ctx := context.WithValue(r.Context(), contextKeyUser, tk.Login)
 		r = r.WithContext(ctx)
+
 		// Proceed to proxy
 		next.ServeHTTP(w, r)
 	})
