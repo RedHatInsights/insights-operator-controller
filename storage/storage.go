@@ -69,7 +69,7 @@ func enableForeignKeys(connections *sql.DB) {
 
 	_, err = statement.Exec()
 	if err != nil {
-		log.Fatal("Can not set PRAGMA for sqlite", err)
+		defer log.Fatal("Can not set PRAGMA for sqlite", err)
 	}
 }
 
