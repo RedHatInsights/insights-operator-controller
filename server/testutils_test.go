@@ -112,7 +112,7 @@ func runSQLiteScript(t *testing.T, path string) {
 	err = cmd.Run()
 
 	if err != nil {
-		log.Fatalf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err)
+		defer log.Fatalf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err)
 	}
 }
 
