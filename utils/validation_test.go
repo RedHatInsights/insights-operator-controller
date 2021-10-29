@@ -65,7 +65,7 @@ func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
 	if id, ok := v["id"].(string); ok && len(id) != 0 {
 		return true
 	}
-	if name, ok := v["name"].(string); ok && len(name) != 0 {
+	if name, ok := v["name"].(string); ok && name != "" {
 		return true
 	}
 	return false
