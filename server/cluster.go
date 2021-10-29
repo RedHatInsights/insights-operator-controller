@@ -240,7 +240,8 @@ func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
 	if id, ok := v["id"].(string); ok && id != "" {
 		return true
 	}
-	if name, ok := v["name"].(string); ok && len(name) != 0 {
+	// check if name is filled-in
+	if name, ok := v["name"].(string); ok && name != "" {
 		return true
 	}
 	return false
