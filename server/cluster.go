@@ -65,7 +65,8 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if len(strings.TrimSpace(clusterName)) == 0 {
+	// check if cluster name provided by user is empty
+	if strings.TrimSpace(clusterName) == "" {
 		TryToSendResponse(http.StatusBadRequest, writer, "Cluster name shouldn't be empty")
 		return
 	}
