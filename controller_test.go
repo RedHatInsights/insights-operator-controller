@@ -109,7 +109,7 @@ func TestReadConfigurationFromEnvVar(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error during config file reading", err)
 	}
-	if len(cfg.Address) == 0 {
+	if cfg.Address == "" {
 		t.Fatal("The config is probably wrong", err)
 	}
 }
