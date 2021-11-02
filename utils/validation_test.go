@@ -62,7 +62,7 @@ func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
 		return false
 	}
 	// the int validation is done next by validator, we are just checking if its filled
-	if id, ok := v["id"].(string); ok && len(id) != 0 {
+	if id, ok := v["id"].(string); ok && id != "" {
 		return true
 	}
 	if name, ok := v["name"].(string); ok && name != "" {
