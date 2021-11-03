@@ -1,7 +1,7 @@
 // Cluster handling REST API implementation
 
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -230,7 +230,7 @@ var SearchClusterTemplate = utils.MergeMaps(map[string]interface{}{
 }, utils.PaginationTemplate)
 
 // oneOfIDOrNameValidation validates that id or name is filled
-func oneOfIDOrNameValidation(i interface{}, context interface{}) bool {
+func oneOfIDOrNameValidation(i, context interface{}) bool {
 	// Tag oneOfIdOrName
 	v, ok := context.(map[string]interface{})
 	if !ok {
