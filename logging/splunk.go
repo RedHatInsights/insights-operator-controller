@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ type Client struct {
 }
 
 // NewClient creates a new instance of Splunk client.
-func NewClient(enabled bool, address string, token string, source string, sourceType string, index string) Client {
+func NewClient(enabled bool, address, token, source, sourceType, index string) Client {
 	if enabled {
 		url := address + "/services/collector/raw"
 		splunk := splunk.NewClient(nil, url, token, source, sourceType, index)
@@ -42,7 +42,7 @@ func NewClient(enabled bool, address string, token string, source string, source
 }
 
 // Log add a new message into the Splunk log.
-func (client Client) Log(key string, value string) error {
+func (client Client) Log(key, value string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
 			map[string]string{key: value})
@@ -52,7 +52,7 @@ func (client Client) Log(key string, value string) error {
 }
 
 // LogAction add a new message about performed action into the Splunk log.
-func (client Client) LogAction(action string, user string, description string) error {
+func (client Client) LogAction(action, user, description string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
 			map[string]string{
@@ -65,7 +65,7 @@ func (client Client) LogAction(action string, user string, description string) e
 }
 
 // LogTriggerAction add a new message about performed trigger-related action into the Splunk log.
-func (client Client) LogTriggerAction(action string, user string, cluster string, trigger string) error {
+func (client Client) LogTriggerAction(action, user, cluster, trigger string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.Log(
 			map[string]string{
@@ -79,7 +79,7 @@ func (client Client) LogTriggerAction(action string, user string, cluster string
 }
 
 // LogWithTime add a new message with timestamp into the Splunk log.
-func (client Client) LogWithTime(time int64, key string, value string) error {
+func (client Client) LogWithTime(time int64, key, value string) error {
 	if client.ClientImpl != nil {
 		err := client.ClientImpl.LogWithTime(
 			time,
