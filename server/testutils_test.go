@@ -1,7 +1,7 @@
 // Utilities for testing to avoid code repetition. File not in ./utils because
 // of cyclic imports
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import (
 	"github.com/RedHatInsights/insights-operator-controller/server"
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/gorilla/mux"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -178,7 +178,7 @@ func CheckResponse(t *testing.T, rr *httptest.ResponseRecorder, expectedStatusCo
 	}
 
 	result := rr.Result()
-	body, _ := ioutil.ReadAll(result.Body)
+	body, _ := io.ReadAll(result.Body)
 
 	// body needs to be properly closed
 	defer func() {
