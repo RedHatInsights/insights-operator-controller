@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package server
 // https://redhatinsights.github.io/insights-operator-controller/packages/server/profile.html
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -85,7 +86,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 	}
 
 	// read configuration from request body
-	configuration, err := ioutil.ReadAll(request.Body)
+	configuration, err := io.ReadAll(request.Body)
 
 	if err != nil || len(configuration) == 0 {
 		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
