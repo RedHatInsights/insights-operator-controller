@@ -24,7 +24,6 @@ package server
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
