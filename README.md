@@ -6,6 +6,33 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/RedHatInsights/insights-operator-controller)
 [![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/RedHatInsights/insights-operator-controller/blob/master/LICENSE)
 
+<!-- vim-markdown-toc GFM -->
+
+* [Description](#description)
+* [How to build the tool](#how-to-build-the-tool)
+* [Start](#start)
+* [Configuration](#configuration)
+    * [HTTPS instead of HTTP](#https-instead-of-http)
+    * [Configuration file](#configuration-file)
+    * [Environment variables](#environment-variables)
+    * [LDAP Authentication](#ldap-authentication)
+* [Data storage](#data-storage)
+* [ER Diagram](#er-diagram)
+    * [SQLite](#sqlite)
+    * [PostgreSQL](#postgresql)
+    * [RDS AWS PostgreSQL](#rds-aws-postgresql)
+* [Testing](#testing)
+    * [Unit tests](#unit-tests)
+    * [REST API tests](#rest-api-tests)
+* [Code style and cyclomatic complexity checks](#code-style-and-cyclomatic-complexity-checks)
+* [CI](#ci)
+* [Contribution](#contribution)
+* [Package manifest](#package-manifest)
+
+<!-- vim-markdown-toc -->
+
+
+
 ## Description
 
 A service to be used to store Insights operator configuration and to offer the configuration to selected operator.
