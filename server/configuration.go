@@ -28,7 +28,7 @@ import (
 	"github.com/RedHatInsights/insights-operator-controller/storage"
 	"github.com/RedHatInsights/insights-operator-utils/responses"
 	"github.com/gorilla/mux"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -207,7 +207,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 	}
 
 	// try to read configuration from request body
-	configuration, err := ioutil.ReadAll(request.Body)
+	configuration, err := io.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
 		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
