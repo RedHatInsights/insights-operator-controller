@@ -162,7 +162,7 @@ func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *
 		return
 	}
 
-	configuration, err := ioutil.ReadAll(request.Body)
+	configuration, err := io.ReadAll(request.Body)
 	if err != nil || len(configuration) == 0 {
 		TryToSendBadRequestServerResponse(writer, "Configuration needs to be provided in the request body")
 		return
