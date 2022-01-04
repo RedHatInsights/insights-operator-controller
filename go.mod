@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/Masterminds/squirrel v1.2.0
-	github.com/RedHatInsights/insights-operator-utils v1.8.2
+	github.com/RedHatInsights/insights-operator-utils v1.14.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
