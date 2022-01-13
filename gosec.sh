@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Red Hat, Inc
+# Copyright 2020, 2021, 2022 Red Hat, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,11 @@ NC=$(tput sgr0) # No Color
 
 GO_SEC_ARGS=""
 
+VERBOSE=false
+if [[ $* == *verbose* ]]; then
+    VERBOSE=true
+fi
+
 if [[ $* != *verbose* ]]; then
     GO_SEC_ARGS="-quiet"
 fi
@@ -31,7 +36,7 @@ echo -e "${BLUE}Security issues detection${NC}"
 if ! [ -x "$(command -v gosec)" ]
 then
     echo -e "${BLUE}Installing ${NC}"
-    curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.8.1
+    curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin"
     # shellcheck disable=SC2181
     if [ $? -eq 0 ]
     then
