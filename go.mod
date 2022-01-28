@@ -8,7 +8,7 @@ require (
 	github.com/ZachtimusPrime/Go-Splunk-HTTP v0.0.0-20190909123348-f5369e72b8af
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.1.0
