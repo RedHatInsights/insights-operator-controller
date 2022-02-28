@@ -1,7 +1,7 @@
 // Utils for working with maps
 
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ func mergeMapsT(srcs ...interface{}) map[string]interface{} {
 	for _, srcm := range srcs {
 		var toMerge map[string]interface{}
 
-		switch v := srcm.(interface{}).(type) {
+		switch v := srcm.(type) {
 		case map[string]interface{}:
 			toMerge = v
 
