@@ -1,4 +1,4 @@
-// Copyright 2020 Red Hat, Inc
+// Copyright 2020, 2021, 2022 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,11 +23,6 @@ import (
 
 	tests "github.com/RedHatInsights/insights-operator-controller/tests/rest"
 	"github.com/verdverm/frisby"
-)
-
-const (
-	contentType = "Content-Type"
-	appJSON     = "application/json; charset=utf-8"
 )
 
 func BenchmarkMissingToken(b *testing.B) {

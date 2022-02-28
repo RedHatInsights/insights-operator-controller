@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -786,10 +786,7 @@ func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration s
 	}()
 
 	_, err = statement.Exec(configuration, t, username, description)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // SelectConfigurationProfileID selects the ID of lately inserted/created configuration profile. To be used in transaction.
