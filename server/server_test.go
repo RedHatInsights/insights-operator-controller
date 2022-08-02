@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ func TestAddDefaultHeaders(t *testing.T) {
 	defer serv.Storage.Close()
 
 	// Add header to test addition of Access-Control-Allow-Origin
-	req, _ := http.NewRequest("GET", "/health-check", nil)
+	req, _ := http.NewRequest("GET", "/health-check", http.NoBody)
 	req.Header.Set("Origin", "local")
 
 	rr := httptest.NewRecorder()
