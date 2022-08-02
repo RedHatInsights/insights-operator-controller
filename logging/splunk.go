@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020, 2021 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ type Client struct {
 func NewClient(enabled bool, address, token, source, sourceType, index string) Client {
 	if enabled {
 		url := address + "/services/collector/raw"
-		splunk := splunk.NewClient(nil, url, token, source, sourceType, index)
-		return Client{ClientImpl: splunk}
+		splunkClient := splunk.NewClient(nil, url, token, source, sourceType, index)
+		return Client{ClientImpl: splunkClient}
 	}
 	return Client{ClientImpl: nil}
 }
