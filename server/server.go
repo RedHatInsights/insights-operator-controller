@@ -99,9 +99,12 @@ func (s Server) createTLSServer(router http.Handler) *http.Server {
 	} // #nosec G402
 	tlsConfig.BuildNameToCertificate()
 	server := &http.Server{
-		Addr:      s.Address,
-		TLSConfig: tlsConfig,
-		Handler:   router,
+		Addr:              s.Address,
+		TLSConfig:         tlsConfig,
+		Handler:           router,
+		ReadTimeout:       1 * time.Minute,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      30 * time.Second,
 	}
 
 	return server
