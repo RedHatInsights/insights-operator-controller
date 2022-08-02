@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ type TriggerResponse struct {
 	Triggers []Trigger `json:"triggers"`
 }
 
-func compareTriggers(f *frisby.Frisby, triggers []Trigger, expected []Trigger) {
+func compareTriggers(f *frisby.Frisby, triggers, expected []Trigger) {
 	if len(triggers) != len(expected) {
 		f.AddError(fmt.Sprintf("%d triggers are expected, but got %d", len(expected), len(triggers)))
 	}
