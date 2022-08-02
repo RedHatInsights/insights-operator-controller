@@ -45,7 +45,7 @@ func mergeMapsT(srcs ...interface{}) map[string]interface{} {
 			toMerge = interMap(v)
 
 		case url.Values:
-			toMerge = interMap((map[string][]string)(v))
+			toMerge = interMap(map[string][]string(v))
 
 		default:
 			panic("unknown type")

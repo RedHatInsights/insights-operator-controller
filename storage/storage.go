@@ -74,7 +74,7 @@ func enableForeignKeys(connections *sql.DB) {
 }
 
 // New function creates and initializes a new instance of Storage structure
-func New(driverName string, dataSourceName string) (Storage, error) {
+func New(driverName, dataSourceName string) (Storage, error) {
 	log.Printf("Making connection to data storage, driver=%s datasource=%s", driverName, dataSourceName)
 	connections, err := sql.Open(driverName, dataSourceName)
 

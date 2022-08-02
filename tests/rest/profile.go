@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ type ConfigurationProfileResponse struct {
 	Profile ConfigurationProfile `json:"profile"`
 }
 
-func compareConfigurationProfiles(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
+func compareConfigurationProfiles(f *frisby.Frisby, profiles, expected []ConfigurationProfile) {
 	if len(profiles) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configuration profiles are expected, but got %d", len(expected), len(profiles)))
 	}
@@ -69,7 +69,7 @@ func compareConfigurationProfiles(f *frisby.Frisby, profiles []ConfigurationProf
 	}
 }
 
-func compareConfigurationProfilesWithoutID(f *frisby.Frisby, profiles []ConfigurationProfile, expected []ConfigurationProfile) {
+func compareConfigurationProfilesWithoutID(f *frisby.Frisby, profiles, expected []ConfigurationProfile) {
 	if len(profiles) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configuration profiles are expected, but got %d", len(expected), len(profiles)))
 	}

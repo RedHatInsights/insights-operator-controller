@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type ClusterConfigurationsResponse struct {
 	Configuration []ClusterConfiguration `json:"configuration"`
 }
 
-func compareConfigurations(f *frisby.Frisby, configurations []ClusterConfiguration, expected []ClusterConfiguration) {
+func compareConfigurations(f *frisby.Frisby, configurations, expected []ClusterConfiguration) {
 	if len(configurations) != len(expected) {
 		f.AddError(fmt.Sprintf("%d configurations are expected, but got %d", len(expected), len(configurations)))
 	}

@@ -1,4 +1,4 @@
-// Copyright 2020 Red Hat, Inc
+// Copyright 2020, 2021, 2022 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ type dataConfiguration struct {
 // methods for creating dummy data for tests
 // Insert the same dbDriver and storageSpecification you expect to use
 // in your test to have meaningful and coherent tests
-func NewDataGenerator(dbDriver string, storageSpecification string) DataGenerator {
+func NewDataGenerator(dbDriver, storageSpecification string) DataGenerator {
 	var returnMe DataGenerator
 	returnMe.storage, _ = storage.New(dbDriver, storageSpecification)
 
@@ -177,6 +177,6 @@ func (g DataGenerator) PopulateTrigger(triggerType string) []error {
 
 // InsertTriggerType inserts one trigger_type object with ttype type and
 // description
-func (g DataGenerator) InsertTriggerType(ttype string, description string) error {
+func (g DataGenerator) InsertTriggerType(ttype, description string) error {
 	return g.storage.NewTriggerType(ttype, description)
 }
