@@ -78,7 +78,7 @@ func deleteCluster(f *frisby.Frisby, clusterID string) {
 	f.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 }
 
-func compareClusters(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
+func compareClusters(f *frisby.Frisby, clusters, expected []Cluster) {
 	if len(clusters) != len(expected) {
 		f.AddError(fmt.Sprintf("%d clusters are expected, but got %d", len(expected), len(clusters)))
 		return
@@ -91,7 +91,7 @@ func compareClusters(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
 	}
 }
 
-func compareClustersWithoutID(f *frisby.Frisby, clusters []Cluster, expected []Cluster) {
+func compareClustersWithoutID(f *frisby.Frisby, clusters, expected []Cluster) {
 	if len(clusters) != len(expected) {
 		f.AddError(fmt.Sprintf("%d clusters are expected, but got %d", len(expected), len(clusters)))
 		return
