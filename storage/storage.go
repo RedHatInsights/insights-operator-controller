@@ -499,7 +499,7 @@ func (storage Storage) GetConfigurationProfile(id int) (ConfigurationProfile, er
 }
 
 // StoreConfigurationProfile stores a given configuration profile (string ATM) into the database.
-func (storage Storage) StoreConfigurationProfile(username string, description string, configuration string) ([]ConfigurationProfile, error) {
+func (storage Storage) StoreConfigurationProfile(username, description, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
 	t := time.Now()
@@ -530,7 +530,7 @@ func (storage Storage) StoreConfigurationProfile(username string, description st
 }
 
 // ChangeConfigurationProfile updates the existing configuration profile specified by its ID.
-func (storage Storage) ChangeConfigurationProfile(id int, username string, description string, configuration string) ([]ConfigurationProfile, error) {
+func (storage Storage) ChangeConfigurationProfile(id int, username, description, configuration string) ([]ConfigurationProfile, error) {
 	var profiles []ConfigurationProfile
 
 	t := time.Now()
@@ -767,7 +767,7 @@ SELECT operator_configuration.id
 }
 
 // InsertNewConfigurationProfile inserts new configuration profile into a database (in transaction).
-func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration string, username string, description string) bool {
+func (storage Storage) InsertNewConfigurationProfile(tx *sql.Tx, configuration, username, description string) bool {
 	t := time.Now()
 
 	statement, err := tx.Prepare("INSERT INTO configuration_profile(configuration, changed_at, changed_by, description) VALUES ($1, $2, $3, $4)")
@@ -858,7 +858,7 @@ func (storage Storage) DeactivatePreviousConfigurations(tx *sql.Tx, clusterID Cl
 
 // InsertNewOperatorConfiguration inserts the new configuration for selected operator/cluster.
 // To be called inside transaction.
-func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username string, reason string) error {
+func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID ClusterID, configurationID int, username, reason string) error {
 	t := time.Now()
 	statement, err := tx.Prepare("INSERT INTO operator_configuration(cluster, configuration, changed_at, changed_by, active, reason) VALUES ($1, $2, $3, $4, $5, $6)")
 
@@ -884,7 +884,7 @@ func (storage Storage) InsertNewOperatorConfiguration(tx *sql.Tx, clusterID Clus
 }
 
 // CreateClusterConfiguration creates new configuration for specified cluster.
-func (storage Storage) CreateClusterConfiguration(cluster string, username string, reason string, description, configuration string) ([]ClusterConfiguration, error) {
+func (storage Storage) CreateClusterConfiguration(cluster, username, reason, description, configuration string) ([]ClusterConfiguration, error) {
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(cluster)
 
@@ -944,7 +944,7 @@ func (storage Storage) CreateClusterConfiguration(cluster string, username strin
 }
 
 // EnableClusterConfiguration enables the specified cluster configuration (set the 'active' flag).
-func (storage Storage) EnableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
+func (storage Storage) EnableClusterConfiguration(cluster, username, reason string) ([]ClusterConfiguration, error) {
 	id, err := storage.GetConfigurationIDForCluster(cluster)
 	if err != nil {
 		return []ClusterConfiguration{}, err
@@ -976,7 +976,7 @@ func (storage Storage) EnableClusterConfiguration(cluster string, username strin
 
 // DisableClusterConfiguration disables the specified cluster configuration (reset the 'active' flag).
 // TODO: copy & paste, needs to be refactored later
-func (storage Storage) DisableClusterConfiguration(cluster string, username string, reason string) ([]ClusterConfiguration, error) {
+func (storage Storage) DisableClusterConfiguration(cluster, username, reason string) ([]ClusterConfiguration, error) {
 	id, err := storage.GetConfigurationIDForCluster(cluster)
 	if err != nil {
 		return []ClusterConfiguration{}, err
@@ -1312,7 +1312,7 @@ func (storage Storage) GetTriggerID(triggerType string) (int, error) {
 }
 
 // NewTrigger constructs new trigger in a database.
-func (storage Storage) NewTrigger(clusterName string, triggerType string, userName string, reason string, link string) error {
+func (storage Storage) NewTrigger(clusterName, triggerType, userName, reason, link string) error {
 	// retrieve cluster ID
 	clusterInfo, err := storage.GetClusterByName(clusterName)
 	clusterID := clusterInfo.ID
@@ -1356,7 +1356,7 @@ func (storage Storage) NewTrigger(clusterName string, triggerType string, userNa
 }
 
 // NewTriggerType inserts a trigger_type object in the database
-func (storage Storage) NewTriggerType(ttype string, description string) error {
+func (storage Storage) NewTriggerType(ttype, description string) error {
 	statement, err := storage.connections.Prepare("INSERT INTO trigger_type(type, description) VALUES ($1, $2)")
 	if err != nil {
 		log.Print(err)
