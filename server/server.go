@@ -37,7 +37,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -85,7 +84,7 @@ func checkSplunkOperation(err error) {
 
 // createTLSServer methods creates an instance of HTTPS server using TLS
 func (s Server) createTLSServer(router http.Handler) *http.Server {
-	caCert, err := ioutil.ReadFile(s.TLSCert)
+	caCert, err := os.ReadFile(s.TLSCert)
 	if err != nil {
 		log.Fatal(err)
 	}
