@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ const sqlite3 = "sqlite3"
 const dataSource = ":memory:"
 
 // MustGetMockStorage creates test sqlite storage in file or in memory
-func MustGetMockStorage(tb testing.TB, init bool) (storage.Storage, func()) {
+func MustGetMockStorage(tb testing.TB, init bool) (storageImpl storage.Storage, closer func()) {
 	sqliteStorage, _ := mustGetSqliteStorage(tb, dataSource, init)
 
 	return sqliteStorage, func() {
