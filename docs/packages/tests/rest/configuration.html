@@ -102,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/tests/res
 	<div class="ident">Configuration</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterConfiguration</div> <div class="literal">`json:&#34;configuration&#34;`</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">compareConfigurations</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">configurations</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterConfiguration</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterConfiguration</div><div class="operator">)</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">compareConfigurations</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">configurations</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterConfiguration</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">configurations</div><div class="operator">)</div> <div class="operator">!=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div> <div class="operator">{</div>
 		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;%d configurations are expected, but got %d&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">configurations</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>

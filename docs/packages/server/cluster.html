@@ -103,7 +103,7 @@
 	<td class="doc"><p>Cluster handling REST API implementation</p>
 </td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -202,7 +202,13 @@ which might be caused by issue in Gorilla mux (not on client side)</p>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
-	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">strings</div><div class="operator">.</div><div class="ident">TrimSpace</div><div class="operator">(</div><div class="ident">clusterName</div><div class="operator">)</div><div class="operator">)</div> <div class="operator">==</div> <div class="literal">0</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if cluster name provided by user is empty</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">TrimSpace</div><div class="operator">(</div><div class="ident">clusterName</div><div class="operator">)</div> <div class="operator">==</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 		<div class="ident">TryToSendResponse</div><div class="operator">(</div><div class="ident">http</div><div class="operator">.</div><div class="ident">StatusBadRequest</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;Cluster name shouldn&#39;t be empty&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
@@ -214,6 +220,7 @@ which might be caused by issue in Gorilla mux (not on client side)</p>
 	<td class="doc"><p>try to record the action CreateNewCluster into Splunk</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Splunk</div><div class="operator">.</div><div class="ident">LogAction</div><div class="operator">(</div><div class="literal">&#34;CreateNewCluster&#34;</div><div class="operator">,</div> <div class="literal">&#34;tester&#34;</div><div class="operator">,</div> <div class="ident">clusterName</div><div class="operator">)</div><div class="operator"></div>
+
 </code></pre></td>
       </tr>
       
@@ -222,13 +229,7 @@ which might be caused by issue in Gorilla mux (not on client side)</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">checkSplunkOperation</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>err := storage.CreateNewCluster(clusterId, clusterName)</p>
-</td>
-	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">RegisterNewCluster</div><div class="operator">(</div><div class="ident">clusterName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">s</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">.</div><div class="ident">RegisterNewCluster</div><div class="operator">(</div><div class="ident">clusterName</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Cannot create new cluster&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">TryToSendInternalServerError</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
@@ -491,7 +492,7 @@ case sensitive</p>
       <tr class="section">
 	<td class="doc"><p>oneOfIDOrNameValidation validates that id or name is filled</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">oneOfIDOrNameValidation</div><div class="operator">(</div><div class="ident">i</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">context</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">oneOfIDOrNameValidation</div><div class="operator">(</div><div class="ident">i</div><div class="operator">,</div> <div class="ident">context</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
       
@@ -506,12 +507,19 @@ case sensitive</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>the int validation is done next by validator, we are just checking if its filled</p>
+	<td class="doc"><p>the int validation is done next by validator, we are just checking
+if its filled-in</p>
 </td>
-	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">id</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;id&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">id</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;id&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">id</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">true</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">if</div> <div class="ident">name</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;name&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">name</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if name is filled-in</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">name</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;name&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">name</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">true</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 	<div class="keyword">return</div> <div class="ident">false</div><div class="operator"></div>

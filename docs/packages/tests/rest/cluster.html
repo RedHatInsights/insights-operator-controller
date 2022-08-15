@@ -102,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -214,7 +214,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/tests/res
 	<div class="keyword">return</div> <div class="ident">response</div><div class="operator">.</div><div class="ident">Clusters</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusterID</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">createCluster</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusterID</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="ident">f</div><div class="operator">.</div><div class="ident">Post</div><div class="operator">(</div><div class="ident">API_URL</div> <div class="operator">&#43;</div> <div class="literal">&#34;client/cluster/&#34;</div> <div class="operator">&#43;</div> <div class="ident">clusterName</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">f</div><div class="operator">.</div><div class="ident">Send</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">201</div><div class="operator">)</div><div class="operator"></div>
@@ -226,7 +226,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/tests/res
 	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectHeader</div><div class="operator">(</div><div class="literal">&#34;Content-Type&#34;</div><div class="operator">,</div> <div class="literal">&#34;application/json; charset=utf-8&#34;</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div> <div class="operator">!=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div> <div class="operator">{</div>
 		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;%d clusters are expected, but got %d&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
@@ -239,7 +239,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/tests/res
 	<div class="operator">}</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">compareClustersWithoutID</div><div class="operator">(</div><div class="ident">f</div> <div class="operator">*</div><div class="ident">frisby</div><div class="operator">.</div><div class="ident">Frisby</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div> <div class="operator">!=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div> <div class="operator">{</div>
 		<div class="ident">f</div><div class="operator">.</div><div class="ident">AddError</div><div class="operator">(</div><div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div><div class="literal">&#34;%d clusters are expected, but got %d&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">expected</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div><div class="operator"></div>
@@ -380,32 +380,34 @@ https://redhatinsights.github.io/insights-operator-controller/packages/tests/res
 	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">checkDeleteAllClusters</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
-	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check deleting all existing clusters&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="comment">/*
+func checkDeleteAllClusters() {
+	f := frisby.Create(&#34;Check deleting all existing clusters&#34;)
 
-	<div class="ident">clusters</div> <div class="operator">:=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">expected</div> <div class="operator">:=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div>
-		<div class="operator">{</div><div class="literal">0</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">}</div><div class="operator">,</div>
-		<div class="operator">{</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000001&#34;</div><div class="operator">}</div><div class="operator">,</div>
-		<div class="operator">{</div><div class="literal">2</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000002&#34;</div><div class="operator">}</div><div class="operator">,</div>
-		<div class="operator">{</div><div class="literal">3</div><div class="operator">,</div> <div class="literal">&#34;00000000-0000-0000-0000-000000000003&#34;</div><div class="operator">}</div><div class="operator">,</div>
-	<div class="operator">}</div><div class="operator"></div>
-	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+	clusters := readListOfClusters(f)
+	expected := []Cluster{
+		{0, &#34;00000000-0000-0000-0000-000000000000&#34;},
+		{1, &#34;00000000-0000-0000-0000-000000000001&#34;},
+		{2, &#34;00000000-0000-0000-0000-000000000002&#34;},
+		{3, &#34;00000000-0000-0000-0000-000000000003&#34;},
+	}
+	compareClusters(f, clusters, expected)
 
-	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;0&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;1&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;2&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">deleteCluster</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="literal">&#34;3&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">f</div><div class="operator">.</div><div class="ident">ExpectStatus</div><div class="operator">(</div><div class="literal">200</div><div class="operator">)</div><div class="operator"></div>
+	deleteCluster(f, &#34;0&#34;)
+	f.ExpectStatus(200)
+	deleteCluster(f, &#34;1&#34;)
+	f.ExpectStatus(200)
+	deleteCluster(f, &#34;2&#34;)
+	f.ExpectStatus(200)
+	deleteCluster(f, &#34;3&#34;)
+	f.ExpectStatus(200)
 
-	<div class="ident">clusters</div> <div class="operator">=</div> <div class="ident">readListOfClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">)</div><div class="operator"></div>
+	clusters = readListOfClusters(f)
 
-	<div class="ident">expected</div> <div class="operator">=</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">Cluster</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
-	<div class="ident">compareClusters</div><div class="operator">(</div><div class="ident">f</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
-<div class="operator">}</div><div class="operator"></div>
+	expected = []Cluster{}
+	compareClusters(f, clusters, expected)
+}
+*/</div>
 
 <div class="keyword">func</div> <div class="ident">checkCreateNewCluster</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="ident">f</div> <div class="operator">:=</div> <div class="ident">frisby</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="literal">&#34;Check creating new cluster&#34;</div><div class="operator">)</div><div class="operator"></div>

@@ -103,7 +103,7 @@
 	<td class="doc"><p>Utils for working with maps</p>
 </td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ map[string][]string  (for example r.URL.Query() or r.Form (as url.Values))</p>
 	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">srcm</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">srcs</div> <div class="operator">{</div>
 		<div class="keyword">var</div> <div class="ident">toMerge</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
 
-		<div class="keyword">switch</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="ident">srcm</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">type</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="keyword">switch</div> <div class="ident">v</div> <div class="operator">:=</div> <div class="ident">srcm</div><div class="operator">.</div><div class="operator">(</div><div class="keyword">type</div><div class="operator">)</div> <div class="operator">{</div>
 		<div class="keyword">case</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">:</div>
 			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">v</div><div class="operator"></div>
 
@@ -157,7 +157,7 @@ map[string][]string  (for example r.URL.Query() or r.Form (as url.Values))</p>
 			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">interMap</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator"></div>
 
 		<div class="keyword">case</div> <div class="ident">url</div><div class="operator">.</div><div class="ident">Values</div><div class="operator">:</div>
-			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">interMap</div><div class="operator">(</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">)</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">toMerge</div> <div class="operator">=</div> <div class="ident">interMap</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">(</div><div class="ident">v</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 
 		<div class="keyword">default</div><div class="operator">:</div>
 			<div class="ident">panic</div><div class="operator">(</div><div class="literal">&#34;unknown type&#34;</div><div class="operator">)</div><div class="operator"></div>
