@@ -102,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -183,7 +183,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/utils/val
       <tr class="section">
 	<td class="doc"><p>oneOfIDOrNameValidation validates that id or name is filled</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">oneOfIDOrNameValidation</div><div class="operator">(</div><div class="ident">i</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">context</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">oneOfIDOrNameValidation</div><div class="operator">(</div><div class="ident">i</div><div class="operator">,</div> <div class="ident">context</div> <div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
       
@@ -200,10 +200,10 @@ https://redhatinsights.github.io/insights-operator-controller/packages/utils/val
       <tr class="section">
 	<td class="doc"><p>the int validation is done next by validator, we are just checking if its filled</p>
 </td>
-	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">id</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;id&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">id</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">id</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;id&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">id</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">true</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">if</div> <div class="ident">name</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;name&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">name</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">0</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">name</div><div class="operator">,</div> <div class="ident">ok</div> <div class="operator">:=</div> <div class="ident">v</div><div class="operator">[</div><div class="literal">&#34;name&#34;</div><div class="operator">]</div><div class="operator">.</div><div class="operator">(</div><div class="ident">string</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">ok</div> <div class="operator">&amp;&amp;</div> <div class="ident">name</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">true</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 	<div class="keyword">return</div> <div class="ident">false</div><div class="operator"></div>

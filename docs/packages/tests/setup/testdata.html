@@ -100,7 +100,7 @@
     <tbody>
       
       <tr class="section">
-	<td class="doc"><p>Copyright 2020 Red Hat, Inc</p>
+	<td class="doc"><p>Copyright 2020, 2021, 2022 Red Hat, Inc</p>
 
 <p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
 you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ methods for creating dummy data for tests
 Insert the same dbDriver and storageSpecification you expect to use
 in your test to have meaningful and coherent tests</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">NewDataGenerator</div><div class="operator">(</div><div class="ident">dbDriver</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">storageSpecification</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">DataGenerator</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">NewDataGenerator</div><div class="operator">(</div><div class="ident">dbDriver</div><div class="operator">,</div> <div class="ident">storageSpecification</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">DataGenerator</div> <div class="operator">{</div>
 	<div class="keyword">var</div> <div class="ident">returnMe</div> <div class="ident">DataGenerator</div><div class="operator"></div>
 	<div class="ident">returnMe</div><div class="operator">.</div><div class="ident">storage</div><div class="operator">,</div> <div class="ident">_</div> <div class="operator">=</div> <div class="ident">storage</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">dbDriver</div><div class="operator">,</div> <div class="ident">storageSpecification</div><div class="operator">)</div><div class="operator"></div>
 
@@ -345,7 +345,7 @@ trigger objects into the database</p>
 	<td class="doc"><p>InsertTriggerType inserts one trigger_type object with ttype type and
 description</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">g</div> <div class="ident">DataGenerator</div><div class="operator">)</div> <div class="ident">InsertTriggerType</div><div class="operator">(</div><div class="ident">ttype</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">description</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">g</div> <div class="ident">DataGenerator</div><div class="operator">)</div> <div class="ident">InsertTriggerType</div><div class="operator">(</div><div class="ident">ttype</div><div class="operator">,</div> <div class="ident">description</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
 	<div class="keyword">return</div> <div class="ident">g</div><div class="operator">.</div><div class="ident">storage</div><div class="operator">.</div><div class="ident">NewTriggerType</div><div class="operator">(</div><div class="ident">ttype</div><div class="operator">,</div> <div class="ident">description</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 

@@ -103,7 +103,7 @@
 	<td class="doc"><p>Auth implementation based on JWT</p>
 </td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
 
 	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/responses&#34;</div><div class="operator"></div>
 
-	<div class="ident">jwt</div> <div class="literal">&#34;github.com/dgrijalva/jwt-go&#34;</div><div class="operator"></div>
+	<div class="ident">jwt</div> <div class="literal">&#34;github.com/golang-jwt/jwt/v4&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 <div class="keyword">type</div> <div class="ident">contextKey</div> <div class="ident">string</div><div class="operator"></div>
@@ -176,10 +176,16 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
 
 	<div class="keyword">return</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">HandlerFunc</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="ident">w</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">ResponseWriter</div><div class="operator">,</div> <div class="ident">r</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Request</div><div class="operator">)</div> <div class="operator">{</div>
 
-		<div class="ident">tokenHeader</div> <div class="operator">:=</div> <div class="ident">r</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">.</div><div class="ident">Get</div><div class="operator">(</div><div class="literal">&#34;Authorization&#34;</div><div class="operator">)</div> <div class="operator"></div><div class="comment">//Grab the token from the header</div>
+		<div class="ident">tokenHeader</div> <div class="operator">:=</div> <div class="ident">r</div><div class="operator">.</div><div class="ident">Header</div><div class="operator">.</div><div class="ident">Get</div><div class="operator">(</div><div class="literal">&#34;Authorization&#34;</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// Grab the token from the header</div>
 
-		<div class="keyword">if</div> <div class="ident">tokenHeader</div> <div class="operator">==</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div> <div class="comment">//Token is missing, returns with error code 403 Unauthorized</div>
-			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Missing auth token&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">tokenHeader</div> <div class="operator">==</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Token is missing, returns with error code 403 Unauthorized</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Missing auth token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 				<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error sending response about missing auth token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="operator">}</div><div class="operator"></div>
@@ -192,8 +198,15 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
 	<td class="code"><pre><code>			<div class="keyword">return</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 
-		<div class="ident">splitted</div> <div class="operator">:=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Split</div><div class="operator">(</div><div class="ident">tokenHeader</div><div class="operator">,</div> <div class="literal">&#34; &#34;</div><div class="operator">)</div> <div class="operator"></div><div class="comment">//The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement</div>
-		<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">splitted</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
+		<div class="ident">splitted</div> <div class="operator">:=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Split</div><div class="operator">(</div><div class="ident">tokenHeader</div><div class="operator">,</div> <div class="literal">&#34; &#34;</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>The token normally comes in format <code>Bearer {token-body}</code>, we
+check if the retrieved token matched this requirement</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">splitted</div><div class="operator">)</div> <div class="operator">!=</div> <div class="literal">2</div> <div class="operator">{</div>
 			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Invalid/Malformed auth token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 				<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error sending response about invalid/malformed auth token&#34;</div><div class="operator">)</div><div class="operator"></div>
@@ -207,15 +220,21 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
 	<td class="code"><pre><code>			<div class="keyword">return</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 
-		<div class="ident">tokenPart</div> <div class="operator">:=</div> <div class="ident">splitted</div><div class="operator">[</div><div class="literal">1</div><div class="operator">]</div> <div class="operator"></div><div class="comment">//Grab the token part, what we are truly interested in</div>
+		<div class="ident">tokenPart</div> <div class="operator">:=</div> <div class="ident">splitted</div><div class="operator">[</div><div class="literal">1</div><div class="operator">]</div> <div class="operator"></div><div class="comment">// Grab the token part, what we are truly interested in</div>
 		<div class="ident">tk</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">Token</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
 
 		<div class="ident">token</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">jwt</div><div class="operator">.</div><div class="ident">ParseWithClaims</div><div class="operator">(</div><div class="ident">tokenPart</div><div class="operator">,</div> <div class="ident">tk</div><div class="operator">,</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">token</div> <div class="operator">*</div><div class="ident">jwt</div><div class="operator">.</div><div class="ident">Token</div><div class="operator">)</div> <div class="operator">(</div><div class="keyword">interface</div><div class="operator">{</div><div class="operator">}</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 			<div class="keyword">return</div> <div class="operator">[</div><div class="operator">]</div><div class="ident">byte</div><div class="operator">(</div><div class="ident">os</div><div class="operator">.</div><div class="ident">Getenv</div><div class="operator">(</div><div class="literal">&#34;token_password&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
 
-		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div> <div class="comment">//Malformed token, returns with http code 403 as usual</div>
-			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Malformed authentication token&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>malformed token, returns with HTTP code 403 as usual</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Malformed authentication token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 				<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error sending response about malformed authentication token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="operator">}</div><div class="operator"></div>
@@ -228,8 +247,14 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
 	<td class="code"><pre><code>			<div class="keyword">return</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 
-		<div class="keyword">if</div> <div class="operator">!</div><div class="ident">token</div><div class="operator">.</div><div class="ident">Valid</div> <div class="operator">{</div> <div class="comment">//Token is invalid, maybe not signed on this server</div>
-			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Token is not valid.&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="operator">!</div><div class="ident">token</div><div class="operator">.</div><div class="ident">Valid</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>token is invalid, maybe not signed on this server</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">responses</div><div class="operator">.</div><div class="ident">SendForbidden</div><div class="operator">(</div><div class="ident">w</div><div class="operator">,</div> <div class="literal">&#34;Token is not valid.&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 				<div class="ident">log</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error sending response about not valid authentication token&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="operator">}</div><div class="operator"></div>
@@ -246,10 +271,12 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/au
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token</p>
+	<td class="doc"><p>Everything went well, proceed with the request and set the
+caller to the user retrieved from the parsed token</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">ctx</div> <div class="operator">:=</div> <div class="ident">context</div><div class="operator">.</div><div class="ident">WithValue</div><div class="operator">(</div><div class="ident">r</div><div class="operator">.</div><div class="ident">Context</div><div class="operator">(</div><div class="operator">)</div><div class="operator">,</div> <div class="ident">contextKeyUser</div><div class="operator">,</div> <div class="ident">tk</div><div class="operator">.</div><div class="ident">Login</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">r</div> <div class="operator">=</div> <div class="ident">r</div><div class="operator">.</div><div class="ident">WithContext</div><div class="operator">(</div><div class="ident">ctx</div><div class="operator">)</div><div class="operator"></div>
+
 </code></pre></td>
       </tr>
       

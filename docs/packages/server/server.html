@@ -102,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -150,7 +150,6 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/se
 	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus/promauto&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/prometheus/client_golang/prometheus/promhttp&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;io&#34;</div><div class="operator"></div>
-	<div class="literal">&#34;io/ioutil&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;log&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;net/http&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
@@ -233,29 +232,31 @@ https://redhatinsights.github.io/insights-operator-controller/packages/server/se
 	<td class="doc"><p>createTLSServer methods creates an instance of HTTPS server using TLS</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="operator">(</div><div class="ident">s</div> <div class="ident">Server</div><div class="operator">)</div> <div class="ident">createTLSServer</div><div class="operator">(</div><div class="ident">router</div> <div class="ident">http</div><div class="operator">.</div><div class="ident">Handler</div><div class="operator">)</div> <div class="operator">*</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Server</div> <div class="operator">{</div>
-	<div class="ident">caCert</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">ioutil</div><div class="operator">.</div><div class="ident">ReadFile</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">TLSCert</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">caCert</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">ReadFile</div><div class="operator">(</div><div class="ident">s</div><div class="operator">.</div><div class="ident">TLSCert</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Fatal</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 	<div class="ident">caCertPool</div> <div class="operator">:=</div> <div class="ident">x509</div><div class="operator">.</div><div class="ident">NewCertPool</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">caCertPool</div><div class="operator">.</div><div class="ident">AppendCertsFromPEM</div><div class="operator">(</div><div class="ident">caCert</div><div class="operator">)</div><div class="operator"></div>
+
 </code></pre></td>
       </tr>
       
       <tr class="section">
 	<td class="doc"><p>disable &quot;G402 (CWE-295): TLS MinVersion too low. (Confidence: HIGH, Severity: HIGH)&quot;</p>
-
-<h1>nosec G402</h1>
 </td>
 	<td class="code"><pre><code>	<div class="ident">tlsConfig</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">tls</div><div class="operator">.</div><div class="ident">Config</div><div class="operator">{</div>
 		<div class="ident">ClientCAs</div><div class="operator">:</div>  <div class="ident">caCertPool</div><div class="operator">,</div>
 		<div class="ident">ClientAuth</div><div class="operator">:</div> <div class="ident">tls</div><div class="operator">.</div><div class="ident">RequireAndVerifyClientCert</div><div class="operator">,</div>
-	<div class="operator">}</div><div class="operator"></div>
-	<div class="ident">tlsConfig</div><div class="operator">.</div><div class="ident">BuildNameToCertificate</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="operator"></div><div class="comment">// #nosec G402</div>
+
 	<div class="ident">server</div> <div class="operator">:=</div> <div class="operator">&amp;</div><div class="ident">http</div><div class="operator">.</div><div class="ident">Server</div><div class="operator">{</div>
-		<div class="ident">Addr</div><div class="operator">:</div>      <div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">,</div>
-		<div class="ident">TLSConfig</div><div class="operator">:</div> <div class="ident">tlsConfig</div><div class="operator">,</div>
-		<div class="ident">Handler</div><div class="operator">:</div>   <div class="ident">router</div><div class="operator">,</div>
+		<div class="ident">Addr</div><div class="operator">:</div>              <div class="ident">s</div><div class="operator">.</div><div class="ident">Address</div><div class="operator">,</div>
+		<div class="ident">TLSConfig</div><div class="operator">:</div>         <div class="ident">tlsConfig</div><div class="operator">,</div>
+		<div class="ident">Handler</div><div class="operator">:</div>           <div class="ident">router</div><div class="operator">,</div>
+		<div class="ident">ReadTimeout</div><div class="operator">:</div>       <div class="literal">1</div> <div class="operator">*</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Minute</div><div class="operator">,</div>
+		<div class="ident">ReadHeaderTimeout</div><div class="operator">:</div> <div class="literal">5</div> <div class="operator">*</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Second</div><div class="operator">,</div>
+		<div class="ident">WriteTimeout</div><div class="operator">:</div>      <div class="literal">30</div> <div class="operator">*</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Second</div><div class="operator">,</div>
 	<div class="operator">}</div><div class="operator"></div>
 
 	<div class="keyword">return</div> <div class="ident">server</div><div class="operator"></div>
