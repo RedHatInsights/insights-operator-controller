@@ -96,7 +96,7 @@ func (s Server) createTLSServer(router http.Handler) *http.Server {
 		ClientCAs:  caCertPool,
 		ClientAuth: tls.RequireAndVerifyClientCert,
 	} // #nosec G402
-	tlsConfig.BuildNameToCertificate()
+
 	server := &http.Server{
 		Addr:              s.Address,
 		TLSConfig:         tlsConfig,
