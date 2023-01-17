@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -80,6 +80,19 @@ func checkSplunkOperation(err error) {
 	if err != nil {
 		log.Println("(not critical) Log into splunk failed", err)
 	}
+}
+
+// createServer method creates an instance of HTTP server
+func (s Server) createServer(router http.Handler) *http.Server {
+	server := &http.Server{
+		Addr:              s.Address,
+		Handler:           router,
+		ReadTimeout:       1 * time.Minute,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      30 * time.Second,
+	}
+
+	return server
 }
 
 // createTLSServer methods creates an instance of HTTPS server using TLS
@@ -270,7 +283,8 @@ func (s Server) Initialize() {
 		server := s.createTLSServer(router)
 		err = server.ListenAndServeTLS(s.TLSCert, s.TLSKey)
 	} else {
-		err = http.ListenAndServe(s.Address, router)
+		server := s.createServer(router)
+		err = server.ListenAndServe()
 	}
 	if err != nil {
 		log.Fatal("Unable to initialize HTTP server", err)
