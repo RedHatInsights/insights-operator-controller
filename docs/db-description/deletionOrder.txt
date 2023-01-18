@@ -1,0 +1,5 @@
+trigger
+operator_configuration
+trigger_type
+configuration_profile
+cluster
