@@ -26,6 +26,7 @@
 * [Testing](#testing)
     * [Unit tests](#unit-tests)
     * [REST API tests](#rest-api-tests)
+    * [BDD tests](#bdd-tests)
 * [Code style and cyclomatic complexity checks](#code-style-and-cyclomatic-complexity-checks)
 * [CI](#ci)
 * [Contribution](#contribution)
@@ -206,6 +207,17 @@ perform REST API tests, start the following script:
 ```
 
 Please note that the service should not be running at the same moment (as it used the same port).
+
+### BDD tests
+
+Behaviour tests for this service are included in [Insights Behavioral
+Spec](https://github.com/RedHatInsights/insights-behavioral-spec) repository.
+In order to run these tests, the following steps need to be made:
+
+1. clone the [Insights Behavioral Spec](https://github.com/RedHatInsights/insights-behavioral-spec) repository
+1. go into the cloned subdirectory `insights-behavioral-spec`
+
+
 
 ## Code style and cyclomatic complexity checks
 
