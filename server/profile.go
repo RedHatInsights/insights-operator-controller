@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020, 2021 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import (
 )
 
 // ListConfigurationProfiles method reads list of configuration profiles.
-func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) ListConfigurationProfiles(writer http.ResponseWriter, request *http.Request) {
 	// try to read list of configuration profiles from storage
 	profiles, err := s.Storage.ListConfigurationProfiles()
 
@@ -45,7 +45,7 @@ func (s Server) ListConfigurationProfiles(writer http.ResponseWriter, request *h
 }
 
 // GetConfigurationProfile method reads profile specified by its ID
-func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -67,7 +67,7 @@ func (s Server) GetConfigurationProfile(writer http.ResponseWriter, request *htt
 }
 
 // NewConfigurationProfile method creates new configuration profile
-func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) NewConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	// username needs to be specified in request
 	username, foundUsername := request.URL.Query()["username"]
 
@@ -109,7 +109,7 @@ func (s Server) NewConfigurationProfile(writer http.ResponseWriter, request *htt
 }
 
 // DeleteConfigurationProfile method deletes configuration profile
-func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -136,7 +136,7 @@ func (s Server) DeleteConfigurationProfile(writer http.ResponseWriter, request *
 }
 
 // ChangeConfigurationProfile method changes configuration profile
-func (s Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) ChangeConfigurationProfile(writer http.ResponseWriter, request *http.Request) {
 	// profile ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 
