@@ -60,7 +60,7 @@ type testCase struct {
 }
 
 // testRequest tests a single testCase
-func testRequest(t *testing.T, test testCase) {
+func testRequest(t *testing.T, test *testCase) {
 	t.Run(test.testName, func(t *testing.T) {
 
 		req, _ := http.NewRequest(test.requestMethod, "", bytes.NewBufferString(test.reqBody))
