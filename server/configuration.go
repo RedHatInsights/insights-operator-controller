@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ func sendConfiguration(writer http.ResponseWriter, configuration string) {
 }
 
 // GetConfiguration method returns single configuration by id
-func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -62,7 +62,7 @@ func (s Server) GetConfiguration(writer http.ResponseWriter, request *http.Reque
 }
 
 // DeleteConfiguration method removes single configuration specified by its ID
-func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -89,7 +89,7 @@ func (s Server) DeleteConfiguration(writer http.ResponseWriter, request *http.Re
 }
 
 // GetAllConfigurations method reads and returns list of all configurations
-func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetAllConfigurations(writer http.ResponseWriter, request *http.Request) {
 	// try to read list of all configurations from storage
 	configuration, err := s.Storage.ListAllClusterConfigurations()
 
@@ -102,7 +102,7 @@ func (s Server) GetAllConfigurations(writer http.ResponseWriter, request *http.R
 }
 
 // GetClusterConfiguration method returns list of configuration for single cluster
-func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified it request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -124,7 +124,7 @@ func (s Server) GetClusterConfiguration(writer http.ResponseWriter, request *htt
 }
 
 // EnableOrDisableConfiguration method enables or disables single cluster configuration
-func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, active string) {
+func (s *Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request *http.Request, active string) {
 	// configuration ID needs to be specified in request
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -164,17 +164,17 @@ func (s Server) EnableOrDisableConfiguration(writer http.ResponseWriter, request
 }
 
 // EnableConfiguration method enables single configuration
-func (s Server) EnableConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) EnableConfiguration(writer http.ResponseWriter, request *http.Request) {
 	s.EnableOrDisableConfiguration(writer, request, "1")
 }
 
 // DisableConfiguration method disables single configuration
-func (s Server) DisableConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DisableConfiguration(writer http.ResponseWriter, request *http.Request) {
 	s.EnableOrDisableConfiguration(writer, request, "0")
 }
 
 // NewClusterConfiguration method creates configuration for single cluster
-func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) NewClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -229,7 +229,7 @@ func (s Server) NewClusterConfiguration(writer http.ResponseWriter, request *htt
 }
 
 // EnableClusterConfiguration method enables cluster configuration
-func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) EnableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -270,7 +270,7 @@ func (s Server) EnableClusterConfiguration(writer http.ResponseWriter, request *
 }
 
 // DisableClusterConfiguration method disables cluster configuration
-func (s Server) DisableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DisableClusterConfiguration(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
