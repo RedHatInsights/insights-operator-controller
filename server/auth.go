@@ -1,7 +1,7 @@
 // Auth implementation based on JWT
 
 /*
-Copyright © 2019, 2020, 2021, 2022 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ type Token struct {
 }
 
 // JWTAuthentication middleware for checking auth rights
-func (s Server) JWTAuthentication(next http.Handler) http.Handler {
+func (s *Server) JWTAuthentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
