@@ -1,7 +1,7 @@
 // Cluster handling REST API implementation
 
 /*
-Copyright © 2019, 2020, 2021 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import (
 )
 
 // GetClusters method reads list of all clusters from database and return it to a client.
-func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 	// try to retrieve list of clusters from storage
 	clusters, err := s.Storage.ListOfClusters()
 
@@ -53,7 +53,7 @@ func (s Server) GetClusters(writer http.ResponseWriter, request *http.Request) {
 }
 
 // NewCluster method creates a record with new cluster in a database. The updated list of all clusters is returned to client.
-func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 	// get the cluster name from request
 	clusterName, foundName := mux.Vars(request)["name"]
 
@@ -96,7 +96,7 @@ func (s Server) NewCluster(writer http.ResponseWriter, request *http.Request) {
 }
 
 // GetClusterByID method reads cluster specified by its ID and return it to a client.
-func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetClusterByID(writer http.ResponseWriter, request *http.Request) {
 	// try to retrieve cluster ID from query
 	id, err := retrieveIDRequestParameter(request)
 
@@ -121,7 +121,7 @@ func (s Server) GetClusterByID(writer http.ResponseWriter, request *http.Request
 }
 
 // DeleteCluster method deletes a cluster
-func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeleteCluster(writer http.ResponseWriter, request *http.Request) {
 	clusterID, err := retrieveIDRequestParameter(request)
 	if err != nil {
 		log.Println("Cluster ID is not provided or not an integer")
@@ -155,7 +155,7 @@ func (s Server) DeleteCluster(writer http.ResponseWriter, request *http.Request)
 }
 
 // DeleteClusterByName method deletes a cluster
-func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Request) {
 	// get the cluster name from request
 	clusterName, foundName := mux.Vars(request)["name"]
 	if !foundName {
@@ -190,7 +190,7 @@ func (s Server) DeleteClusterByName(writer http.ResponseWriter, request *http.Re
 }
 
 // SearchCluster method searchs for a cluster specified by its ID or name.
-func (s Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) SearchCluster(writer http.ResponseWriter, request *http.Request) {
 	var (
 		req     storage.SearchClusterRequest
 		cluster *storage.Cluster

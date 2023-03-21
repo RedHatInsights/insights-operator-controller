@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import (
 )
 
 // ReadConfigurationForOperator method reads configuration for the operator.
-func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) ReadConfigurationForOperator(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -62,7 +62,7 @@ func (s Server) ReadConfigurationForOperator(writer http.ResponseWriter, request
 }
 
 // RegisterCluster method registers new cluster.
-func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) RegisterCluster(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	clusterName, foundName := mux.Vars(request)["cluster"]
 
@@ -91,7 +91,7 @@ func (s Server) RegisterCluster(writer http.ResponseWriter, request *http.Reques
 }
 
 // GetActiveTriggersForCluster method returns list of triggers for single cluster
-func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -113,7 +113,7 @@ func (s Server) GetActiveTriggersForCluster(writer http.ResponseWriter, request 
 }
 
 // AckTriggerForCluster method perform ack for single cluster's trigger
-func (s Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) AckTriggerForCluster(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {

@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import (
 )
 
 // GetAllTriggers method returns list of all triggers
-func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request) {
 	// try to read list of all triggers from storage
 	triggers, err := s.Storage.ListAllTriggers()
 
@@ -45,7 +45,7 @@ func (s Server) GetAllTriggers(writer http.ResponseWriter, request *http.Request
 }
 
 // GetTrigger method returns single trigger by id
-func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -67,7 +67,7 @@ func (s Server) GetTrigger(writer http.ResponseWriter, request *http.Request) {
 }
 
 // DeleteTrigger method deletes single trigger
-func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request) {
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -98,7 +98,7 @@ func (s Server) DeleteTrigger(writer http.ResponseWriter, request *http.Request)
 }
 
 // ActivateTrigger method actives single trigger
-func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) ActivateTrigger(writer http.ResponseWriter, request *http.Request) {
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -125,7 +125,7 @@ func (s Server) ActivateTrigger(writer http.ResponseWriter, request *http.Reques
 }
 
 // DeactivateTrigger method deactivates single trigger
-func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Request) {
 	// trigger ID needs to be specified in request parameter
 	id, err := retrieveIDRequestParameter(request)
 	if err != nil {
@@ -152,7 +152,7 @@ func (s Server) DeactivateTrigger(writer http.ResponseWriter, request *http.Requ
 }
 
 // GetClusterTriggers method returns list of triggers for single cluster
-func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {
@@ -174,7 +174,7 @@ func (s Server) GetClusterTriggers(writer http.ResponseWriter, request *http.Req
 }
 
 // RegisterClusterTrigger method registers new trigger for cluster
-func (s Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) RegisterClusterTrigger(writer http.ResponseWriter, request *http.Request) {
 	// cluster name needs to be specified in request parameter
 	cluster, found := mux.Vars(request)["cluster"]
 	if !found {

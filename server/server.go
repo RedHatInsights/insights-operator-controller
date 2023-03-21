@@ -83,7 +83,7 @@ func checkSplunkOperation(err error) {
 }
 
 // createServer method creates an instance of HTTP server
-func (s Server) createServer(router http.Handler) *http.Server {
+func (s *Server) createServer(router http.Handler) *http.Server {
 	server := &http.Server{
 		Addr:              s.Address,
 		Handler:           router,
@@ -96,7 +96,7 @@ func (s Server) createServer(router http.Handler) *http.Server {
 }
 
 // createTLSServer methods creates an instance of HTTPS server using TLS
-func (s Server) createTLSServer(router http.Handler) *http.Server {
+func (s *Server) createTLSServer(router http.Handler) *http.Server {
 	caCert, err := os.ReadFile(s.TLSCert)
 	if err != nil {
 		log.Fatal(err)
@@ -156,7 +156,7 @@ func retrieveIDRequestParameter(request *http.Request) (int64, error) {
 }
 
 // MainEndpoint method is handler for the main endpoint of REST API server
-func (s Server) MainEndpoint(writer http.ResponseWriter, request *http.Request) {
+func (s *Server) MainEndpoint(writer http.ResponseWriter, request *http.Request) {
 	start := time.Now()
 	_, err := io.WriteString(writer, "Hello world!\n")
 	if err != nil {
@@ -173,7 +173,7 @@ func logRequestHandler(writer http.ResponseWriter, request *http.Request, nextHa
 }
 
 // LogRequest method represents middleware for loging requests
-func (s Server) LogRequest(nextHandler http.Handler) http.Handler {
+func (s *Server) LogRequest(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(writer http.ResponseWriter, request *http.Request) {
 			logRequestHandler(writer, request, nextHandler)
@@ -181,7 +181,7 @@ func (s Server) LogRequest(nextHandler http.Handler) http.Handler {
 }
 
 // AddDefaultHeaders method represents middleware for adding headers that should be in any response
-func (s Server) AddDefaultHeaders(nextHandler http.Handler) http.Handler {
+func (s *Server) AddDefaultHeaders(nextHandler http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			if Environment != "production" {
@@ -198,7 +198,7 @@ func (s Server) AddDefaultHeaders(nextHandler http.Handler) http.Handler {
 }
 
 // Initialize perform the server initialization
-func (s Server) Initialize() {
+func (s *Server) Initialize() {
 	log.Println("Environment: ", Environment)
 	log.Println("API Prefix: ", APIPrefix)
 	log.Println("Initializing HTTP server at", s.Address)
