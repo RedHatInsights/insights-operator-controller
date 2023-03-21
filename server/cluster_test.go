@@ -1,5 +1,5 @@
 /*
-Copyright © 2019, 2020 Red Hat, Inc.
+Copyright © 2019, 2020, 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ func TestNonErrorsClusterWithoutData(t *testing.T) {
 	}
 
 	for _, tt := range nonErrorTT {
-		testRequest(t, tt)
+		testRequest(t, &tt)
 	}
 }
 
@@ -59,7 +59,7 @@ func TestNonErrorsClusterWithData(t *testing.T) {
 	}
 
 	for _, tt := range nonErrorTT {
-		testRequest(t, tt)
+		testRequest(t, &tt)
 	}
 }
 
@@ -80,7 +80,7 @@ func TestDatabaseErrorCluster(t *testing.T) {
 	serv.Storage.Close()
 
 	for _, tt := range dbErrorTT {
-		testRequest(t, tt)
+		testRequest(t, &tt)
 	}
 }
 
@@ -103,6 +103,6 @@ func TestParameterErrorsCluster(t *testing.T) {
 	}
 
 	for _, tt := range paramErrorTT {
-		testRequest(t, tt)
+		testRequest(t, &tt)
 	}
 }
